@@ -51,7 +51,7 @@
                   {{ requestForm.language }}
                 </p>
                 <p>
-                  {{ requestForm.field[1] }}
+                  {{ requestForm.field && requestForm.field[1] }}
                 </p>
               </div>
             </div>
@@ -508,7 +508,7 @@ export default {
         window.zhuge.track("用户成功付款", {
           价格: this.currentOrder.pay_amount,
           语言: this.requestForm.language,
-          科目: this.requestForm.field[1],
+          科目: this.requestForm.field && this.requestForm.field[1],
           学历: this.requestForm.type,
           论文字数: this.requestForm.word_count,
         });
@@ -516,7 +516,7 @@ export default {
         window.zhuge.track("用户取消付款", {
           价格: this.currentOrder.pay_amount,
           语言: this.requestForm.language,
-          科目: this.requestForm.field[1],
+          科目: this.requestForm.field && this.requestForm.field[1],
           学历: this.requestForm.type,
           论文字数: this.requestForm.word_count,
         });
@@ -635,7 +635,7 @@ export default {
       window.zhuge.track("用户成功付款", {
         价格: this.currentOrder.pay_amount,
         语言: this.requestForm.language,
-        科目: this.requestForm.field[1],
+        科目: this.requestForm.field && this.requestForm.field[1],
         学历: this.requestForm.type,
         论文字数: this.requestForm.word_count,
       });

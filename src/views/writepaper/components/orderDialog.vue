@@ -14,19 +14,21 @@
       <div class="reduceBox">
         <div class="boxLeft">
           <div class="reduceCard">
-            <p>{{ requestForm.title }}</p>
+            <p>
+              {{ requestForm.title ? requestForm.title : "暂无" }}
+            </p>
             <div class="cardChildList">
               <p>
-                {{ requestForm.type }}
+                {{ requestForm.type ? requestForm.type : "暂无" }}
               </p>
               <p>
                 {{ requestForm.word_count ? requestForm.word_count : "暂无" }}
               </p>
               <p>
-                {{ requestForm.language }}
+                {{ requestForm.language ? requestForm.language : "暂无" }}
               </p>
               <p>
-                {{ requestForm.field[1] }}
+                {{ requestForm.field && equestForm.field[1] }}
               </p>
             </div>
           </div>
@@ -393,7 +395,7 @@ export default {
     getDetail() {
       this.$log("d1111", this.requestKey);
       if (this.requestKey) {
-        this.getList({ key: this.requestKey }, 10000);
+        // this.getList({ key: this.requestKey }, 10000);
       } else {
         this.$message({
           type: "warning",

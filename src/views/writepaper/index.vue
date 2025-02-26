@@ -97,7 +97,7 @@
     <!-- 论文查询生辰弹窗 -->
     <order-dialog
       :requestKey="requestKey"
-      :payStatus="payStatus"
+      :payStatus="payStatusPro"
       :paperPercent="paperPercent"
     ></order-dialog>
     <paypopup :requestKey="requestKey" :payStatus="popupStatus"></paypopup>
@@ -139,7 +139,7 @@ export default {
       outlineData: [],
       requestKey: "", //out_trade_no
       requestKeyLine: "", //out_trade_no
-      payStatus: 0,
+      payStatusPro: 0,
       popupStatusLine: 0,
       paperPercent: 0,
       popupStatus: 0,
@@ -247,7 +247,8 @@ export default {
     // 展示论文加载弹窗
     showPaperDialog(data) {
       this.requestKey = data.requestKey;
-      this.payStatus = Date.now();
+      this.payStatusPro = new Date().getTime();
+      console.log("this.payStatusPro", this.payStatusPro);
       if (data.paperPercent && data.paperPercent > 0) {
         this.paperPercent = data.paperPercent;
       }

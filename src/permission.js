@@ -86,7 +86,6 @@ router.beforeEach(async (to, from, next) => {
     store.dispatch("user/setStoreToken", loginId);
     hasToken = loginId;
   }
-  console.log("d-0ddd", hasToken, to);
   if (hasToken) {
     try {
       // 在这里调用一个 API 来验证 token 是否有效
