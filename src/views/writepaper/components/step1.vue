@@ -35,6 +35,18 @@
           <p>{{ outlineStatusText }}<i class="el-icon-loading"></i></p>
           <p class="progressNumber">{{ currentNumber }}%</p>
         </div>
+        <p
+          style="
+            position: absolute;
+            bottom: -30px;
+            left: -50px;
+            width: 260px;
+            font-size: 14px;
+            color: #5c6166;
+          "
+        >
+          深度求索，慢但质量高，预计15分钟完成
+        </p>
       </div>
     </div>
     <div v-else class="errText outlineTitleDesc">

@@ -296,7 +296,7 @@ export default {
       // this.activeIndex = 1;
       this.$store.dispatch("app/setActiveIndex", 1);
       this.$nextTick(() => {
-        eventBus.emit("beginTime", 180);
+        eventBus.emit("beginTime", 900);
         this.$scrollTo("#step1", 500, { offset: -150 });
       });
     },
