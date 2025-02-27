@@ -280,6 +280,16 @@ export default {
       let data = {
         out_trade_no: obj.order.out_trade_no,
       };
+      let outLineData = obj.outline;
+      let requestForm = {
+        title: outLineData.title,
+        language: outLineData.language,
+        type: outLineData.type,
+        field: ["哲学", outLineData.field],
+        key: outLineData.key1,
+        word_count: outLineData.word_count,
+      };
+      this.$store.dispatch("app/setRequestForm", requestForm);
       rePaper(data).then((res) => {
         eventBus.emit("orderDialogChange", false);
         this.$nextTick(() => {
@@ -421,12 +431,22 @@ export default {
     }, 300),
     pushFinish(row) {
       eventBus.emit("orderDialogChange", false);
-
+      console.log("rwo", row);
       // 关闭弹窗
       // 生成一个 0 到 10 之间的随机数，然后加上 30
       const randomNum = Math.random() * 10 + 30;
       // 使用 toFixed(2) 保留两位小数，并将结果转换为浮点数
       this.$log("ddd1111", row, row.order.out_trade_no);
+      let outLineData = row.outline;
+      let requestForm = {
+        title: outLineData.title,
+        language: outLineData.language,
+        type: outLineData.type,
+        field: ["哲学", outLineData.field],
+        key: outLineData.key1,
+        word_count: outLineData.word_count,
+      };
+      this.$store.dispatch("app/setRequestForm", requestForm);
       this.$nextTick(() => {
         eventBus.emit("showEmitPaperDialog", {
           requestKey: row.order.out_trade_no,

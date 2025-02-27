@@ -167,29 +167,19 @@ export default {
         alert("请输入有效的自定义金额");
         return;
       }
-      this.payStatus = new Date().getTime();
-      this.$log(" this.payStatus", this.payStatus);
 
       // 提交逻辑
       recharge(this.formData).then((res) => {
         this.$log("this.formdata", this.formData, res);
         this.isDialogVisible = true;
-        this.payStatus = new Date().getTime();
+        if (res.result.pay_link) {
+          let order = {
+            ...res.result,
+          };
+          this.$store.dispatch("user/setWalletsOrder", order);
 
-        // 订单存储
-        let order = {
-          //
-          ...res.result,
-        };
-        // // 弹窗里的附加信息
-        // let addList = res.result.additional_service
-        //   ? res.result.additional_service
-        //   : [];
-
-        // this.$store.dispatch("paper/setAdditionList", addList);
-        this.$store.dispatch("user/setWalletsOrder", order);
-        // this.requestKeyLine = res.result.out_trade_no;
-        // this.popupStatusLine = Date.now();
+          this.payStatus = new Date().getTime();
+        }
       });
     },
   },

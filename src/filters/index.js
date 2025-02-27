@@ -113,7 +113,7 @@ export function orderStatusFormatter(status) {
   // Success = 2
   // Failed =3
   if (status == 0) {
-    return "等待中";
+    return "排队中";
   }
   if (status == 1) {
     return "生成中";

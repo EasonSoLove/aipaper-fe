@@ -28,7 +28,7 @@
                 {{ requestForm.language ? requestForm.language : "暂无" }}
               </p>
               <p>
-                {{ requestForm.field && equestForm.field[1] }}
+                {{ requestForm.field && requestForm.field[1] }}
               </p>
             </div>
           </div>
@@ -393,9 +393,8 @@ export default {
         });
     },
     getDetail() {
-      this.$log("d1111", this.requestKey);
       if (this.requestKey) {
-        // this.getList({ key: this.requestKey }, 10000);
+        this.getList({ key: this.requestKey }, 10000);
       } else {
         this.$message({
           type: "warning",
