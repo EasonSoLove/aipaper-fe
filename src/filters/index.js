@@ -112,16 +112,20 @@ export function orderStatusFormatter(status) {
   // Generating = 1
   // Success = 2
   // Failed =3
-  if (status == 0) {
+  if (status) {
+    if (status == 0) {
+      return "排队中";
+    }
+    if (status == 1) {
+      return "生成中";
+    }
+    if (status == 2) {
+      return "生成成功";
+    }
+    if (status == 3) {
+      return "生成失败";
+    }
+  } else {
     return "排队中";
-  }
-  if (status == 1) {
-    return "生成中";
-  }
-  if (status == 2) {
-    return "生成成功";
-  }
-  if (status == 3) {
-    return "生成失败";
   }
 }

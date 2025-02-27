@@ -171,6 +171,8 @@ export default {
         // 在这里执行你需要的操作
         this.ownPayStatus = true;
         this.$store.dispatch("paper/setPollingStatus", true);
+        this.$log("this.requestForm,弹窗内watch事件333", this.requestForm);
+
         this.getDetail();
       },
     },
