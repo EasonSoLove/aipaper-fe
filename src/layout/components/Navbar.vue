@@ -130,7 +130,7 @@
             <span> 我的大纲 </span>
           </div>
           <!-- 钱包 -->
-          <!-- <el-tooltip
+          <el-tooltip
             class="item"
             effect="dark"
             content="我的钱包"
@@ -144,7 +144,7 @@
               <i class="el-icon-wallet"></i>
               <span> 钱包 </span>
             </div>
-          </el-tooltip> -->
+          </el-tooltip>
 
           <!-- 登录按钮 -->
           <template>

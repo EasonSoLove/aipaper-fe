@@ -15,7 +15,8 @@
           :label="orderObj.order.out_trade_no"
           :value="orderObj.order.out_trade_no"
         ></el-checkbox>
-        <div class="order">
+        <!-- 订单展示 -->
+        <div v-if="!!orderObj.order.key1" class="order">
           <div class="orderNum rowBetween">
             <!-- <div class="left">订单号：{{ orderObj.order.out_trade_no }}</div> -->
             <div class="left" style="width: 60%">
@@ -192,6 +193,24 @@
               </el-button>
             </div>
           </div>
+        </div>
+        <!-- 充值订单  -->
+        <div
+          v-if="!orderObj.order.key1"
+          class="order"
+          style="font-size: 14px; line-height: 20px"
+        >
+          <p>订单类型:支付订单</p>
+          <p>
+            支付状态:
+            <span class="warning">{{
+              payStatusObj[orderObj.order.payment_status]
+            }}</span>
+          </p>
+          <p>
+            订单金额:
+            <span class="price">￥{{ orderObj.order.total_price }}</span>
+          </p>
         </div>
       </div>
     </el-checkbox-group>
