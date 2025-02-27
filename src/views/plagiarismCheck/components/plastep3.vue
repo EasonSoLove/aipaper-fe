@@ -209,6 +209,8 @@ export default {
     //   大纲标题: row.title,
     //   大纲key: row.key1,
     // });
+    let localPreViewId = localStorage.getItem("localPreViewId");
+    this.orderText = localPreViewId;
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
   },

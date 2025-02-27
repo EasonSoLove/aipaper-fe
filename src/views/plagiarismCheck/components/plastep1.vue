@@ -317,6 +317,7 @@ export default {
         .then((response) => {
           Ming(response);
           this.fileBackKey = response.result;
+          localStorage.setItem("localPreViewId", this.fileBackKey);
           this.$store.dispatch("paper/setPreviewId", this.fileBackKey);
           this.fileList = [file];
           // 开启轮询
