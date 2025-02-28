@@ -65,7 +65,7 @@
               >
                 10分钟
               </span>
-              <span v-else class="primary"> 30分钟 </span>左右完成 ，请耐心等待
+              <span v-else class="primary"> 60分钟 </span>左右完成 ，请耐心等待
             </p>
             <p class="dialog-text">如果您有事离开, 此弹窗可以放心关闭</p>
             <p class="dialog-text">
