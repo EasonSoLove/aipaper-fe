@@ -376,7 +376,7 @@ export default {
             });
             if (getDomain() === "www") {
               setTimeout(() => {
-                // eventBus.emit("showGift"); // 展示活动弹窗
+                // eventBus.emit("showGift"); // 展示活动弹窗 TODO:
                 Ming("登录成功setTImeout");
               }, 1500);
             }
