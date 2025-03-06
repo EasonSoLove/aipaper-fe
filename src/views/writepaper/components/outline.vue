@@ -67,6 +67,16 @@
           </div>
         </div>
       </div>
+      <!-- <div
+        :class="[
+          'firstItem',
+          'secondItem',
+          device == 'mobile' ? 'mobilebox' : '',
+        ]"
+      >
+        <advance></advance>
+      </div> -->
+
       <div
         :class="[
           'firstItem',
@@ -333,6 +343,7 @@ import polling from "@/utils/polling-utils";
 import advantage from "@/views/dashboard/components/advantage";
 import example from "./example/index.vue";
 import TitleInput from "./outline/TitleInput.vue";
+import advance from "./outline/advance.vue";
 export default {
   name: "outline",
   data() {
@@ -427,6 +438,7 @@ export default {
   },
   components: {
     // webinfo,
+    advance,
     advantage,
     example,
     TitleInput,
