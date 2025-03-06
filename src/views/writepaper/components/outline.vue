@@ -573,7 +573,7 @@ export default {
         let data = {
           title: this.requestForm.title,
           language: this.requestForm.language,
-          field: this.requestForm.field && this.requestForm.field[1],
+          field: this.requestForm.field[1],
           type: this.requestForm.type,
           product: this.requestForm.product,
           paper_level: this.requestForm.paper_level == "初级" ? 0 : 3,
@@ -583,7 +583,7 @@ export default {
           .then((res) => {
             window.zhuge.track("生成大纲", {
               语言: this.requestForm.language,
-              科目: this.requestForm.field && this.requestForm.field[1],
+              科目: this.requestForm.field[1],
               学业类型: this.requestForm.type,
               论文类型: this.requestForm.product,
               论文水平: this.requestForm.paper_level,

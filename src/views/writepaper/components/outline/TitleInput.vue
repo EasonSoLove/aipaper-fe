@@ -28,6 +28,7 @@
             <div class="header-title">
               <span class="starSpan">
                 <img
+                  style="margin-top: 4px"
                   src="@/assets/images/index/icon_32_star.png"
                   alt="" /></span
               >AI推荐标题

@@ -65,7 +65,7 @@
               >
                 10分钟
               </span>
-              <span v-else class="primary"> 30分钟 </span>左右完成 ，请耐心等待
+              <span v-else class="primary"> 60分钟 </span>左右完成 ，请耐心等待
             </p>
             <p class="dialog-text">如果您有事离开, 此弹窗可以放心关闭</p>
             <p class="dialog-text">
@@ -171,6 +171,8 @@ export default {
         // 在这里执行你需要的操作
         this.ownPayStatus = true;
         this.$store.dispatch("paper/setPollingStatus", true);
+        this.$log("this.requestForm,弹窗内watch事件333", this.requestForm);
+
         this.getDetail();
       },
     },

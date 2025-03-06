@@ -57,7 +57,8 @@
                       ? 'danger'
                       : 'warning'
                   "
-                  >{{
+                >
+                  {{
                     item.case.paper_case.stage | orderStatusFormatter
                   }}</el-link
                 >

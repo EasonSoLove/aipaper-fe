@@ -631,7 +631,7 @@ export default {
         });
     },
     paySend() {
-      this.$bdSave();
+      // this.$bdSave();
       window.zhuge.track("用户成功付款", {
         价格: this.currentOrder.pay_amount,
         语言: this.requestForm.language,
@@ -639,6 +639,8 @@ export default {
         学历: this.requestForm.type,
         论文字数: this.requestForm.word_count,
       });
+      this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
+
       eventBus.emit("showEmitPaperDialog", {
         requestKey: this.currentOrder.out_trade_no,
         payStatus: 2,

@@ -248,7 +248,7 @@ export default {
     showPaperDialog(data) {
       this.requestKey = data.requestKey;
       this.payStatusPro = new Date().getTime();
-      console.log("this.payStatusPro", this.payStatusPro);
+      this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
       if (data.paperPercent && data.paperPercent > 0) {
         this.paperPercent = data.paperPercent;
       }

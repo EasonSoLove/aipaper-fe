@@ -35,9 +35,12 @@
           <!-- 写死正式版的内容 -->
           <div
             v-show="
-              requestForm.product == '毕业论文' ||
-              requestForm.product ==
-                '结课论文                                                       '
+              currentOrder.order_type == 'PAPER_VOCATIONAL' ||
+              currentOrder.order_type == 'PAPER_VOCATIONAL_STAGES' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE_STAGES' ||
+              currentOrder.order_type == 'PAPER_MASTER' ||
+              currentOrder.order_type == 'PAPER_MASTER_STAGES'
             "
             class="cardAdditions"
           >
@@ -81,9 +84,12 @@
         <!-- 预览版 -->
         <div
           v-show="
-            requestForm.product == '毕业论文' ||
-            requestForm.product ==
-              '结课论文                                                       '
+            currentOrder.order_type == 'PAPER_VOCATIONAL' ||
+            currentOrder.order_type == 'PAPER_VOCATIONAL_STAGES' ||
+            currentOrder.order_type == 'PAPER_UNDERGRADUATE' ||
+            currentOrder.order_type == 'PAPER_UNDERGRADUATE_STAGES' ||
+            currentOrder.order_type == 'PAPER_MASTER' ||
+            currentOrder.order_type == 'PAPER_MASTER_STAGES'
           "
           class="cardClidOnly cardRight"
           :class="{ selected: internalValue === 'PAY_STAGES' }"
@@ -355,7 +361,7 @@ export default {
         this.$emit("input", newValue);
       },
     },
-    ...mapGetters(["requestForm", "homeData"]),
+    ...mapGetters(["requestForm", "currentOrder", "homeData"]),
     wordShow() {
       return (
         this.requestForm.product == "毕业论文" ||
