@@ -92,14 +92,14 @@
           <!-- <div class="gift">
             <span class="num">1</span>
           </div> -->
-          <div
+          <!-- <div
             class="giftBtn hidden-xs-only"
             v-if="sub_domain == 'www'"
             @click="showGift"
           >
             <span class="icoSpan"> HOT </span>
             <span class="giftSpanMain">最新活动 </span>
-          </div>
+          </div> -->
           <el-tooltip
             class="item"
             effect="dark"
