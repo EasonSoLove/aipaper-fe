@@ -10,13 +10,13 @@
           降低重复率/AIGC率
           <span class="underLeft"></span>
         </p>
-        <!-- <p
+        <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
         >
-          降低AIGC率
+          付费版文件降重/降AIGC
           <span class="underLeft"></span>
-        </p> -->
+        </p>
         <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
           <p style="color: #606266">
@@ -28,27 +28,28 @@
         </div>
       </div>
     </div>
-    <div
-      v-loading="sendStatus"
-      element-loading-text="使用高级推理AI, 润色中..."
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
-    >
-      <div class="edit flex">
-        <div class="edit-1">
-          <el-input
-            type="textarea"
-            :rows="20"
-            :placeholder="placeText[activeIndex - 1]"
-            maxlength="5000"
-            show-word-limit
-            v-model="original_paragraph"
-            resize="false"
-            :autosize="{ minRows: 15, maxRows: 20 }"
-          >
-          </el-input>
-        </div>
-        <!-- <div class="edit-2 flex align-center">
+    <template v-if="activeIndex == 1">
+      <div
+        v-loading="sendStatus"
+        element-loading-text="使用高级推理AI, 润色中..."
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      >
+        <div class="edit flex">
+          <div class="edit-1">
+            <el-input
+              type="textarea"
+              :rows="20"
+              :placeholder="placeText[activeIndex - 1]"
+              maxlength="5000"
+              show-word-limit
+              v-model="original_paragraph"
+              resize="false"
+              :autosize="{ minRows: 15, maxRows: 20 }"
+            >
+            </el-input>
+          </div>
+          <!-- <div class="edit-2 flex align-center">
         <el-button type="primary" round>降低重复率
           <span class="edTwoIcon">
             <svg class="icon svg-icon" aria-hidden="true">
@@ -64,62 +65,67 @@
           </span>
         </el-button>
       </div> -->
-        <div class="edit-3">
-          <el-input
-            type="textarea"
-            :rows="20"
-            readonly
-            :placeholder="reduceText[activeIndex - 1]"
-            maxlength="5000"
-            show-word-limit
-            v-model="textareaOut"
-            resize="false"
-            :autosize="{ minRows: 15, maxRows: 20 }"
-          >
-          </el-input>
-          <div class="btns">
-            <el-button
-              type="primary"
-              v-clipboard:copy="textareaOut"
-              v-clipboard:success="onCopy"
-              v-clipboard:error="onError"
-              round
-              size="mini"
+          <div class="edit-3">
+            <el-input
+              type="textarea"
+              :rows="20"
+              readonly
+              :placeholder="reduceText[activeIndex - 1]"
+              maxlength="5000"
+              show-word-limit
+              v-model="textareaOut"
+              resize="false"
+              :autosize="{ minRows: 15, maxRows: 20 }"
             >
-              复制结果
-            </el-button>
+            </el-input>
+            <div class="btns">
+              <el-button
+                type="primary"
+                v-clipboard:copy="textareaOut"
+                v-clipboard:success="onCopy"
+                v-clipboard:error="onError"
+                round
+                size="mini"
+              >
+                复制结果
+              </el-button>
+            </div>
           </div>
         </div>
+        <div class="customization">
+          <p class="contentTitle">
+            请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等
+          </p>
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 4 }"
+            :rows="4"
+            placeholder="请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等"
+            v-model="user_content"
+          >
+          </el-input>
+        </div>
       </div>
-      <div class="customization">
-        <p class="contentTitle">
-          请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等
-        </p>
-        <el-input
-          type="textarea"
-          :autosize="{ minRows: 4 }"
-          :rows="4"
-          placeholder="请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等"
-          v-model="user_content"
-        >
-        </el-input>
-      </div>
-    </div>
 
-    <div v-loading="sendStatus" @click="reduceSend" class="reduceBtn g_poin">
-      <p>开始生成</p>
-    </div>
+      <div v-loading="sendStatus" @click="reduceSend" class="reduceBtn g_poin">
+        <p>开始生成</p>
+      </div>
+    </template>
+    <template v-if="activeIndex == 2">
+      <filereduce></filereduce>
+    </template>
   </div>
 </template>
 
 <script>
 import swiperOne from "@/views/writepaper/components/swiperOne.vue";
 import { editReduce } from "@/api/user";
-
+import filereduce from "./components/filereduce.vue";
 export default {
   name: "reduceRepetition",
   components: {
     swiperOne,
+    filereduce,
   },
   data() {
     return {
