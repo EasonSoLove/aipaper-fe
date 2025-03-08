@@ -114,6 +114,7 @@
     <template v-if="activeIndex == 2">
       <filereduce></filereduce>
     </template>
+    <reducepay :requestKey="requestKey" :payStatus="popupStatus"></reducepay>
   </div>
 </template>
 
@@ -121,14 +122,21 @@
 import swiperOne from "@/views/writepaper/components/swiperOne.vue";
 import { editReduce } from "@/api/user";
 import filereduce from "./components/filereduce.vue";
+import reducepay from "./components/index.vue";
+import eventBus from "@/utils/eventBus";
+
 export default {
   name: "reduceRepetition",
   components: {
     swiperOne,
+    reducepay,
     filereduce,
   },
   data() {
     return {
+      popupStatus: 0,
+      requestKey: "", //out_trade_no
+
       logo: require("@/assets/images/logo_paper.png"),
       drawer: false,
       direction: "rtl", //抽屉方向
@@ -148,7 +156,17 @@ export default {
     };
   },
   computed: {},
+  created() {
+    eventBus.on("showEmitPaypopup", this.showPayDialog); // 订阅事件
+  },
+  beforeDestroy() {
+    eventBus.off("showEmitPaypopup", this.showPayDialog); // 订阅事件
+  },
   methods: {
+    showPayDialog(data) {
+      this.requestKey = data.requestKey;
+      this.popupStatus = Date.now();
+    },
     onCopy() {
       this.$message({
         type: "success",

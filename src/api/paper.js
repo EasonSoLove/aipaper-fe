@@ -109,17 +109,24 @@ export function pay_order(data) {
     data,
   });
 }
-export function upload_reduce_file(data) {
+export function upload_reduce_file(params) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/edit/upload_reduce_file",
     method: "post",
-    data,
+    params,
   });
 }
 // 下载大纲接口
 export function pay_download(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/outline/pay_download",
+    method: "post",
+    data,
+  });
+}
+export function reduce_aigc_pay(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/orders/reduce_aigc_pay",
     method: "post",
     data,
   });

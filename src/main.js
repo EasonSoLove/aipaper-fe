@@ -22,8 +22,10 @@ import i18n from "./lang"; // internationalization
 import VueClipboard from "vue-clipboard2";
 // import globalModal from "./components/GlobalModal.vue";
 import globalDialog from "./components/globalDialog.vue";
+import progressonly from './components/progressonly.vue'
 
 Vue.component("global-modal", globalDialog);
+Vue.component("progressonly", progressonly);
 Vue.prototype.$bus = new Vue();
 // const VConsole = require("vconsole");
 // const vConsole = new VConsole();
