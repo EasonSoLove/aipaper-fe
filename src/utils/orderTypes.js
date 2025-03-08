@@ -6,6 +6,7 @@ const OrderType = {
   PAPER_UNDERGRADUATE: "本科正文",
   PAPER_MASTER: "研究生正文",
   PAPER_FINAL: "结课论文",
+  REDUCE_AIGC: "降重/降AIGC订单",
   PAPER_VOCATIONAL_STAGES: "专科正文",
   PAPER_UNDERGRADUATE_STAGES: "本科正文",
   PAPER_MASTER_STAGES: "研究生正文",

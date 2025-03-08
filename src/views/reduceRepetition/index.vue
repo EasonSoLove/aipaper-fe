@@ -113,6 +113,11 @@
     </template>
     <template v-if="activeIndex == 2">
       <filereduce></filereduce>
+      <progressonly
+        :requestKey="requestKey"
+        :payStatus="payStatusPro"
+        :paperPercent="paperPercent"
+      />
     </template>
     <reducepay :requestKey="requestKey" :payStatus="popupStatus"></reducepay>
   </div>
@@ -136,7 +141,7 @@ export default {
     return {
       popupStatus: 0,
       requestKey: "", //out_trade_no
-
+      payStatusPro: 0,
       logo: require("@/assets/images/logo_paper.png"),
       drawer: false,
       direction: "rtl", //抽屉方向
@@ -152,17 +157,28 @@ export default {
         "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
       ],
       original_paragraph: "",
+      paperPercent: 0,
       user_content: "",
     };
   },
   computed: {},
   created() {
+    eventBus.on("showEmitPaperDialog", this.showPaperDialog); // 订阅事件
     eventBus.on("showEmitPaypopup", this.showPayDialog); // 订阅事件
   },
   beforeDestroy() {
     eventBus.off("showEmitPaypopup", this.showPayDialog); // 订阅事件
+    eventBus.off("showEmitPaperDialog", this.showPaperDialog); // 订阅事件
   },
   methods: {
+    showPaperDialog(data) {
+      this.requestKey = data.requestKey;
+      this.payStatusPro = new Date().getTime();
+      this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
+      if (data.paperPercent && data.paperPercent > 0) {
+        this.paperPercent = data.paperPercent;
+      }
+    },
     showPayDialog(data) {
       this.requestKey = data.requestKey;
       this.popupStatus = Date.now();

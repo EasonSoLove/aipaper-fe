@@ -109,11 +109,11 @@ export function pay_order(data) {
     data,
   });
 }
-export function upload_reduce_file(params) {
+export function upload_reduce_file(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/edit/upload_reduce_file",
     method: "post",
-    params,
+    data,
   });
 }
 // 下载大纲接口

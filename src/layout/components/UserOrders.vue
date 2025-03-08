@@ -43,7 +43,10 @@
                 style="margin-bottom: 8px"
                 :key="'case2' + j"
               >
-                论文题目: {{ item.case.paper_case.title }}
+                <span v-show="orderObj.order.order_type != 'REDUCE_AIGC'">
+                  论文题目:
+                </span>
+                {{ item.case.paper_case.title }}
               </div>
               <div class="orderTitle orderTitleSpan" :key="'case3' + j">
                 生成状态:
@@ -65,7 +68,7 @@
               </div>
               <div class="orderTitle orderTitleSpan" :key="'title' + j">
                 <!-- {{ item.product.name }} -->
-                论文类型:
+                订单类型:
                 <span class="info">{{
                   orderObj.order.order_type
                     ? orderTypes[orderObj.order.order_type]
@@ -95,6 +98,7 @@
                     type="text"
                     :disabled="item.case.paper_case.stage !== 1"
                     @click="pushStep3(orderObj)"
+                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
                   >
                     查看论文进度
                   </el-button>
@@ -103,6 +107,7 @@
                     type="text"
                     :disabled="!item.case.file_urls.pdf"
                     @click="openPaper(orderObj)"
+                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
                   >
                     预览
                   </el-button>
@@ -482,6 +487,14 @@ export default {
         订单Out_trade_no: item.order.out_trade_no,
       });
       this.downStatus = true;
+      console.log("item", item);
+      if (item.order.order_type == "REDUCE_AIGC") {
+        let zipUrl = item.order_item_response[0].case.file_urls.word;
+        window.open(zipUrl);
+        this.downStatus = false;
+
+        return false;
+      }
       paperPack({ out_trade_no: item.order.out_trade_no })
         .then((res) => {
           this.downStatus = false;

@@ -577,11 +577,7 @@ export default {
     paySend() {
       // this.$bdSave();
       window.zhuge.track("用户成功付款", {
-        价格: this.currentOrder.pay_amount,
-        语言: this.requestForm.language,
-        科目: this.requestForm.field && this.requestForm.field[1],
-        学历: this.requestForm.type,
-        论文字数: this.requestForm.word_count,
+        类目: "查重付费",
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
 
