@@ -1,40 +1,86 @@
 <template>
-  <div
-    style="
-      background-color: #fff;
-      margin-top: -20px;
-      padding-left: 20px;
-      padding-bottom: 50px;
-      padding-top: 50px;
-    "
-  >
-    <!-- 页面名称 -->
-
-    <h2>文件上传与解析</h2>
-    <el-upload
-      ref="upload"
-      action=""
-      :http-request="handleUpload"
-      :before-upload="beforeUpload"
-      multiple
-      list-type="text"
-    >
-      <el-button size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">仅支持上传.docx文件</div>
-    </el-upload>
-    <div v-if="fileList.length">
-      <h3>上传文件列表：</h3>
-      <ul>
-        <li v-for="(file, index) in fileList" :key="index">
-          {{ file.file_name }} - 字符数: {{ file.file_chars }}
-        </li>
-      </ul>
-      <p>总字符数: {{ totalChars }}</p>
-      <p>Reduce Key: {{ reduceKey }}</p>
+  <div class="container">
+    <!-- 左右布局 -->
+    <div v-loading="loading" class="layout">
+      <!-- 右侧上传区域 -->
+      <el-card class="upload-section">
+        <div slot="header" class="file-list-header">
+          <span>文件上传与解析</span>
+        </div>
+        <el-upload
+          ref="upload"
+          class="upload-demo"
+          drag
+          action=""
+          :show-file-list="false"
+          :http-request="handleUpload"
+          :before-upload="beforeUpload"
+          multiple
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">
+            <span style="font-weight: bold; font-size: 14px"> 温馨提示: </span>
+          </div>
+          <div class="el-upload__tip" slot="tip">可上传多个文件</div>
+          <div class="el-upload__tip" slot="tip">
+            限制总降重为:
+            <i style="color: #0066ff; font-weight: bold">30000</i> 字
+          </div>
+          <div class="el-upload__tip" slot="tip">
+            仅支持上传
+            <i style="color: #0066ff; font-weight: bold">.docx</i>
+            文件
+          </div>
+        </el-upload>
+      </el-card>
+      <!-- 左侧文件列表 -->
+      <el-card class="box-card file-list-card">
+        <div slot="header" class="file-list-header">
+          <span>已上传文件列表</span>
+        </div>
+        <!-- 文件列表 -->
+        <ul v-if="fileList.length" class="file-list">
+          <li
+            v-for="(file, index) in fileList"
+            :key="index"
+            class="file-item"
+            @mouseover="hoverIndex = index"
+            @mouseleave="hoverIndex = null"
+          >
+            <div class="file-content">
+              <div class="file-info">
+                <span class="file-name">{{ file.file_name }}</span>
+                <span class="file-chars">字符数: {{ file.file_chars }}</span>
+              </div>
+              <button class="delete-button" @click="removeFile(index)">
+                删除
+                <!-- v-if="hoverIndex === index" -->
+              </button>
+            </div>
+          </li>
+        </ul>
+        <!-- 空状态 -->
+        <div v-else>
+          <el-empty description="无上传文件"></el-empty>
+        </div>
+        <!-- 总字符数固定在底部 -->
+        <div class="file-summary">
+          <p>总字符数: {{ totalChars }}</p>
+        </div>
+      </el-card>
     </div>
 
-    <div>
-      <el-button @click="payReduce">去支付</el-button>
+    <!-- 去支付按钮 -->
+    <div class="pay-button-container">
+      <el-button
+        @click="payReduce"
+        :disabled="fileList.length === 0"
+        type="primary"
+        style="width: 100%"
+      >
+        去支付
+      </el-button>
     </div>
   </div>
 </template>
@@ -50,8 +96,10 @@ export default {
   data() {
     return {
       fileList: [],
+      loading: false,
       reduceKey: "",
       totalChars: 0,
+      hoverIndex: null, // 当前鼠标悬浮的索引
       resdata: {
         file_list: [
           {
@@ -73,7 +121,18 @@ export default {
     };
   },
   methods: {
+    removeFile(index) {
+      // 删除文件的逻辑
+      this.$emit("remove-file", index);
+    },
     payReduce() {
+      if (this.totalChars > 30000) {
+        this.$message({
+          type: "warning",
+          message: "降重最大字数为30000字,请修改部分文件后重试!",
+        });
+        return false;
+      }
       let data = {
         reduce_key: this.reduceKey,
         payment_method: "alipay",
@@ -133,7 +192,7 @@ export default {
       if (this.reduceKey) {
         formData.append("reduce_key", this.reduceKey);
       }
-
+      this.loading = true;
       try {
         upload_reduce_file(formData).then((res) => {
           console.log("res", res);
@@ -144,7 +203,9 @@ export default {
             this.fileList = res.result.file_list;
             this.reduceKey = res.result.reduce_key;
             this.totalChars = res.result.word_count;
+            this.loading = false;
           } else {
+            this.loading = false;
             onError();
           }
         });
@@ -152,6 +213,7 @@ export default {
         console.error("Upload error:", error);
         this.$message.error("上传出错，请检查网络或联系管理员");
         onError(error);
+        this.loading = false;
       }
     },
   },
@@ -159,10 +221,119 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-h2 {
-  margin-bottom: 20px;
+/* 整体容器 */
+.container {
+  background-color: #fff;
+  margin-top: -20px;
+  padding: 20px;
+  padding-bottom: 50px;
 }
-.el-upload__tip {
+
+/* 布局样式 */
+.layout {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+/* 左侧文件列表样式 */
+.file-list-card {
+  flex: 1;
+  margin-left: 20px;
+  position: relative;
+}
+
+.file-list-header {
+  font-size: 16px;
+}
+
+/* 文件列表 */
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+  position: relative;
+}
+
+.file-item:hover {
+  background: #f0f8ff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-content {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+/* 文件信息 */
+.file-info {
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.file-name {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.file-chars {
   color: #666;
+}
+
+/* 删除按钮 */
+.delete-button {
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.delete-button:hover {
+  background: #d9363e;
+}
+
+/* 文件总字符数固定在底部 */
+.file-summary {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.file-summary p {
+  margin: 5px 0;
+}
+
+/* 右侧上传区域 */
+.upload-section {
+  flex: 1;
+  font-size: 16px; /* 与左侧字体一致 */
+}
+
+/* 去支付按钮容器 */
+.pay-button-container {
+  text-align: center;
+  margin-top: 20px;
 }
 </style>

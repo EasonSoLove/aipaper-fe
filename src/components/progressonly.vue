@@ -320,6 +320,14 @@ export default {
             ) {
               caseStatus = false;
             }
+            if (order_item_response[0].case.paper_case.stage == 3) {
+              this.$message({
+                type: "error",
+                message: "查重失败, 请在我的订单重试!",
+              });
+              this.$store.dispatch("paper/setPollingStatus", false);
+              this.ownPayStatus = false;
+            }
           }
 
           if (caseStatus) {
@@ -331,7 +339,10 @@ export default {
           } else {
             // if()
             let zipUrl = order_item_response[0].case.file_urls.word;
-            window.open(zipUrl);
+
+            if (zipUrl) {
+              window.open(zipUrl);
+            }
 
             this.$store.dispatch("paper/setPollingStatus", false);
             this.ownPayStatus = false;

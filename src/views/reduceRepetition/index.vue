@@ -7,7 +7,7 @@
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
-          降低重复率/AIGC率
+          免费版降低重复率/AIGC率
           <span class="underLeft"></span>
         </p>
         <p
@@ -390,5 +390,13 @@ export default {
 }
 ::v-deep .el-loading-spinner .el-loading-text {
   font-size: 14px !important;
+}
+::v-deep .el-upload {
+  width: 100%;
+}
+::v-deep .el-upload-dragger {
+  height: 240px;
+  width: 100%;
+  padding-top: 40px;
 }
 </style>
