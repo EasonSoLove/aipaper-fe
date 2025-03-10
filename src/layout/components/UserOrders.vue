@@ -105,6 +105,15 @@
                   <el-button
                     icon="el-icon-view"
                     type="text"
+                    :disabled="item.case.paper_case.stage !== 1"
+                    @click="pushStep2(orderObj)"
+                    v-show="orderObj.order.order_type == 'REDUCE_AIGC'"
+                  >
+                    查看降重进度
+                  </el-button>
+                  <el-button
+                    icon="el-icon-view"
+                    type="text"
                     :disabled="!item.case.file_urls.pdf"
                     @click="openPaper(orderObj)"
                     v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
@@ -232,6 +241,11 @@
       >
       </el-pagination>
     </div>
+    <progressonly
+      :requestKey="requestKey"
+      :payStatus="payStatusPro"
+      :paperPercent="paperPercent"
+    />
   </div>
 </template>
 <script>
@@ -239,6 +253,7 @@
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import { getList } from "@/api/table";
+import { re_reduce } from "@/api/paper";
 import OrderType from "@/utils/orderTypes.js";
 import {
   getOrderList,
@@ -262,6 +277,9 @@ export default {
   data() {
     return {
       orderTypes: OrderType,
+      requestKey: "", //out_trade_no
+      payStatusPro: 0,
+      paperPercent: 0,
       // 定义变量
       checkList: [],
       orderList: [],
@@ -302,6 +320,24 @@ export default {
   },
   methods: {
     sendReLoad(obj) {
+      console.log("obj", obj);
+      if (obj.order.order_type == "REDUCE_AIGC") {
+        let data = {
+          reduce_key: obj.order.key1,
+        };
+        re_reduce(data).then((res) => {
+          this.$message({
+            type: "success",
+            message: "成功重试，内容生成中！",
+          });
+          this.requestKey = obj.order.out_trade_no;
+          this.payStatusPro = new Date().getTime();
+          this.paperPercent = 0;
+          this.refresh();
+        });
+        return false;
+      }
+
       let data = {
         out_trade_no: obj.order.out_trade_no,
       };
@@ -431,8 +467,18 @@ export default {
     //   //   paperPercent: 0,
     //   // });
     // },
+
+    pushStep2: _.debounce(function (row) {
+      this.requestKey = row.order.out_trade_no;
+      this.payStatusPro = new Date().getTime();
+      this.paperPercent = 30;
+    }, 300),
     pushStep3: _.debounce(function (row) {
       zhuge.track(`查看论文进度`, {});
+      console.log("reow", row);
+      if (row.order.order_type == "REDUCE_AIGC") {
+        return false;
+      }
       const targetPath = "/main/writepaper";
       const currentPath = this.$route.path;
       // 检查当前路径是否与目标路径相同

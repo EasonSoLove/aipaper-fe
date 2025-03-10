@@ -80,7 +80,7 @@
               </p>
             </template>
             <template v-else>
-              <p class="reduceP1">努力查重中,</p>
+              <p class="reduceP1">努力降重中,</p>
               <p class="reduceP2">
                 成功后会<span style="font-weight: bold" class="primary">
                   自动下载
@@ -96,7 +96,7 @@
               <p class="dialog-text">
                 后续,在
                 <span style="color: #1b2126">顶部栏 - 我的订单</span>
-                , 查看您的查重报告
+                , 查看您的降重报告
               </p>
             </template>
           </div>
@@ -323,7 +323,7 @@ export default {
             if (order_item_response[0].case.paper_case.stage == 3) {
               this.$message({
                 type: "error",
-                message: "查重失败, 请在我的订单重试!",
+                message: "降重失败, 请在我的订单重试!",
               });
               this.$store.dispatch("paper/setPollingStatus", false);
               this.ownPayStatus = false;

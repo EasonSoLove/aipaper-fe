@@ -92,7 +92,7 @@
             </div>
           </div>
         </div>
-        <div class="customization">
+        <!-- <div class="customization">
           <p class="contentTitle">
             请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等
           </p>
@@ -104,7 +104,7 @@
             v-model="user_content"
           >
           </el-input>
-        </div>
+        </div> -->
       </div>
 
       <div v-loading="sendStatus" @click="reduceSend" class="reduceBtn g_poin">
@@ -142,6 +142,8 @@ export default {
       popupStatus: 0,
       requestKey: "", //out_trade_no
       payStatusPro: 0,
+      paperPercent: 0,
+
       logo: require("@/assets/images/logo_paper.png"),
       drawer: false,
       direction: "rtl", //抽屉方向
@@ -157,18 +159,17 @@ export default {
         "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
       ],
       original_paragraph: "",
-      paperPercent: 0,
       user_content: "",
     };
   },
   computed: {},
   created() {
-    eventBus.on("showEmitPaperDialog", this.showPaperDialog); // 订阅事件
+    eventBus.on("showEmitReduceDialog", this.showPaperDialog); // 订阅事件
     eventBus.on("showEmitPaypopup", this.showPayDialog); // 订阅事件
   },
   beforeDestroy() {
     eventBus.off("showEmitPaypopup", this.showPayDialog); // 订阅事件
-    eventBus.off("showEmitPaperDialog", this.showPaperDialog); // 订阅事件
+    eventBus.off("showEmitReduceDialog", this.showPaperDialog); // 订阅事件
   },
   methods: {
     showPaperDialog(data) {
@@ -199,7 +200,7 @@ export default {
       zhuge.track(`用户点击降重按钮`, {});
       let data = {
         original_paragraph: this.original_paragraph,
-        user_content: this.user_content,
+        // user_content: this.user_content,
       };
       this.sendStatus = true;
       editReduce(data).then((res) => {

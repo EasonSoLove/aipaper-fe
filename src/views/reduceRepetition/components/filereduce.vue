@@ -24,7 +24,7 @@
           </div>
           <div class="el-upload__tip" slot="tip">可上传多个文件</div>
           <div class="el-upload__tip" slot="tip">
-            限制总降重为:
+            限制降重总数:
             <i style="color: #0066ff; font-weight: bold">30000</i> 字
           </div>
           <div class="el-upload__tip" slot="tip">
@@ -53,7 +53,7 @@
                 <span class="file-name">{{ file.file_name }}</span>
                 <span class="file-chars">字符数: {{ file.file_chars }}</span>
               </div>
-              <button class="delete-button" @click="removeFile(index)">
+              <button class="delete-button" @click="removeFile(file)">
                 删除
                 <!-- v-if="hoverIndex === index" -->
               </button>
@@ -87,7 +87,11 @@
 
 <script>
 import axios from "axios";
-import { upload_reduce_file, reduce_aigc_pay } from "@/api/paper";
+import {
+  upload_reduce_file,
+  reduce_aigc_pay,
+  remove_reduce_file,
+} from "@/api/paper";
 import eventBus from "@/utils/eventBus";
 import Progress from "@/components/progressonly.vue";
 
@@ -114,17 +118,34 @@ export default {
             file_chars: 5891,
           },
         ],
-        reduce_key: "7528f831-b9d1-4097-8906-caa7cee797ae",
+        reduce_key: "",
         total_files: 2,
         word_count: 21230,
       },
     };
   },
   methods: {
-    removeFile(index) {
+    removeFile(file) {
       // 删除文件的逻辑
-      this.$emit("remove-file", index);
+      console.log("remove-file", file);
+      console.log("remove-file", this.reduceKey);
+      let data = {
+        file_name: file.file_name,
+        reduce_key: this.reduceKey,
+      };
+      remove_reduce_file(data).then((res) => {
+        // 重新赋值 fileList
+        this.fileList = this.fileList.filter(
+          (file2) => file2.index !== file.index
+        );
+
+        this.$message({
+          type: "success",
+          message: "删除文件成功！",
+        });
+      });
     },
+
     payReduce() {
       if (this.totalChars > 30000) {
         this.$message({
@@ -194,26 +215,30 @@ export default {
       }
       this.loading = true;
       try {
-        upload_reduce_file(formData).then((res) => {
-          console.log("res", res);
-          if (res.code === 200) {
-            //       this.fileList = this.resdata.file_list;
-            // this.totalChars = this.resdata.word_count;
-            // this.reduceKey = this.resdata.reduce_key;
-            this.fileList = res.result.file_list;
-            this.reduceKey = res.result.reduce_key;
-            this.totalChars = res.result.word_count;
+        upload_reduce_file(formData)
+          .then((res) => {
+            console.log("res", res);
+            if (res.code === 200) {
+              //       this.fileList = this.resdata.file_list;
+              // this.totalChars = this.resdata.word_count;
+              // this.reduceKey = this.resdata.reduce_key;
+              this.fileList = res.result.file_list;
+              this.reduceKey = res.result.reduce_key;
+              this.totalChars = res.result.word_count;
+              this.loading = false;
+            } else {
+              this.loading = false;
+              onError();
+            }
+          })
+          .catch(() => {
             this.loading = false;
-          } else {
-            this.loading = false;
-            onError();
-          }
-        });
+          });
       } catch (error) {
         console.error("Upload error:", error);
         this.$message.error("上传出错，请检查网络或联系管理员");
-        onError(error);
         this.loading = false;
+        onError(error);
       }
     },
   },

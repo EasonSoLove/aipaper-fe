@@ -581,7 +581,7 @@ export default {
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
 
-      eventBus.emit("showEmitPaperDialog", {
+      eventBus.emit("showEmitReduceDialog", {
         requestKey: this.currentOrder.out_trade_no,
         payStatus: 2,
         paperPercent: 0,

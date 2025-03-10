@@ -102,6 +102,20 @@ export function title_recommend(data) {
     data,
   });
 }
+export function remove_reduce_file(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/edit/remove_reduce_file",
+    method: "post",
+    data,
+  });
+}
+export function re_reduce(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/edit/re_reduce",
+    method: "post",
+    data,
+  });
+}
 export function pay_order(data) {
   return request({
     url: baseUrl + "/api/ai-paper/pass/pay_order",
