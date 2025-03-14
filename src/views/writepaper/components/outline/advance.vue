@@ -45,7 +45,7 @@
     </div>
     <div>
       <div class="button-group">
-        <button @click="saveKeywords" class="button">检索文献</button>
+        <button @click="seachPaperS" class="button">检索文献</button>
       </div>
       <div class="content">
         <div class="sidebar">
@@ -131,16 +131,7 @@ export default {
   },
   methods: {
     saveKeywords() {
-      let data = {
-        key: "22949e2b-efd1-4dc1-9312-f453067bc039",
-        search_cn_keywords: ["测试关键词", "宗教发展", "印度哲学", "宗教研究"],
-        search_en_keywords: [
-          "test save en keywords",
-          "religious development",
-          "Indian philosophy",
-          "religious studies",
-        ],
-      };
+      let data = this.keyWordsData;
       save_keywords(data).then((res) => {
         console.log(res, "res");
       });
@@ -158,21 +149,12 @@ export default {
       this.keyWordsData.search_cn_keywords = resultData.search_cn_keywords;
       this.keyWordsData.search_en_keywords = resultData.search_en_keywords;
     },
-    saveKeywords() {
+    seachPaperS() {
       this.saveKeywords();
-      let data = {
-        key: "22949e2b-efd1-4dc1-9312-f453067bc039",
-        search_cn_keywords: ["印度宗教", "宗教发展", "印度哲学", "宗教研究"],
-        search_en_keywords: [
-          "Indian religions",
-          "religious development",
-          "Indian philosophy",
-          "religious studies",
-        ],
-      };
+      let data = this.keyWordsData;
       search_papers(data).then((res) => {});
       let paperList = {
-        key: "22949e2b-efd1-4dc1-9312-f453067bc039",
+        key: "cef28d53-c41c-4a57-8dfb-25d3a8550ea8",
         search_cn_keywords: ["印度宗教", "宗教发展", "印度哲学", "宗教研究"],
         search_en_keywords: [
           "Indian religions",
@@ -249,32 +231,8 @@ export default {
       };
       generate_keywords(data).then((res) => {
         console.log(res);
+        this.keyWordsData = res.result;
       });
-
-      let result = {
-        title: "印度宗教的发展与研究",
-        language: "中文",
-        field: "哲学类",
-        type: "本科",
-        product: "毕业论文",
-        word_count: 8000,
-        paper_level: 0,
-        key: "032d35f2-86a9-4374-8374-3400d5d451aa",
-        version: "v2",
-        search_cn_keywords: [
-          "印度宗教",
-          "宗教发展",
-          "印度哲学",
-          "宗教研究方法",
-        ],
-        search_en_keywords: [
-          "Indian religion",
-          "religious development",
-          "Indian philosophy",
-          "religious research methods",
-        ],
-      };
-      this.keyWordsData = result;
     },
     removeKeyword(type, index) {
       if (type === "cn") {
