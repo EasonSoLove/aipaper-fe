@@ -130,6 +130,27 @@ export function upload_reduce_file(data) {
     data,
   });
 }
+export function generate_keywords(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/generate_keywords",
+    method: "post",
+    data,
+  });
+}
+export function save_keywords(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/save_keywords",
+    method: "post",
+    data,
+  });
+}
+export function search_papers(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/search_papers",
+    method: "post",
+    data,
+  });
+}
 // 下载大纲接口
 export function pay_download(data) {
   return request({

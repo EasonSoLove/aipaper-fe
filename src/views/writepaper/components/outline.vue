@@ -11,13 +11,13 @@
           <span class="underLeft"></span>
         </p>
         <!-- checkoutPaper(2) -->
-        <!-- <p
-          @click="$devf"
+        <p
+          @click="checkoutPaper(2)"
           :class="['outLeftTitle', 'paperClass', index == 2 ? 'activeLT' : '']"
         >
-          万象学术版
+          万象定制版
           <span class="underLeft"></span>
-        </p> -->
+        </p>
       </div>
       <div class="outRight">
         <div
@@ -67,15 +67,16 @@
           </div>
         </div>
       </div>
-      <!-- <div
+      <div
         :class="[
           'firstItem',
           'secondItem',
           device == 'mobile' ? 'mobilebox' : '',
         ]"
+        v-if="index == 2"
       >
         <advance></advance>
-      </div> -->
+      </div>
 
       <div
         :class="[
@@ -361,7 +362,7 @@ export default {
         word_count: 5000,
       },
       OrderType: OrderType,
-      index: 1,
+      index: 2,
       carProp: {
         value: "name",
         label: "name",
