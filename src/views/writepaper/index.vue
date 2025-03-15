@@ -159,19 +159,26 @@ export default {
     downLine,
   },
   mounted() {
-    //     this.$message({
-    //       showClose: true,
-    //       center: true,
-    //       duration: 6000,
-    //       type: "warning",
-    //       dangerouslyUseHTMLString: true,
-    //       message: `
+    this.$message({
+      showClose: true,
+      center: true,
+      duration: 6000,
+      type: "warning",
+      dangerouslyUseHTMLString: true,
+      message: `
+            <p style="text-align: center;">
+            近期算力紧张，用户访问骤增，大纲和正文有失败情况，请重试。
+          </p>
+    <p style="text-align: center;margin-top: 10px">如果生成大纲或者正文失败，重试不成功，请及时联系客服解决！给大家带来的不便，敬请谅解。</p>
+
+            `,
+    });
+    //     `
     //         <p style="text-align: center;">
-    //         近期用户数激增，服务器压力较大。外加网站遭遇攻击，给大家带来的不变，敬请谅解。
+    //         近期算力紧张，给大家带来的不变，敬请谅解。
     //       </p>
     // <p style="text-align: center;margin-top: 10px">如果生成大纲或者正文失败，请重试，重试不成功，请及时联系客服解决！再次抱歉，我们一直在努力，让学术更简单！</p>
     //         `,
-    //     });
 
     // 页面初始化
     window.addEventListener("scroll", this.handleScroll);
