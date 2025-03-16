@@ -75,7 +75,7 @@
         ]"
         v-if="index == 2"
       >
-        <advance></advance>
+        <advance :parentForm="requestForm"></advance>
       </div>
 
       <div
@@ -801,6 +801,7 @@ export default {
 }
 .uesrInputBox {
   padding-top: 25px;
+  padding-right: 40px;
   padding-bottom: 40px;
   .selectLang:first-child {
     margin-top: 0px;
