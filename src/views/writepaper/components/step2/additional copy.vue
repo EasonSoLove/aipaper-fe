@@ -406,7 +406,7 @@ export default {
           literatureReview: 29,
         },
         {
-          wordCount: "21000 - 30000",
+          wordCount: "21000 - 25000",
           vocational: 196,
           undergraduate: 216,
           master: 256,

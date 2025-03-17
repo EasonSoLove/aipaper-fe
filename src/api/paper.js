@@ -109,6 +109,13 @@ export function remove_reduce_file(data) {
     data,
   });
 }
+export function save_papers_list(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/step_outline/save_papers_list",
+    method: "post",
+    data,
+  });
+}
 export function re_reduce(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/edit/re_reduce",

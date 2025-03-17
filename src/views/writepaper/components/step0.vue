@@ -65,7 +65,7 @@
                   orderObj.updated_at | dateFormatter
                 }}</span>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -380,7 +380,7 @@ export default {
         word_count: 0,
       },
       minCount: 3000,
-      maxCount: 30000,
+      maxCount: 25000,
       original_item: {},
       generated_items: [],
       currentDialogRow: {},
@@ -397,12 +397,12 @@ export default {
           label: this.$createElement("strong", "20000"),
         },
 
-        30000: {
+        25000: {
           style: {
             color: "#E6A23C",
             width: "90px",
           },
-          label: this.$createElement("strong", "30000"),
+          label: this.$createElement("strong", "25000"),
         },
       },
     };

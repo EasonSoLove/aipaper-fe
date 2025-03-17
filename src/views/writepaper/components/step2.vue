@@ -534,7 +534,7 @@
         <el-slider
           v-model="paper_words"
           :min="1000"
-          :max="30000"
+          :max="25000"
           :marks="marks"
           :step="1000"
         >
@@ -894,11 +894,11 @@ export default {
           },
           label: this.$createElement("strong", "20000字"),
         },
-        30000: {
+        25000: {
           style: {
             color: "#E6A23C",
           },
-          label: this.$createElement("strong", "三万字"),
+          label: this.$createElement("strong", "25000字"),
         },
       },
       numberValidateForm: {

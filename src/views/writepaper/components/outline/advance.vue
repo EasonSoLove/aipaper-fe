@@ -30,7 +30,7 @@
         </ul>
         <div class="keyBottom">
           <el-input
-            placeholder="新增中文关键词"
+            placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newCnKeyword"
             @keyup.enter="addKeyword('cn')"
             :disabled="keyWordsData.search_cn_keywords.length >= 4"
@@ -69,7 +69,7 @@
         </ul>
         <div class="keyBottom">
           <el-input
-            placeholder="新增英文关键词"
+            placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newEnKeyword"
             @keyup.enter="addKeyword('en')"
             :disabled="keyWordsData.search_en_keywords.length >= 4"
@@ -98,7 +98,60 @@
       </div>
       <div class="content">
         <div class="sidebar">
-          <h3>搜索到的文件列表</h3>
+          <h3>用户上传文献列表</h3>
+          <div
+            class="sidebar-item"
+            v-for="(paper, index) in user_upload_paper_fe_lists"
+            :key="`ref-${index}`"
+            :class="paper.is_relevant === 'yes' ? 'selected-item' : ''"
+          >
+            <div class="paper-card">
+              <div class="paper-header">
+                <h4>{{ paper.title }}</h4>
+                <el-button
+                  type="success"
+                  size="mini"
+                  :plain="paper.is_relevant !== 'yes'"
+                  @click="togglePaperSelection(paper)"
+                >
+                  {{ paper.is_relevant === "yes" ? "已选中" : "选择" }}
+                </el-button>
+              </div>
+              <p :class="{ abstract: true, expanded: paper.isExpanded }">
+                <span v-if="!paper.isExpanded" class="abstract-content">
+                  {{ paper.abstract }}
+                </span>
+                <span v-else>
+                  {{ paper.abstract }}
+                </span>
+                <span
+                  class="toggle-button"
+                  @click="paper.isExpanded = !paper.isExpanded"
+                >
+                  {{ paper.isExpanded ? "收起" : "展开" }}
+                </span>
+              </p>
+              <div class="paper-footer">
+                <p class="formPaper">
+                  <img
+                    style="height: 16px; width: 16px"
+                    src="@/assets/images/index/blue.png"
+                    alt=""
+                  />
+                  {{ paper.database }}
+                </p>
+                <p>
+                  作者: <span>{{ paper.authors.join(", ") }}</span>
+                </p>
+                <p class="dateP">
+                  日期: <span>{{ paper.date }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <h3>系统检索文献列表</h3>
+
           <div
             class="sidebar-item"
             v-for="(paper, index) in reference_paper_fe_lists"
@@ -140,8 +193,12 @@
                   />
                   {{ paper.database }}
                 </p>
-                <p>作者: {{ paper.authors.join(", ") }}</p>
-                <p>日期: {{ paper.date }}</p>
+                <p>
+                  作者: <span>{{ paper.authors.join(", ") }}</span>
+                </p>
+                <p class="dateP">
+                  日期: <span>{{ paper.date }}</span>
+                </p>
               </div>
             </div>
           </div>
@@ -153,13 +210,12 @@
               <div class="paper-header">
                 <h4>{{ paper.title }}</h4>
                 <el-button
-                  type="success"
+                  type="danger"
                   size="mini"
-                  :plain="paper.is_relevant !== 'yes'"
-                  @click="togglePaperSelection(paper)"
-                >
-                  {{ paper.is_relevant === "yes" ? "已选中" : "选择" }}
-                </el-button>
+                  @click="delSelectPaper(paper)"
+                  icon="el-icon-delete"
+                  circle
+                ></el-button>
               </div>
               <p :class="{ abstract: true, expanded: paper.isExpanded }">
                 <span v-if="!paper.isExpanded" class="abstract-content">
@@ -176,7 +232,14 @@
                 </span>
               </p>
               <div class="paper-footer">
-                <p>来源: {{ paper.database }}</p>
+                <p class="formPaper">
+                  <img
+                    style="height: 16px; width: 16px"
+                    src="@/assets/images/index/blue.png"
+                    alt=""
+                  />
+                  {{ paper.database }}
+                </p>
                 <p>作者: {{ paper.authors.join(", ") }}</p>
                 <p>日期: {{ paper.date }}</p>
               </div>
@@ -184,25 +247,37 @@
           </div>
         </div>
         <div class="upload-section">
-          <div class="upload-box">上传文件区域</div>
-          <input type="text" placeholder="论文题目" class="input-field" />
-          <input
-            type="text"
-            placeholder="填写引文格式（模型提取）"
-            class="input-field"
-          />
-          <button class="upload-button">上传</button>
+          <div class="upload-box">
+            <el-upload
+              class="upload-demo"
+              style="width: 100%"
+              drag
+              action="https://jsonplaceholder.typicode.com/posts/"
+              multiple
+              :show-file-list="false"
+            >
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">
+                将文件拖到此处，或<em>点击上传</em>
+              </div>
+              <div class="el-upload__tip" slot="tip">
+                只能上传jpg/png文件，且不超过500kb
+              </div>
+            </el-upload>
+          </div>
         </div>
       </div>
-      <footer class="footer">
-        <button class="button">生成大纲</button>
-      </footer>
     </div>
   </div>
 </template>
 
 <script>
-import { generate_keywords, save_keywords, search_papers } from "@/api/paper";
+import {
+  generate_keywords,
+  save_papers_list,
+  save_keywords,
+  search_papers,
+} from "@/api/paper";
 export default {
   name: "DocumentManager",
   data() {
@@ -929,6 +1004,8 @@ export default {
     },
     togglePaperSelection(paper) {
       // 切换选中状态
+      console.log(paper, "ssddddel");
+
       if (paper.is_relevant === "yes") {
         paper.is_relevant = "no";
         // 从选中列表中移除
@@ -948,26 +1025,42 @@ export default {
         }
       }
     },
-    selectPaper(paper, event) {
-      // 如果选中，就添加到 selectedPapers 中，否则移除
-      const isSelected = event.target.checked; // 检查复选框是否被选中
-      paper.is_relevant = isSelected ? "yes" : "no"; // 更新论文的选中状态
-
-      if (isSelected) {
-        // 如果选中，将论文添加到 selectedPapers 中
-        if (
-          !this.selectedPapers.some(
-            (selected) => selected.title === paper.title
-          )
-        ) {
-          this.selectedPapers.push(paper);
+    delSelectPaper(paper, event) {
+      console.log(this.selectedPapers, "this.selectedPapers");
+      // 如果取消选中，从 selectedPapers 中移除
+      this.selectedPapers = this.selectedPapers.filter(
+        (item) => item.title !== paper.title
+      );
+      // 搜索到的文件列表
+      this.reference_paper_fe_lists.forEach((item) => {
+        if (item.title == paper.title) {
+          item.is_relevant = "no";
         }
-      } else {
-        // 如果取消选中，从 selectedPapers 中移除
-        this.selectedPapers = this.selectedPapers.filter(
-          (selected) => selected.title !== paper.title
-        );
-      }
+      });
+      this.user_upload_paper_fe_lists.forEach((item) => {
+        if (item.title == paper.title) {
+          item.is_relevant = "no";
+        }
+      });
+
+      this.saveUserSelect();
+    },
+    saveUserSelect() {
+      let data = {
+        key: this.keyWordsData.key,
+        reference_paper_fe_lists: [],
+        user_upload_paper_fe_list: [],
+      };
+      this.selectedPapers.forEach((item) => {
+        if (item.search_type == "user_upload") {
+          data.user_upload_paper_fe_list.push(item);
+        } else {
+          data.reference_paper_fe_lists.push(item);
+        }
+      });
+      save_papers_list(data).then((res) => {
+        console.log("保存成功");
+      });
     },
   },
 };
@@ -977,6 +1070,7 @@ export default {
 .container {
   padding-left: 40px;
   margin-top: -10px;
+  margin-bottom: -20px;
   font-size: 14px;
   width: 100%;
 }
@@ -1039,7 +1133,7 @@ li {
 
 .content {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   margin-bottom: 20px;
   min-height: 200px;
   max-height: 400px;
@@ -1057,8 +1151,6 @@ li {
 
 .sidebar-item,
 .sidebar-list {
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
   margin-bottom: 10px;
 }
 
@@ -1115,15 +1207,41 @@ hr {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 10px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  ::v-deep(.el-upload-dragger) {
+    width: 190px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  ::v-deep(.el-upload) {
+    height: 100%;
+  }
+  ::v-deep(.upload-box) {
+    height: 100%;
+  }
+  ::v-deep(.el-upload-dragger .el-icon-upload) {
+    // height: 100%;
+    margin-top: -30px;
+  }
+  .upload-demo {
+    height: 100%;
+  }
 }
 
 .upload-box {
   border: 1px solid #ccc;
-  padding: 20px;
+  padding: 5px;
   border-radius: 10px;
   background-color: #f0f8ff;
   text-align: center;
+  height: 100%;
 }
 
 .upload-button {
@@ -1159,7 +1277,9 @@ hr {
 }
 
 .selected-item {
-  background-color: #e6ffe6; /* 浅绿色背景 */
+  .paper-card {
+    background-color: rgba(104, 250, 104, 0.1); /* 浅绿色背景 */
+  }
 }
 
 .selected-paper {
@@ -1213,5 +1333,11 @@ hr {
     border-radius: 14px;
     flex-shrink: 0;
   }
+  p > span {
+    color: #303133;
+  }
+}
+.dateP {
+  margin-left: 20px;
 }
 </style>

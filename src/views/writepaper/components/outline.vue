@@ -303,6 +303,27 @@
           </div>
         </div>
       </div>
+      <div
+        :class="[
+          'firstItem',
+          'secondItem',
+          device == 'mobile' ? 'mobilebox' : '',
+        ]"
+      >
+        <!-- 论文字数 -->
+        <div class="selectLang formItem firstItem" style="padding-right: 0">
+          <p class="formItemLabel">投喂信息</p>
+          <div class="formItemCon">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 8 }"
+              placeholder="可投喂信息： 开题报告， 设计思路等内容"
+              v-model="requestForm.newTItle"
+            >
+            </el-input>
+          </div>
+        </div>
+      </div>
 
       <!-- 三级大纲 -->
       <!-- <div class="selectLang formItem">
@@ -352,6 +373,7 @@ export default {
       // 定义变量
       requestForm: {
         title: "",
+        newTItle: "",
         threeCon: false,
         language: "中文",
         type: "本科",
@@ -376,7 +398,7 @@ export default {
         结课论文: "专科、本科课论文水准，可通过论文水平进一步控制论文深度",
       },
       minCount: 3000,
-      maxCount: 30000,
+      maxCount: 25000,
       options: [
         {
           value: "中文",
@@ -426,12 +448,12 @@ export default {
           label: this.$createElement("strong", "20000"),
         },
 
-        30000: {
+        25000: {
           style: {
             width: "90px",
             color: "#E6A23C",
           },
-          label: this.$createElement("strong", "30000"),
+          label: this.$createElement("strong", "25000"),
         },
       },
       showContrast: false,
