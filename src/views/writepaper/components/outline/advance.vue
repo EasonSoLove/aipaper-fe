@@ -15,7 +15,7 @@
         </p>
         <ul>
           <li
-            v-for="(keyword, index) in keyWordsData.search_cn_keywords"
+            v-for="(keyword, index) in formDataV2.search_cn_keywords"
             :key="index"
           >
             {{ keyword }}
@@ -33,7 +33,7 @@
             placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newCnKeyword"
             @keyup.enter="addKeyword('cn')"
-            :disabled="keyWordsData.search_cn_keywords.length >= 4"
+            :disabled="formDataV2.search_cn_keywords.length >= 4"
             class="input-with-select"
           >
             <el-button
@@ -54,7 +54,7 @@
         </p>
         <ul>
           <li
-            v-for="(keyword, index) in keyWordsData.search_en_keywords"
+            v-for="(keyword, index) in formDataV2.search_en_keywords"
             :key="index"
           >
             {{ keyword }}
@@ -72,7 +72,7 @@
             placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newEnKeyword"
             @keyup.enter="addKeyword('en')"
-            :disabled="keyWordsData.search_en_keywords.length >= 4"
+            :disabled="formDataV2.search_en_keywords.length >= 4"
             class="input-with-select"
           >
             <el-button
@@ -255,6 +255,7 @@
               action="https://jsonplaceholder.typicode.com/posts/"
               multiple
               :show-file-list="false"
+              :before-upload="beforeUpload"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -277,13 +278,14 @@ import {
   save_papers_list,
   save_keywords,
   search_papers,
+  upload_papers,
 } from "@/api/paper";
 export default {
   name: "DocumentManager",
   data() {
     return {
       // isMenuOpen: true, // 控制整个内容区显示状态
-      keyWordsData: {
+      formDataV2: {
         search_cn_keywords: [],
         search_en_keywords: [],
       },
@@ -933,25 +935,90 @@ export default {
     },
   },
   methods: {
+    beforeUpload(file) {
+      // const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
+      // const isLt500K = file.size / 1024 < 500;
+
+      // if (!isJPGorPNG) {
+      //   this.$message.error('上传文件只能是 JPG 或 PNG 格式!');
+      //   return false;
+      // }
+      // if (!isLt500K) {
+      //   this.$message.error('上传文件大小不能超过 500KB!');
+      //   return false;
+      // }
+      if (!this.formDataV2.key) {
+        this.$message({
+          type: "warning",
+          message: "上传文件需先生成检索关键字!",
+        });
+        return false;
+      }
+      let data = new FormData();
+      console.log("file", file);
+      data.append("files", file);
+      data.append("key", this.formDataV2.key);
+      upload_papers(data).then((res) => {
+        console.log("ssd", res);
+        this.$message({
+          type: "warning",
+          message: "上传文件成功!",
+        });
+        this.getPaperList();
+      });
+      return false;
+    },
     saveKeywords() {
-      let data = this.keyWordsData;
+      let data = this.formDataV2;
       save_keywords(data).then((res) => {
         console.log(res, "res");
         let resultData = res.result;
-        this.keyWordsData.search_cn_keywords = resultData.search_cn_keywords;
-        this.keyWordsData.search_en_keywords = resultData.search_en_keywords;
+        this.formDataV2.search_cn_keywords = resultData.search_cn_keywords;
+        this.formDataV2.search_en_keywords = resultData.search_en_keywords;
+        this.getPaperList();
       });
       // 保存成功 更新关键词列表
     },
     seachPaperS() {
       this.loading = true;
+
       this.saveKeywords();
-      let data = this.keyWordsData;
+    },
+    getPaperList() {
+      this.loading = true;
+
+      let data = this.formDataV2;
       search_papers(data).then((res) => {
+        this.loading = false;
+
         let paperList = res.result;
         this.reference_paper_fe_lists = paperList.reference_paper_fe_lists;
+        if (
+          this.reference_paper_fe_lists &&
+          this.reference_paper_fe_lists.length > 0
+        ) {
+          this.reference_paper_fe_lists.forEach((item) => {
+            item.isExpanded = false;
+          });
+        }
+
         this.user_upload_paper_fe_lists = paperList.user_upload_paper_fe_lists;
-        this.loading = false;
+        if (
+          this.user_upload_paper_fe_lists &&
+          this.user_upload_paper_fe_lists.length > 0
+        ) {
+          this.user_upload_paper_fe_lists.forEach((item) => {
+            item.isExpanded = false;
+          });
+        }
+        console.log(
+          "this.reference_paper_fe_lists",
+          this.reference_paper_fe_lists
+        );
+        console.log(
+          "this.user_upload_paper_fe_lists",
+          this.user_upload_paper_fe_lists
+        );
       });
     },
     toggleMenu() {},
@@ -975,29 +1042,29 @@ export default {
       };
       generate_keywords(data).then((res) => {
         console.log(res);
-        this.keyWordsData = res.result;
+        this.formDataV2 = res.result;
         this.loading = false;
       });
     },
     removeKeyword(type, index) {
       if (type === "cn") {
-        this.keyWordsData.search_cn_keywords.splice(index, 1);
+        this.formDataV2.search_cn_keywords.splice(index, 1);
       } else if (type === "en") {
-        this.keyWordsData.search_en_keywords.splice(index, 1);
+        this.formDataV2.search_en_keywords.splice(index, 1);
       }
     },
     addKeyword(type) {
-      if (type === "cn" && this.keyWordsData.search_cn_keywords.length < 4) {
+      if (type === "cn" && this.formDataV2.search_cn_keywords.length < 4) {
         if (this.newCnKeyword.trim()) {
-          this.keyWordsData.search_cn_keywords.push(this.newCnKeyword.trim());
+          this.formDataV2.search_cn_keywords.push(this.newCnKeyword.trim());
           this.newCnKeyword = "";
         }
       } else if (
         type === "en" &&
-        this.keyWordsData.search_en_keywords.length < 4
+        this.formDataV2.search_en_keywords.length < 4
       ) {
         if (this.newEnKeyword.trim()) {
-          this.keyWordsData.search_en_keywords.push(this.newEnKeyword.trim());
+          this.formDataV2.search_en_keywords.push(this.newEnKeyword.trim());
           this.newEnKeyword = "";
         }
       }
@@ -1024,6 +1091,8 @@ export default {
           this.selectedPapers.push(newPaper);
         }
       }
+
+      this.saveUserSelect();
     },
     delSelectPaper(paper, event) {
       console.log(this.selectedPapers, "this.selectedPapers");
@@ -1047,7 +1116,7 @@ export default {
     },
     saveUserSelect() {
       let data = {
-        key: this.keyWordsData.key,
+        key: this.formDataV2.key,
         reference_paper_fe_lists: [],
         user_upload_paper_fe_list: [],
       };

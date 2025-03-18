@@ -111,11 +111,19 @@ export function remove_reduce_file(data) {
 }
 export function save_papers_list(data) {
   return request({
-    url: baseUrl + "/api/ai-paper/paper/step_outline/save_papers_list",
+    url: baseUrl + "/api/ai-paper/step_outline/save_papers_list",
     method: "post",
     data,
   });
 }
+export function upload_papers(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/upload_papers",
+    method: "post",
+    data,
+  });
+}
+
 export function re_reduce(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/edit/re_reduce",
