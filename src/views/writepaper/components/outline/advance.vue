@@ -15,7 +15,7 @@
         </p>
         <ul>
           <li
-            v-for="(keyword, index) in formDataV2.search_cn_keywords"
+            v-for="(keyword, index) in formdataV2.search_cn_keywords"
             :key="index"
           >
             {{ keyword }}
@@ -33,7 +33,10 @@
             placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newCnKeyword"
             @keyup.enter="addKeyword('cn')"
-            :disabled="formDataV2.search_cn_keywords.length >= 4"
+            :disabled="
+              formdataV2.search_cn_keywords &&
+              formdataV2.search_cn_keywords.length >= 4
+            "
             class="input-with-select"
           >
             <el-button
@@ -54,7 +57,7 @@
         </p>
         <ul>
           <li
-            v-for="(keyword, index) in formDataV2.search_en_keywords"
+            v-for="(keyword, index) in formdataV2.search_en_keywords"
             :key="index"
           >
             {{ keyword }}
@@ -72,7 +75,10 @@
             placeholder="关键词上限4个,可删除后自定义关键词"
             v-model="newEnKeyword"
             @keyup.enter="addKeyword('en')"
-            :disabled="formDataV2.search_en_keywords.length >= 4"
+            :disabled="
+              formdataV2.search_en_keywords &&
+              formdataV2.search_en_keywords.length >= 4
+            "
             class="input-with-select"
           >
             <el-button
@@ -280,6 +286,8 @@ import {
   search_papers,
   upload_papers,
 } from "@/api/paper";
+import { mapGetters } from "vuex";
+
 export default {
   name: "DocumentManager",
   data() {
@@ -928,6 +936,10 @@ export default {
       selectedPapers: [], // 用于存储选中的论文
     };
   },
+  computed: {
+    // 计算属性
+    ...mapGetters(["formdataV2"]),
+  },
   props: {
     parentForm: {
       type: Object,
@@ -947,7 +959,7 @@ export default {
       //   this.$message.error('上传文件大小不能超过 500KB!');
       //   return false;
       // }
-      if (!this.formDataV2.key) {
+      if (!this.formdataV2.key) {
         this.$message({
           type: "warning",
           message: "上传文件需先生成检索关键字!",
@@ -957,26 +969,34 @@ export default {
       let data = new FormData();
       console.log("file", file);
       data.append("files", file);
-      data.append("key", this.formDataV2.key);
+      data.append("key", this.formdataV2.key);
       upload_papers(data).then((res) => {
         console.log("ssd", res);
+        this.dealSelectList(res.result);
         this.$message({
           type: "warning",
           message: "上传文件成功!",
         });
-        this.getPaperList();
       });
       return false;
     },
+    //  取出用户上传的文件放在左侧 用户上传区
+    dealSelectList(selectList) {},
     saveKeywords() {
-      let data = this.formDataV2;
-      save_keywords(data).then((res) => {
-        console.log(res, "res");
-        let resultData = res.result;
-        this.formDataV2.search_cn_keywords = resultData.search_cn_keywords;
-        this.formDataV2.search_en_keywords = resultData.search_en_keywords;
-        this.getPaperList();
-      });
+      let data = this.formdataV2;
+      save_keywords(data)
+        .then((res) => {
+          console.log(res, "res");
+          let resultData = res.result;
+          this.formDataV2.search_cn_keywords = resultData.search_cn_keywords;
+          this.formDataV2.search_en_keywords = resultData.search_en_keywords;
+          this.setFormV2();
+
+          this.getPaperList();
+        })
+        .catch(() => {
+          this.loading = false;
+        });
       // 保存成功 更新关键词列表
     },
     seachPaperS() {
@@ -988,38 +1008,43 @@ export default {
       this.loading = true;
 
       let data = this.formDataV2;
-      search_papers(data).then((res) => {
-        this.loading = false;
+      search_papers(data)
+        .then((res) => {
+          this.loading = false;
 
-        let paperList = res.result;
-        this.reference_paper_fe_lists = paperList.reference_paper_fe_lists;
-        if (
-          this.reference_paper_fe_lists &&
-          this.reference_paper_fe_lists.length > 0
-        ) {
-          this.reference_paper_fe_lists.forEach((item) => {
-            item.isExpanded = false;
-          });
-        }
+          let paperList = res.result;
+          this.reference_paper_fe_lists = paperList.reference_paper_fe_lists;
+          if (
+            this.reference_paper_fe_lists &&
+            this.reference_paper_fe_lists.length > 0
+          ) {
+            this.reference_paper_fe_lists.forEach((item) => {
+              item.isExpanded = false;
+            });
+          }
 
-        this.user_upload_paper_fe_lists = paperList.user_upload_paper_fe_lists;
-        if (
-          this.user_upload_paper_fe_lists &&
-          this.user_upload_paper_fe_lists.length > 0
-        ) {
-          this.user_upload_paper_fe_lists.forEach((item) => {
-            item.isExpanded = false;
-          });
-        }
-        console.log(
-          "this.reference_paper_fe_lists",
-          this.reference_paper_fe_lists
-        );
-        console.log(
-          "this.user_upload_paper_fe_lists",
-          this.user_upload_paper_fe_lists
-        );
-      });
+          this.user_upload_paper_fe_lists =
+            paperList.user_upload_paper_fe_lists;
+          if (
+            this.user_upload_paper_fe_lists &&
+            this.user_upload_paper_fe_lists.length > 0
+          ) {
+            this.user_upload_paper_fe_lists.forEach((item) => {
+              item.isExpanded = false;
+            });
+          }
+          console.log(
+            "this.reference_paper_fe_lists",
+            this.reference_paper_fe_lists
+          );
+          console.log(
+            "this.user_upload_paper_fe_lists",
+            this.user_upload_paper_fe_lists
+          );
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     toggleMenu() {},
     getkeyWords() {
@@ -1040,11 +1065,20 @@ export default {
         word_count: 8000,
         paper_level: 0,
       };
-      generate_keywords(data).then((res) => {
-        console.log(res);
-        this.formDataV2 = res.result;
-        this.loading = false;
-      });
+      generate_keywords(data)
+        .then((res) => {
+          console.log(res);
+          this.formDataV2 = res.result;
+          this.setFormV2();
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    // 把v2的数据保存下来
+    setFormV2() {
+      this.$store.dispatch("paper/setFormdataV2", this.formDataV2);
     },
     removeKeyword(type, index) {
       if (type === "cn") {
@@ -1116,7 +1150,7 @@ export default {
     },
     saveUserSelect() {
       let data = {
-        key: this.formDataV2.key,
+        key: this.formdataV2.key,
         reference_paper_fe_lists: [],
         user_upload_paper_fe_list: [],
       };

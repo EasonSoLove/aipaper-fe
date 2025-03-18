@@ -23,5 +23,6 @@ const getters = {
   bdVid: (state) => state.paper.bdVid,
   orderStatus: (state) => state.paper.orderStatus,
   selector_item: (state) => state.paper.selector_item,
+  formdataV2: (state) => state.paper.formdataV2,
 };
 export default getters;

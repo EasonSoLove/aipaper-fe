@@ -338,6 +338,7 @@
       <!-- 生成大纲 -->
       <div
         @click="sendOutlineForm"
+        v-if="index == 1"
         :class="[
           'outlineBtn',
           'g_poin',
@@ -346,6 +347,18 @@
         ]"
       >
         <p>生成大纲</p>
+      </div>
+      <div
+        v-if="index == 2"
+        @click="sendV2Form"
+        :class="[
+          'outlineBtn',
+          'g_poin',
+          index == 2 ? 'paperMain' : '',
+          produceLineStatus ? 'produceClass' : '',
+        ]"
+      >
+        <p>生成大纲.</p>
       </div>
     </div>
     <advantage ref="advantageDia"></advantage>
@@ -361,6 +374,7 @@ import { mapGetters } from "vuex";
 import eventBus from "@/utils/eventBus";
 import { getToken } from "@/utils/auth"; //
 import { outlineCreate } from "@/api/user";
+import { create_outline } from "@/api/paper";
 import polling from "@/utils/polling-utils";
 import advantage from "@/views/dashboard/components/advantage";
 import example from "./example/index.vue";
@@ -498,7 +512,7 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["homeData", "produceLineStatus", "device"]),
+    ...mapGetters(["homeData", "produceLineStatus", "device", "formdataV2"]),
   },
   methods: {
     showAdv() {
@@ -561,6 +575,17 @@ export default {
     //   this.produceLineStatus = true;
     //   this.sendOutlineForm();
     // },
+    sendV2Form() {
+      let data = {
+        key: this.formdataV2.key,
+      };
+      create_outline(data).then((res) => {
+        this.$message({
+          type: "success",
+          message: "申城大纲成功!",
+        });
+      });
+    },
     sendOutlineForm: function () {
       if (this.produceLineStatus) {
         this.$message({

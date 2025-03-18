@@ -116,6 +116,13 @@ export function save_papers_list(data) {
     data,
   });
 }
+export function create_outline(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/create_outline",
+    method: "post",
+    data,
+  });
+}
 export function upload_papers(data) {
   return request({
     url: baseUrl + "/api/ai-paper/step_outline/upload_papers",

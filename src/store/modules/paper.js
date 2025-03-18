@@ -8,6 +8,7 @@ const state = {
   bdVid: "",
   orderStatus: "", //支付时判断支付状态
   selector_item: {},
+  formdataV2: {},
 };
 
 const mutations = {
@@ -19,6 +20,9 @@ const mutations = {
   },
   SAVE_VID: (state, bdVid) => {
     state.bdVid = bdVid;
+  },
+  SAVE_FORMV2: (state, formdataV2) => {
+    state.formdataV2 = formdataV2;
   },
   SET_SELECT: (state, selector_item) => {
     state.selector_item = selector_item;
@@ -37,6 +41,9 @@ const mutations = {
 const actions = {
   setActiveIndex({ commit }, activeIndex) {
     commit("TOGGLE_ACTIVE", activeIndex);
+  },
+  setFormdataV2({ commit }, formdataV2) {
+    commit("SAVE_FORMV2", formdataV2);
   },
   setPreviewId({ commit }, preViewId) {
     commit("TOGGLE_PREVIEW", preViewId);
