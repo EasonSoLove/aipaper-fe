@@ -463,8 +463,7 @@ export default {
       generate_keywords(data)
         .then((res) => {
           console.log(res);
-          this.formdataV2 = res.result;
-          this.setFormV2();
+          this.$store.dispatch("paper/setFormdataV2", res.result);
           this.loading = false;
         })
         .catch(() => {
