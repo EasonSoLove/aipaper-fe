@@ -273,11 +273,19 @@
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
-                将文件拖到此处，或<em>点击上传</em>
+                <p style="font-size: 14px; margin-bottom: 20px">
+                  将文件拖到此处，或<em>点击上传</em>
+                </p>
+                <p style="font-size: 14px; margin-bottom: 10px">
+                  只能上传PDF文件，且不超过10M
+                </p>
+                <p style="font-size: 12px">
+                  Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。文献来源-文献作者-发表年份-文献标题.pdf，例如
+                  XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf，多作者格式如
+                  XX期刊-王某某&李某某&张某某-2018-H5在游戏开发领域的应用研究.pdf，
+                </p>
               </div>
-              <div class="el-upload__tip" slot="tip">
-                只能上传jpg/png文件，且不超过500kb
-              </div>
+              <div class="el-upload__tip" slot="tip"></div>
             </el-upload>
           </div>
         </div>
@@ -340,7 +348,7 @@ export default {
         return false;
       }
 
-      if (!this.formdataV2.key1) {
+      if (!this.formdataV2.key1 && !this.formdataV2.key) {
         this.$message({
           type: "warning",
           message: "上传文件需先生成检索关键字!",
@@ -351,7 +359,7 @@ export default {
       let data = new FormData();
       console.log("file", file);
       data.append("files", file);
-      data.append("key", this.formdataV2.key1);
+      data.append("key", this.formdataV2.key1 || this.formdataV2.key);
 
       upload_papers(data).then((res) => {
         console.log("ssd", res);
@@ -455,13 +463,13 @@ export default {
       }
       this.loading = true;
       let data = {
-        title: "印度宗教的发展与研究",
-        language: "中文",
-        field: "哲学类",
-        type: "本科",
-        product: "毕业论文",
-        word_count: 8000,
-        paper_level: 0,
+        title: this.parentForm.title,
+        language: this.parentForm.language,
+        field: this.parentForm.field[1],
+        type: this.parentForm.type,
+        product: this.parentForm.product,
+        word_count: this.parentForm.word_count,
+        paper_level: this.parentForm.paper_level == "初级" ? 0 : 3,
       };
       generate_keywords(data)
         .then((res) => {
@@ -504,7 +512,7 @@ export default {
       // 切换选中状态
       console.log(paper, "ssddddel");
       let data = {
-        key: this.formdataV2.key1,
+        key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
         user_upload_paper_fe_list: [],
       };
@@ -546,7 +554,7 @@ export default {
       console.log(this.selectedPapers, "this.selectedPapers");
       console.log(paper, "this.selectedPapers");
       let data = {
-        key: this.formdataV2.key1,
+        key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
         user_upload_paper_fe_list: [],
       };
@@ -663,8 +671,8 @@ li {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
-  min-height: 200px;
-  max-height: 400px;
+  min-height: 300px;
+  max-height: 450px;
 }
 
 .sidebar {

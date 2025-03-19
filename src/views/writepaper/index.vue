@@ -352,6 +352,8 @@ export default {
       outlineStatus(data)
         .then((res) => {
           // 使用 next 的回调函数来访问组件实例
+          console.log("ddddddddddddddddddddddddd", res);
+          console.log("ddddddddddddddddddddddddd3333", res.result.vision);
           next((vm) => {
             vm.showOutLine(res.result.outline.outline);
             console.log("dddd", res);
