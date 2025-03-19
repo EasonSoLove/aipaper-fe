@@ -377,8 +377,11 @@ export default {
       this.$store.dispatch("paper/setFormdataV2", this.formdataV2);
     },
     saveKeywords() {
+      console.log(this.formdataV2);
       let data = this.formdataV2;
-      data.key = data.key1;
+      if (!data.key) {
+        data.key = data.key1;
+      }
       save_keywords(data)
         .then((res) => {
           console.log(res, "res");
