@@ -1,5 +1,5 @@
 <template>
-  <div class="ordersList">
+  <div class="ordersList" v-loading="loading">
     <div class="btns">
       <!-- <el-button type="primary" round @click="delList">删除大纲</el-button> -->
       <el-button type="primary" round @click="refresh">刷新大纲</el-button>
@@ -42,11 +42,31 @@
                   <el-button
                     @click="jumpStep2(orderObj)"
                     icon="el-icon-view"
+                    v-show="orderObj.version == 'v1'"
                     :disabled="orderObj.status != '生成成功'"
                     type="text"
                   >
                     查看大纲
                   </el-button>
+
+                  <template v-show="orderObj.version == 'v2'">
+                    <el-button
+                      @click="jumpV2Outline(orderObj)"
+                      v-show="orderObj.status == '等待中'"
+                      icon="el-icon-view"
+                      type="text"
+                    >
+                      继续编辑大纲
+                    </el-button>
+                    <el-button
+                      @click="jumpStep2(orderObj)"
+                      v-show="orderObj.status == '生成成功'"
+                      icon="el-icon-view"
+                      type="text"
+                    >
+                      查看大纲
+                    </el-button>
+                  </template>
                 </div>
                 <div>
                   <el-button
@@ -103,7 +123,7 @@
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import { getList } from "@/api/table";
-import { getOutlineList } from "@/api/user";
+import { getOutlineList, outlineStatus } from "@/api/user";
 import { throttle } from "lodash";
 import eventBus from "@/utils/eventBus";
 import { product } from "@/api/gpt";
@@ -121,6 +141,7 @@ export default {
       // 定义变量
       checkList: [],
       orderList: [],
+      loading: false,
       page: {
         page_num: 0,
         page_size: 5,
@@ -182,6 +203,45 @@ export default {
       eventBus.emit("showDownOutline", requestForm);
       eventBus.emit("orderDialogChange", false);
     },
+    jumpV2Outline(row) {
+      zhuge.track(`用户编辑定制版大纲`, {
+        大纲标题: row.title,
+        大纲key: row.key1,
+      });
+      // 获取数据再跳转
+      this.loading = true;
+      outlineStatus({ key: row.key1 })
+        .then((res) => {
+          console.log("res", res);
+          this.$store.dispatch("paper/setFormdataV2", res.result);
+          this.$store.dispatch("app/setRequestForm", res.result);
+          this.loading = false;
+
+          this.jumpSelfOutline(res.result);
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    // 跳转大纲及打开定制版
+    jumpSelfOutline(requestForm) {
+      if (this.$route.path !== "/main/writepaper") {
+        this.$router.push(
+          {
+            path: "/main/writepaper",
+          },
+          () => {
+            this.$nextTick(() => {
+              eventBus.emit("setFormData", requestForm, 2); // 发布事件
+              eventBus.emit("orderDialogChange", false);
+            });
+          }
+        );
+      } else {
+        eventBus.emit("setFormData", requestForm, 2); // 发布事件
+        eventBus.emit("orderDialogChange", false);
+      }
+    },
     jumpStep2(row) {
       zhuge.track(`用户查看大纲`, {
         大纲标题: row.title,
@@ -234,19 +294,26 @@ export default {
       // });
     },
     handleCurrentChange: throttle(function (newPage) {
+      this.loading = true;
       // 这里可以添加你的分页逻辑，例如发送请求获取新的数据
       let params = {
         page_num: newPage,
         page_size: this.page.page_size,
       };
-      getOutlineList(params).then((res) => {
-        let data = res.result;
-        if (Object.keys(data).length > 0) {
-          this.orderList = data.outline_list || [];
-          this.page.page_num = data.page_num - 0;
-          this.page.total = data.total;
-        }
-      });
+      getOutlineList(params)
+        .then((res) => {
+          this.loading = false;
+
+          let data = res.result;
+          if (Object.keys(data).length > 0) {
+            this.orderList = data.outline_list || [];
+            this.page.page_num = data.page_num - 0;
+            this.page.total = data.total;
+          }
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     }, 300), // 300毫秒内最多执行一次
   },
 };

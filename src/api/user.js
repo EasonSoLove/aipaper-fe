@@ -36,6 +36,7 @@ export function coupon_list(params) {
     params,
   });
 }
+
 export function getUserInfo() {
   return request({
     url: baseUrl + "/api/ai-paper/user/info",

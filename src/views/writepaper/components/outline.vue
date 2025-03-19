@@ -565,10 +565,13 @@ export default {
         }
       }
     },
-    setFormData(data) {
+    setFormData(data, index) {
       this.$log("setFormdata-----------", data);
       if (data) {
         this.requestForm = { ...data };
+      }
+      if (index == 2) {
+        this.index = 2;
       }
     },
     // loadingBtn() {

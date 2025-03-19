@@ -211,7 +211,10 @@
         </div>
         <div class="content-main">
           <h3>已选中的论文</h3>
-          <div v-for="(paper, index) in selectedPapers" :key="index">
+          <div
+            v-for="(paper, index) in formdataV2.reference_paper_selected_lists"
+            :key="index"
+          >
             <div class="paper-card">
               <div class="paper-header">
                 <h4>{{ paper.title }}</h4>
@@ -948,17 +951,20 @@ export default {
   },
   methods: {
     beforeUpload(file) {
-      // const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
-      // const isLt500K = file.size / 1024 < 500;
+      // 检查文件是否为 PDF 格式
+      const isPDF = file.type === "application/pdf";
+      // 检查文件大小是否小于 10MB
+      const isLt10M = file.size / 1024 / 1024 < 10;
 
-      // if (!isJPGorPNG) {
-      //   this.$message.error('上传文件只能是 JPG 或 PNG 格式!');
-      //   return false;
-      // }
-      // if (!isLt500K) {
-      //   this.$message.error('上传文件大小不能超过 500KB!');
-      //   return false;
-      // }
+      if (!isPDF) {
+        this.$message.error("上传文件只能是 PDF 格式!");
+        return false;
+      }
+      if (!isLt10M) {
+        this.$message.error("上传文件大小不能超过 10MB!");
+        return false;
+      }
+
       if (!this.formdataV2.key) {
         this.$message({
           type: "warning",
@@ -966,22 +972,35 @@ export default {
         });
         return false;
       }
+
       let data = new FormData();
       console.log("file", file);
       data.append("files", file);
       data.append("key", this.formdataV2.key);
+
       upload_papers(data).then((res) => {
         console.log("ssd", res);
         this.dealSelectList(res.result);
         this.$message({
-          type: "warning",
+          type: "success", // 将类型改为 success
           message: "上传文件成功!",
         });
       });
+
       return false;
     },
+
     //  取出用户上传的文件放在左侧 用户上传区
-    dealSelectList(selectList) {},
+    dealSelectList(selectList) {
+      this.selectedPapers = selectList.reference_paper_selected_lists;
+      this.user_upload_paper_fe_lists = selectList.user_upload_paper_fe_lists;
+      this.formdataV2.reference_paper_selected_lists =
+        selectList.reference_paper_selected_lists;
+      this.formdataV2.user_upload_paper_fe_lists =
+        selectList.user_upload_paper_fe_lists;
+
+      this.setFormV2();
+    },
     saveKeywords() {
       let data = this.formdataV2;
       save_keywords(data)
@@ -1106,63 +1125,85 @@ export default {
     togglePaperSelection(paper) {
       // 切换选中状态
       console.log(paper, "ssddddel");
-
-      if (paper.is_relevant === "yes") {
-        paper.is_relevant = "no";
-        // 从选中列表中移除
-        this.selectedPapers = this.selectedPapers.filter(
-          (selected) => selected.title !== paper.title
-        );
-      } else {
-        paper.is_relevant = "yes";
-        // 添加到选中列表
-        if (
-          !this.selectedPapers.some(
-            (selected) => selected.title === paper.title
-          )
-        ) {
-          let newPaper = JSON.parse(JSON.stringify(paper));
-          this.selectedPapers.push(newPaper);
-        }
-      }
-
-      this.saveUserSelect();
-    },
-    delSelectPaper(paper, event) {
-      console.log(this.selectedPapers, "this.selectedPapers");
-      // 如果取消选中，从 selectedPapers 中移除
-      this.selectedPapers = this.selectedPapers.filter(
-        (item) => item.title !== paper.title
-      );
-      // 搜索到的文件列表
-      this.reference_paper_fe_lists.forEach((item) => {
-        if (item.title == paper.title) {
-          item.is_relevant = "no";
-        }
-      });
-      this.user_upload_paper_fe_lists.forEach((item) => {
-        if (item.title == paper.title) {
-          item.is_relevant = "no";
-        }
-      });
-
-      this.saveUserSelect();
-    },
-    saveUserSelect() {
       let data = {
         key: this.formdataV2.key,
         reference_paper_fe_lists: [],
         user_upload_paper_fe_list: [],
       };
-      this.selectedPapers.forEach((item) => {
-        if (item.search_type == "user_upload") {
-          data.user_upload_paper_fe_list.push(item);
-        } else {
-          data.reference_paper_fe_lists.push(item);
-        }
-      });
+      if (paper.is_relevant == "no") {
+        paper.is_relevant = "yes";
+      } else {
+        paper.is_relevant = "no";
+      }
+      if (paper.search_type == "user_upload") {
+        data.user_upload_paper_fe_list.push(paper);
+      } else {
+        data.reference_paper_fe_lists.push(paper);
+      }
+      // if (paper.is_relevant === "yes") {
+      //   paper.is_relevant = "no";
+      //   // 从选中列表中移除
+      //   this.selectedPapers = this.selectedPapers.filter(
+      //     (selected) => selected.title !== paper.title
+      //   );
+      // } else {
+      //   paper.is_relevant = "yes";
+      //   // 添加到选中列表
+      //   if (
+      //     !this.selectedPapers.some(
+      //       (selected) => selected.title === paper.title
+      //     )
+      //   ) {
+      //     let newPaper = JSON.parse(JSON.stringify(paper));
+      //     this.selectedPapers.push(newPaper);
+      //   }
+      // }
+
+      this.saveUserSelect(data);
+    },
+    delSelectPaper(paper, event) {
+      console.log(this.selectedPapers, "this.selectedPapers");
+      console.log(paper, "this.selectedPapers");
+      let data = {
+        key: this.formdataV2.key,
+        reference_paper_fe_lists: [],
+        user_upload_paper_fe_list: [],
+      };
+      paper.is_relevant = "no";
+      if (paper.search_type == "user_upload") {
+        data.user_upload_paper_fe_list.push(paper);
+      } else {
+        data.reference_paper_fe_lists.push(paper);
+      }
+      // 如果取消选中，从 selectedPapers 中移除
+      // this.selectedPapers = this.selectedPapers.filter(
+      //   (item) => item.title !== paper.title
+      // );
+      // // 搜索到的文件列表
+      // this.reference_paper_fe_lists.forEach((item) => {
+      //   if (item.title == paper.title) {
+      //     item.is_relevant = "no";
+      //   }
+      // });
+      // this.user_upload_paper_fe_lists.forEach((item) => {
+      //   if (item.title == paper.title) {
+      //     item.is_relevant = "no";
+      //   }
+      // });
+
+      this.saveUserSelect(data);
+    },
+    saveUserSelect(data) {
+      // this.selectedPapers.forEach((item) => {
+      //   if (item.search_type == "user_upload") {
+      //     data.user_upload_paper_fe_list.push(item);
+      //   } else {
+      //     data.reference_paper_fe_lists.push(item);
+      //   }
+      // });
       save_papers_list(data).then((res) => {
         console.log("保存成功");
+        this.dealSelectList(res.result);
       });
     },
   },
