@@ -3,7 +3,7 @@
     <header class="header footer">
       <el-button
         type="primary"
-        :disabled="formdataV2.key1"
+        :disabled="!!formdataV2.key1"
         @click="getkeyWords"
         round
         style="width: 100%"
@@ -260,14 +260,13 @@
             </div>
           </div>
         </div>
-        <div class="upload-section">
+        <div v-loading="uploading" class="upload-section">
           <div class="upload-box">
             <el-upload
               class="upload-demo"
               style="width: 100%"
               drag
               action="https://jsonplaceholder.typicode.com/posts/"
-              multiple
               :show-file-list="false"
               :before-upload="beforeUpload"
             >
@@ -320,6 +319,7 @@ export default {
       reference_paper_fe_lists: [],
       user_upload_paper_fe_lists: [],
       selectedPapers: [], // 用于存储选中的论文
+      uploading: false,
     };
   },
   computed: {
@@ -333,7 +333,7 @@ export default {
     },
   },
   methods: {
-    beforeUpload(file) {
+    beforeUpload(file, fileList) {
       // 检查文件是否为 PDF 格式
       const isPDF = file.type === "application/pdf";
       // 检查文件大小是否小于 10MB
@@ -355,7 +355,7 @@ export default {
         });
         return false;
       }
-
+      this.uploading = true;
       let data = new FormData();
       console.log("file", file);
       data.append("files", file);
@@ -363,6 +363,8 @@ export default {
 
       upload_papers(data).then((res) => {
         console.log("ssd", res);
+        this.uploading = false;
+
         this.dealSelectList(res.result);
         this.$message({
           type: "success", // 将类型改为 success

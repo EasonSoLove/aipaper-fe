@@ -24,5 +24,6 @@ const getters = {
   orderStatus: (state) => state.paper.orderStatus,
   selector_item: (state) => state.paper.selector_item,
   formdataV2: (state) => state.paper.formdataV2,
+  outlineVersion: (state) => state.paper.outlineVersion,
 };
 export default getters;

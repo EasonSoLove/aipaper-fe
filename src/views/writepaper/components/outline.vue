@@ -3,17 +3,22 @@
     <!-- 页面名称 -->
     <div class="outlineTab">
       <div class="outLeft">
+        {{ outlineVersion }}
         <p
-          @click="checkoutPaper(1)"
-          :class="['outLeftTitle', index == 1 ? 'activeLT' : '']"
+          @click="checkoutPaper('v1')"
+          :class="['outLeftTitle', outlineVersion == 'v1' ? 'activeLT' : '']"
         >
           万象专业版
           <span class="underLeft"></span>
         </p>
         <!-- checkoutPaper(2) -->
         <p
-          @click="checkoutPaper(2)"
-          :class="['outLeftTitle', 'paperClass', index == 2 ? 'activeLT' : '']"
+          @click="checkoutPaper('v2')"
+          :class="[
+            'outLeftTitle',
+            'paperClass',
+            outlineVersion == 'v2' ? 'activeLT' : '',
+          ]"
         >
           万象定制版
           <span class="underLeft"></span>
@@ -33,7 +38,9 @@
       </div>
     </div>
     <!-- 用户输入页面 -->
-    <div :class="['uesrInputBox', index == 2 ? 'tabMainActive' : '']">
+    <div
+      :class="['uesrInputBox', outlineVersion == 'v2' ? 'tabMainActive' : '']"
+    >
       <!-- 科目与题目 -->
       <div class="selectLang formItem">
         <el-tooltip
@@ -73,7 +80,7 @@
           'secondItem',
           device == 'mobile' ? 'mobilebox' : '',
         ]"
-        v-if="index == 2"
+        v-if="outlineVersion == 'v2'"
       >
         <advance :parentForm="requestForm"></advance>
       </div>
@@ -338,23 +345,23 @@
       <!-- 生成大纲 -->
       <div
         @click="sendOutlineForm('v1')"
-        v-if="index == 1"
+        v-if="outlineVersion == 'v1'"
         :class="[
           'outlineBtn',
           'g_poin',
-          index == 2 ? 'paperMain' : '',
+          outlineVersion == 'v2' ? 'paperMain' : '',
           produceLineStatus ? 'produceClass' : '',
         ]"
       >
         <p>生成大纲</p>
       </div>
       <div
-        v-if="index == 2"
+        v-if="outlineVersion == 'v2'"
         @click="sendV2Form"
         :class="[
           'outlineBtn',
           'g_poin',
-          index == 2 ? 'paperMain' : '',
+          outlineVersion == 'v2' ? 'paperMain' : '',
           produceLineStatus ? 'produceClass' : '',
         ]"
       >
@@ -399,7 +406,7 @@ export default {
         word_count: 5000,
       },
       OrderType: OrderType,
-      index: 2,
+      // outlineActiveIndex: 2,
       carProp: {
         value: "name",
         label: "name",
@@ -513,7 +520,13 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["homeData", "produceLineStatus", "device", "formdataV2"]),
+    ...mapGetters([
+      "homeData",
+      "outlineVersion",
+      "produceLineStatus",
+      "device",
+      "formdataV2",
+    ]),
   },
   methods: {
     showAdv() {
@@ -567,12 +580,9 @@ export default {
       }
     },
     setFormData(data, index) {
-      this.$log("setFormdata-----------", data);
+      this.$log("setFormdata-----------", data, index);
       if (data) {
         this.requestForm = { ...data };
-      }
-      if (index == 2) {
-        this.index = 2;
       }
     },
     // loadingBtn() {
@@ -766,6 +776,7 @@ export default {
     checkoutPaper(val) {
       this.index = val;
       this.$emit("errorBack", "关闭index");
+      this.$store.dispatch("paper/setOutlineVersion", val);
 
       this.$log("homeData", this.homeData);
     },

@@ -59,7 +59,7 @@
                       继续编辑大纲
                     </el-button>
                     <el-button
-                      @click="jumpStep2(orderObj)"
+                      @click="jumpV2Outline(orderObj)"
                       v-show="orderObj.status == '生成成功'"
                       icon="el-icon-view"
                       type="text"
@@ -216,6 +216,8 @@ export default {
           this.$store.dispatch("paper/setFormdataV2", res.result);
           this.$store.dispatch("app/setRequestForm", res.result);
           this.loading = false;
+          // 记录大纲状态
+          this.$store.dispatch("paper/setOutlineVersion", res.result.version);
 
           this.jumpSelfOutline(res.result);
         })
@@ -225,6 +227,8 @@ export default {
     },
     // 跳转大纲及打开定制版
     jumpSelfOutline(requestForm) {
+      this.$log("setFormdata111-----------", requestForm, 2);
+
       if (this.$route.path !== "/main/writepaper") {
         this.$router.push(
           {
@@ -247,6 +251,9 @@ export default {
         大纲标题: row.title,
         大纲key: row.key1,
       });
+
+      this.$store.dispatch("paper/setOutlineVersion", row.version);
+
       // row.key1
       this.$router.push(
         {
@@ -271,7 +278,7 @@ export default {
             };
             this.$store.dispatch("app/setRequestForm", requestForm);
 
-            eventBus.emit("setFormData", requestForm); // 发布事件
+            eventBus.emit("setFormData", requestForm, 1); // 发布事件
             eventBus.emit("orderDialogChange", false);
           });
         }
