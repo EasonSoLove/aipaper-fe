@@ -84,8 +84,14 @@
 
           <div class="orderText rowBetween handleRow">
             <div class="left">
-              类型:
+              学业类型:
               <span class="price">{{ orderObj.type }}</span>
+            </div>
+            <div class="left">
+              万象大纲:
+              <span class="price">{{
+                orderObj.version == "v1" ? "万象专业版" : "万象定制版"
+              }}</span>
             </div>
             <div class="left">
               科目:
@@ -238,12 +244,39 @@ export default {
             this.$nextTick(() => {
               eventBus.emit("setFormData", requestForm, 2); // 发布事件
               eventBus.emit("orderDialogChange", false);
+
+              if (requestForm.outline && requestForm.outline.outline) {
+                setTimeout(() => {
+                  eventBus.emit("successOutline", requestForm.outline.outline);
+                }, 200);
+              } else {
+                this.$store.dispatch("app/setActiveIndex", 0);
+                let _this = this;
+                setTimeout(() => {
+                  _this.$nextTick(() => {
+                    _this.$scrollTo("#outlineTop", 500, { offset: -1500 });
+                  });
+                }, 200);
+              }
             });
           }
         );
       } else {
         eventBus.emit("setFormData", requestForm, 2); // 发布事件
         eventBus.emit("orderDialogChange", false);
+        let _this = this;
+        if (requestForm.outline && requestForm.outline.outline) {
+          setTimeout(() => {
+            eventBus.emit("successOutline", requestForm.outline.outline);
+          }, 200);
+        } else {
+          this.$store.dispatch("app/setActiveIndex", 0);
+          setTimeout(() => {
+            _this.$nextTick(() => {
+              _this.$scrollTo("#outlineTop", 500, { offset: -1500 });
+            });
+          }, 200);
+        }
       }
     },
     jumpStep2(row) {

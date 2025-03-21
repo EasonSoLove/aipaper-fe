@@ -338,6 +338,26 @@ export default {
       deep: true, // 启用深度监听
       immediate: true,
     },
+    formdataV2: {
+      handler(newVal, oldVal) {
+        // 检查是否为初始化调用
+        if (oldVal === undefined) {
+          this.getDefaultPrice(); // 如果需要在初始化时调用
+          return false;
+        }
+        // 检查具体的字段是否发生变化
+        if (
+          newVal.key !== oldVal.key ||
+          newVal.word_count !== oldVal.word_count ||
+          newVal.product !== oldVal.product
+        ) {
+          // 在这里执行你的操作
+          this.getDefaultPrice();
+        }
+      },
+      deep: true, // 启用深度监听
+      immediate: true,
+    },
   },
 
   mounted() {
@@ -361,7 +381,7 @@ export default {
         this.$emit("input", newValue);
       },
     },
-    ...mapGetters(["requestForm", "currentOrder", "homeData"]),
+    ...mapGetters(["requestForm", "currentOrder", "homeData", "formdataV2"]),
     wordShow() {
       return (
         this.requestForm.product == "毕业论文" ||
@@ -394,9 +414,13 @@ export default {
     getDefaultPrice() {
       // 获取预估价格
       console.log("预估价格", this.requestForm);
-      if (this.requestForm.key) {
+      console.log(
+        "this.requestForm.key || this.requestForm.key1",
+        this.requestForm.key || this.requestForm.key1
+      );
+      if (this.requestForm.key || this.requestForm.key1) {
         let data = {
-          key: this.requestForm.key,
+          key: this.requestForm.key || this.requestForm.key1,
           type: this.requestForm.type,
           product: this.requestForm.product,
           word_count: this.requestForm.word_count,

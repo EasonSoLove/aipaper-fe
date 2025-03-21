@@ -79,7 +79,7 @@
       </div>
     </div>
     <!-- step3不展示论文 -->
-    <div v-if="activeIndex !== 3" class="outlineBox">
+    <div v-if="activeIndex !== 3" class="outlineBox" id="outlineTop">
       <outline @errorBack="errorBack"></outline>
     </div>
 
@@ -227,7 +227,7 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["activeIndex", "device", "requestForm"]),
+    ...mapGetters(["activeIndex", "device", "requestForm", "formdataV2"]),
   },
   methods: {
     fetchDataBasedOnRoute(to) {

@@ -481,7 +481,7 @@ export default {
     getDefaultPrice() {
       // 获取预估价格
       let data = {
-        key: this.requestForm.key,
+        key: this.requestForm.key || this.requestForm.key1,
         type: this.requestForm.type,
         product: this.requestForm.product,
         word_count: this.requestForm.word_count,

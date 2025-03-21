@@ -3,7 +3,6 @@
     <!-- 页面名称 -->
     <div class="outlineTab">
       <div class="outLeft">
-        {{ outlineVersion }}
         <p
           @click="checkoutPaper('v1')"
           :class="['outLeftTitle', outlineVersion == 'v1' ? 'activeLT' : '']"
