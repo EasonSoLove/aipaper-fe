@@ -188,10 +188,7 @@
                 <span v-else>
                   {{ paper.abstract }}
                 </span>
-                <span
-                  class="toggle-button"
-                  @click="paper.isExpanded = !paper.isExpanded"
-                >
+                <span class="toggle-button" @click="paperExpandClick(paper)">
                   {{ paper.isExpanded ? "收起" : "展开" }}
                 </span>
               </p>
@@ -216,10 +213,7 @@
         </div>
         <div class="content-main">
           <h3>已选中的论文</h3>
-          <div
-            v-for="(paper, index) in formdataV2.reference_paper_selected_lists"
-            :key="index"
-          >
+          <div v-for="(paper, index) in selectedPapers" :key="index">
             <div class="paper-card">
               <div class="paper-header">
                 <h4>{{ paper.title }}</h4>
@@ -332,6 +326,19 @@ export default {
       default: () => {},
     },
   },
+  watch: {
+    // 监听 formdataV2.reference_paper_selected_lists 的变化
+    "formdataV2.reference_paper_selected_lists": {
+      handler(newVal, oldVal) {
+        // 当数据改变时，你可以在这里执行任何你需要的操作
+        Ming("reference_paper_selected_lists has been updated", newVal, oldVal);
+        // 这里的操作可以是任何事情，比如调用一个方法或者更改其他数据
+        this.selectedPapers = newVal;
+      },
+      deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
+      immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true
+    },
+  },
   methods: {
     beforeUpload(file, fileList) {
       // 检查文件是否为 PDF 格式
@@ -357,12 +364,12 @@ export default {
       }
       this.uploading = true;
       let data = new FormData();
-      console.log("file", file);
+      Ming("file", file);
       data.append("files", file);
       data.append("key", this.formdataV2.key1 || this.formdataV2.key);
 
       upload_papers(data).then((res) => {
-        console.log("ssd", res);
+        Ming("ssd", res);
         this.uploading = false;
 
         this.dealSelectList(res.result);
@@ -377,8 +384,7 @@ export default {
 
     //  取出用户上传的文件放在左侧 用户上传区
     dealSelectList(selectList) {
-      console.log("dealSelectList", selectList);
-      this.selectedPapers = selectList.reference_paper_selected_lists;
+      Ming("dealSelectList", selectList);
       this.user_upload_paper_fe_lists = selectList.user_upload_paper_fe_lists;
       this.formdataV2.reference_paper_selected_lists =
         selectList.reference_paper_selected_lists;
@@ -387,14 +393,14 @@ export default {
       this.$store.dispatch("paper/setFormdataV2", this.formdataV2);
     },
     saveKeywords() {
-      console.log(this.formdataV2);
+      Ming(this.formdataV2);
       let data = this.formdataV2;
       if (!data.key) {
         data.key = data.key1;
       }
       save_keywords(data)
         .then((res) => {
-          console.log(res, "res");
+          Ming(res, "res");
           let resultData = res.result;
           this.formdataV2.search_cn_keywords = resultData.search_cn_keywords;
           this.formdataV2.search_en_keywords = resultData.search_en_keywords;
@@ -426,8 +432,11 @@ export default {
             this.reference_paper_fe_lists &&
             this.reference_paper_fe_lists.length > 0
           ) {
-            this.reference_paper_fe_lists.forEach((item) => {
-              item.isExpanded = false;
+            this.reference_paper_fe_lists.forEach((item, index) => {
+              this.$set(this.reference_paper_fe_lists, index, {
+                ...item,
+                isExpanded: false,
+              });
             });
           }
 
@@ -437,15 +446,15 @@ export default {
             this.user_upload_paper_fe_lists &&
             this.user_upload_paper_fe_lists.length > 0
           ) {
-            this.user_upload_paper_fe_lists.forEach((item) => {
-              item.isExpanded = false;
+            this.user_upload_paper_fe_lists.forEach((item, index) => {
+              this.$set(this.user_upload_paper_fe_lists, index, {
+                ...item,
+                isExpanded: false,
+              });
             });
           }
-          console.log(
-            "this.reference_paper_fe_lists",
-            this.reference_paper_fe_lists
-          );
-          console.log(
+          Ming("this.reference_paper_fe_lists", this.reference_paper_fe_lists);
+          Ming(
             "this.user_upload_paper_fe_lists",
             this.user_upload_paper_fe_lists
           );
@@ -455,6 +464,13 @@ export default {
         });
     },
     toggleMenu() {},
+    paperExpandClick(paper) {
+      Ming(paper, "收齐切换");
+      Ming(paper.isExpanded, "收齐切换1111");
+      paper.isExpanded = !paper.isExpanded;
+      Ming(paper.isExpanded, "收齐切换2222");
+    },
+
     getkeyWords() {
       if (!this.parentForm.title) {
         this.$message({
@@ -475,7 +491,7 @@ export default {
       };
       generate_keywords(data)
         .then((res) => {
-          console.log(res);
+          Ming(res);
           this.$store.dispatch("paper/setFormdataV2", res.result);
           this.loading = false;
         })
@@ -512,7 +528,7 @@ export default {
     },
     togglePaperSelection(paper) {
       // 切换选中状态
-      console.log(paper, "ssddddel");
+      Ming(paper, "ssddddel");
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
@@ -553,8 +569,6 @@ export default {
       this.saveUserSelect(data, message);
     },
     delSelectPaper(paper, event) {
-      console.log(this.selectedPapers, "this.selectedPapers");
-      console.log(paper, "this.selectedPapers");
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
@@ -597,6 +611,7 @@ export default {
           type: "success",
           message: message,
         });
+        Ming("保存选中按钮请求, ", res.result);
         this.dealSelectList(res.result);
       });
     },

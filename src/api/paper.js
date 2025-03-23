@@ -173,6 +173,13 @@ export function search_papers(data) {
     data,
   });
 }
+export function save_extra_requirements(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/save_extra_requirements",
+    method: "post",
+    data,
+  });
+}
 // 下载大纲接口
 export function pay_download(data) {
   return request({

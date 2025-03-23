@@ -73,16 +73,6 @@
           </div>
         </div>
       </div>
-      <div
-        :class="[
-          'firstItem',
-          'secondItem',
-          device == 'mobile' ? 'mobilebox' : '',
-        ]"
-        v-if="outlineVersion == 'v2'"
-      >
-        <advance :parentForm="requestForm"></advance>
-      </div>
 
       <div
         :class="[
@@ -309,6 +299,19 @@
           </div>
         </div>
       </div>
+      <!-- start 检索文献 -->
+
+      <div
+        :class="[
+          'firstItem',
+          'secondItem',
+          device == 'mobile' ? 'mobilebox' : '',
+        ]"
+        v-if="outlineVersion == 'v2'"
+      >
+        <advance :parentForm="requestForm"></advance>
+      </div>
+      <!-- end 检索文献 -->
       <div
         :class="[
           'firstItem',
@@ -317,18 +320,18 @@
         ]"
       >
         <!-- 投喂信息 -->
-        <!-- <div class="selectLang formItem firstItem" style="padding-right: 0">
+        <div class="selectLang formItem firstItem" style="padding-right: 0">
           <p class="formItemLabel">投喂信息</p>
           <div class="formItemCon">
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 8 }"
               placeholder="可投喂信息： 开题报告， 设计思路等内容"
-              v-model="requestForm.newTItle"
+              v-model="requestForm.extra_requirements"
             >
             </el-input>
           </div>
-        </div> -->
+        </div>
       </div>
 
       <!-- 三级大纲 -->
@@ -380,7 +383,7 @@ import { mapGetters } from "vuex";
 import eventBus from "@/utils/eventBus";
 import { getToken } from "@/utils/auth"; //
 import { outlineCreate } from "@/api/user";
-import { create_outline } from "@/api/paper";
+import { create_outline, save_extra_requirements } from "@/api/paper";
 import polling from "@/utils/polling-utils";
 import advantage from "@/views/dashboard/components/advantage";
 import example from "./example/index.vue";
@@ -394,7 +397,7 @@ export default {
       loading: false,
       requestForm: {
         title: "",
-        newTItle: "",
+        extra_requirements: "",
         threeCon: false,
         language: "中文",
         type: "本科",
@@ -600,6 +603,72 @@ export default {
       // });
       this.sendOutlineForm("v2");
     },
+    // 用户投喂保存
+    saveExtraFun(vision) {
+      let data = {
+        key: this.formdataV2.key || this.formdataV2.key1,
+        extra_requirements: this.requestForm.extra_requirements,
+      };
+      if (this.requestForm.extra_requirements) {
+        save_extra_requirements(data).then((res) => {
+          this.sendV2Fun();
+        });
+      } else {
+        this.sendV2Fun();
+      }
+    },
+    // v2发送请求保存
+    sendV2Fun() {
+      // 保存用户输入数据
+      let data2 = {
+        key: this.formdataV2.key || this.formdataV2.key1,
+        ...this.formdataV2,
+      };
+      this.loading = true;
+      create_outline(data2)
+        .then((res) => {
+          window.zhuge.track("生成大纲", {
+            语言: this.requestForm.language,
+            科目: this.requestForm.field[1],
+            学业类型: this.requestForm.type,
+            论文类型: this.requestForm.product,
+            论文水平: this.requestForm.paper_level,
+            论文字数: this.requestForm.word_count,
+          });
+          this.loading = false;
+          this.$store.dispatch("app/setProStatus", true);
+
+          this.$log("outlineCreateres", res);
+          eventBus.emit("emitOulineClick", 3); // 发布事件
+          this.$log("lunwen", this.requestForm);
+          this.requestForm.key = res.result.key;
+          this.$store.dispatch("app/setRequestForm", this.requestForm);
+          this.requestKey = res.result.key;
+          // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
+          polling({ key: this.requestKey }, 5000)
+            .then((res) => {
+              this.$log("ddddd", res);
+              if (res == "生成失败") {
+                eventBus.emit("errorOutline", res); // 发布事件
+              } else {
+                eventBus.emit("successOutline", res); // 发布事件
+              }
+            })
+            .catch((error) => {
+              this.$log(error, "eeeeeerrrror");
+              this.$message({
+                type: "error",
+                message: "大纲生成失败, 请稍后重试",
+              });
+              eventBus.emit("errorOutline"); // 发布事件
+              this.$emit("errorBack", "关闭index");
+            });
+        })
+        .catch(() => {
+          this.loading = false;
+          this.$store.dispatch("app/setProStatus", false);
+        });
+    },
     sendOutlineForm: function (vision) {
       if (this.produceLineStatus) {
         this.$message({
@@ -640,6 +709,7 @@ export default {
             product: this.requestForm.product,
             paper_level: this.requestForm.paper_level == "初级" ? 0 : 3,
             word_count: this.requestForm.word_count,
+            extra_requirements: this.requestForm.extra_requirements,
           };
           outlineCreate(data)
             .then((res) => {
@@ -685,54 +755,8 @@ export default {
             });
         }
         if (vision == "v2") {
-          // 保存用户输入数据
-          let data = {
-            key: this.formdataV2.key,
-          };
-          this.loading = true;
-          create_outline(data)
-            .then((res) => {
-              window.zhuge.track("生成大纲", {
-                语言: this.requestForm.language,
-                科目: this.requestForm.field[1],
-                学业类型: this.requestForm.type,
-                论文类型: this.requestForm.product,
-                论文水平: this.requestForm.paper_level,
-                论文字数: this.requestForm.word_count,
-              });
-              this.loading = false;
-              this.$store.dispatch("app/setProStatus", true);
-
-              this.$log("outlineCreateres", res);
-              eventBus.emit("emitOulineClick", 3); // 发布事件
-              this.$log("lunwen", this.requestForm);
-              this.requestForm.key = res.result.key;
-              this.$store.dispatch("app/setRequestForm", this.requestForm);
-              this.requestKey = res.result.key;
-              // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
-              polling({ key: this.requestKey }, 5000)
-                .then((res) => {
-                  this.$log("ddddd", res);
-                  if (res == "生成失败") {
-                    eventBus.emit("errorOutline", res); // 发布事件
-                  } else {
-                    eventBus.emit("successOutline", res); // 发布事件
-                  }
-                })
-                .catch((error) => {
-                  this.$log(error, "eeeeeerrrror");
-                  this.$message({
-                    type: "error",
-                    message: "大纲生成失败, 请稍后重试",
-                  });
-                  eventBus.emit("errorOutline"); // 发布事件
-                  this.$emit("errorBack", "关闭index");
-                });
-            })
-            .catch(() => {
-              this.loading = false;
-              this.$store.dispatch("app/setProStatus", false);
-            });
+          // 先保存自定一内容  然后生成大纲
+          this.saveExtraFun();
         }
       } else {
         this.$store.dispatch("app/setProStatus", false);
