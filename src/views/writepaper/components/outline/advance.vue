@@ -6,8 +6,8 @@
         :disabled="!!formdataV2.key1"
         @click="getkeyWords"
         round
-        style="width: 100%"
-        >生成检索关键词</el-button
+        style="width: 50%"
+        >根据题目,生成关键词</el-button
       >
     </header>
     <div class="keywordBox">
@@ -97,19 +97,28 @@
       </div>
     </div>
     <div>
-      <div class="button-group">
-        <el-button
-          type="primary"
-          @click="seachPaperS"
-          round
-          style="width: 100%"
-        >
+      <div
+        class="button-group"
+        style="
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          justify-content: center;
+        "
+      >
+        <el-button type="primary" @click="seachPaperS" round style="width: 50%">
           根据关键词, 检索文献
         </el-button>
       </div>
       <div class="content">
         <div class="sidebar">
-          <h3>用户上传文献列表</h3>
+          <h1 style="display: flex; align-items: center">
+            <p style="margin-right: 10px">没有合适的参考文献?</p>
+            <el-button type="primary" size="mini" @click="dialogVisible = true"
+              >本地上传<i class="el-icon-upload el-icon--right"></i
+            ></el-button>
+          </h1>
+          <!-- <h3>用户上传文献列表</h3>
           <div
             class="sidebar-item"
             v-for="(paper, index) in user_upload_paper_fe_lists"
@@ -159,7 +168,7 @@
                 </p>
               </div>
             </div>
-          </div>
+          </div> -->
           <hr />
           <h3>系统检索文献列表</h3>
 
@@ -225,7 +234,10 @@
                   circle
                 ></el-button>
               </div>
-              <p :class="{ abstract: true, expanded: paper.isExpanded }">
+              <p
+                v-if="paper.search_type !== 'user_upload'"
+                :class="{ abstract: true, expanded: paper.isExpanded }"
+              >
                 <span v-if="!paper.isExpanded" class="abstract-content">
                   {{ paper.abstract }}
                 </span>
@@ -249,40 +261,60 @@
                   {{ paper.database }}
                 </p>
                 <p>作者: {{ paper.authors.join(", ") }}</p>
-                <p>日期: {{ paper.date }}</p>
+                <p class="dateP">日期: {{ paper.date }}</p>
               </div>
             </div>
           </div>
         </div>
-        <div v-loading="uploading" class="upload-section">
-          <div class="upload-box">
-            <el-upload
-              class="upload-demo"
-              style="width: 100%"
-              drag
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :before-upload="beforeUpload"
-            >
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">
-                <p style="font-size: 14px; margin-bottom: 20px">
-                  将文件拖到此处，或<em>点击上传</em>
-                </p>
-                <p style="font-size: 14px; margin-bottom: 10px">
-                  只能上传PDF文件，且不超过10M
-                </p>
-                <p style="font-size: 12px">
-                  Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。文献来源-文献作者-发表年份-文献标题.pdf，例如
-                  XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf，多作者格式如
-                  XX期刊-王某某&李某某&张某某-2018-H5在游戏开发领域的应用研究.pdf，
-                </p>
-              </div>
-              <div class="el-upload__tip" slot="tip"></div>
-            </el-upload>
+      </div>
+      <!-- 上传文件 -->
+      <el-dialog title="上传文件" :visible.sync="dialogVisible" width="50%">
+        <div>
+          <div v-loading="uploading" class="upload-section">
+            <div class="upload-box">
+              <el-upload
+                class="upload-demo"
+                style="width: 100%"
+                drag
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :before-upload="beforeUpload"
+              >
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">
+                  <p style="font-size: 14px; margin-bottom: 10px">
+                    将文件拖到此处，或<em>点击上传</em>
+                  </p>
+                  <p style="font-size: 13px; margin-bottom: 10px">
+                    只能上传 <em>PDF文件</em>，且不超过 <em>10M</em>
+                  </p>
+                  <p style="font-size: 12px"></p>
+                </div>
+                <div class="el-upload__tip" slot="tip">
+                  Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。
+                  <p style="margin-top: 5px; font-size: 12px">
+                    文献来源-文献作者-发表年份-文献标题.pdf，例如
+                    <em style="color: #409eff">
+                      XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf
+                    </em>
+                  </p>
+                  <p style="margin-top: 5px; font-size: 12px">
+                    多作者格式: 如
+                    <em style="color: #409eff">
+                      XX期刊-王某某&李某某&张某某-2018-H5在游戏开发领域的应用研究.pdf
+                    </em>
+                  </p>
+                </div>
+              </el-upload>
+            </div>
           </div>
         </div>
-      </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible = false"
+            >关 闭</el-button
+          >
+        </span>
+      </el-dialog>
+      <!--end 上传文件 -->
     </div>
   </div>
 </template>
@@ -301,6 +333,7 @@ export default {
   name: "DocumentManager",
   data() {
     return {
+      dialogVisible: false,
       // isMenuOpen: true, // 控制整个内容区显示状态
       formDataV2: {
         search_cn_keywords: [],
@@ -535,7 +568,7 @@ export default {
         user_upload_paper_fe_list: [],
       };
       let message = "";
-
+      let old_is_relevant = paper.is_relevant;
       if (paper.is_relevant == "no") {
         paper.is_relevant = "yes";
         message = "添加文献成功!";
@@ -548,6 +581,27 @@ export default {
       } else {
         data.reference_paper_fe_lists.push(paper);
       }
+
+      save_papers_list(data)
+        .then((res) => {
+          this.$message({
+            type: "success",
+            message: message,
+          });
+          Ming("保存选中按钮请求, ", res.result);
+          let data = {
+            ...this.formdataV2,
+          };
+          // this.dealSelectList(res.result);
+          data.reference_paper_selected_lists =
+            res.result.reference_paper_selected_lists;
+          data.user_upload_paper_fe_lists =
+            res.result.user_upload_paper_fe_lists;
+          this.$store.dispatch("paper/setFormdataV2", data);
+        })
+        .catch((res) => {
+          paper.is_relevant = old_is_relevant;
+        });
       // if (paper.is_relevant === "yes") {
       //   paper.is_relevant = "no";
       //   // 从选中列表中移除
@@ -566,7 +620,6 @@ export default {
       //     this.selectedPapers.push(newPaper);
       //   }
       // }
-      this.saveUserSelect(data, message);
     },
     delSelectPaper(paper, event) {
       let data = {
@@ -611,8 +664,14 @@ export default {
           type: "success",
           message: message,
         });
-        Ming("保存选中按钮请求, ", res.result);
-        this.dealSelectList(res.result);
+        let data = {
+          ...this.formdataV2,
+        };
+        // this.dealSelectList(res.result);
+        data.reference_paper_selected_lists =
+          res.result.reference_paper_selected_lists;
+        data.user_upload_paper_fe_lists = res.result.user_upload_paper_fe_lists;
+        this.$store.dispatch("paper/setFormdataV2", data);
       });
     },
   },
@@ -754,47 +813,6 @@ hr {
   background-color: #fff;
   max-height: 400px;
   overflow-y: auto;
-}
-
-.upload-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  ::v-deep(.el-upload-dragger) {
-    width: 190px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  ::v-deep(.el-upload) {
-    height: 100%;
-  }
-  ::v-deep(.upload-box) {
-    height: 100%;
-  }
-  ::v-deep(.el-upload-dragger .el-icon-upload) {
-    // height: 100%;
-    margin-top: -30px;
-  }
-  .upload-demo {
-    height: 100%;
-  }
-}
-
-.upload-box {
-  border: 1px solid #ccc;
-  padding: 5px;
-  border-radius: 10px;
-  background-color: #f0f8ff;
-  text-align: center;
-  height: 100%;
 }
 
 .upload-button {

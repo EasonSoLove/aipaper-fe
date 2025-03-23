@@ -325,7 +325,7 @@
           <div class="formItemCon">
             <el-input
               type="textarea"
-              :autosize="{ minRows: 2, maxRows: 8 }"
+              :autosize="{ minRows: 6, maxRows: 10 }"
               placeholder="可投喂信息： 开题报告， 设计思路等内容"
               v-model="requestForm.extra_requirements"
             >
@@ -367,7 +367,7 @@
           produceLineStatus ? 'produceClass' : '',
         ]"
       >
-        <p>生成大纲.</p>
+        <p>生成大纲</p>
       </div>
     </div>
     <advantage ref="advantageDia"></advantage>
