@@ -111,19 +111,13 @@
         </el-button>
       </div>
       <div class="content">
-        <div class="sidebar">
-          <h1 style="display: flex; align-items: center">
-            <p style="margin-right: 10px">没有合适的参考文献?</p>
-            <el-button type="primary" size="mini" @click="dialogVisible = true"
-              >本地上传<i class="el-icon-upload el-icon--right"></i
-            ></el-button>
-          </h1>
+        <div class="sidebar" style="position: relative; padding-top: 80px">
           <!-- <h3>用户上传文献列表</h3>
           <div
             class="sidebar-item"
             v-for="(paper, index) in user_upload_paper_fe_lists"
             :key="`ref-${index}`"
-            :class="paper.is_relevant === 'yes' ? 'selected-item' : ''"
+            :class="paper.is_relevant === 'yes' ? 'selected-item2' : ''"
           >
             <div class="paper-card">
               <div class="paper-header">
@@ -169,99 +163,132 @@
               </div>
             </div>
           </div> -->
-          <hr />
-          <h3>系统检索文献列表</h3>
-
-          <div
-            class="sidebar-item"
-            v-for="(paper, index) in reference_paper_fe_lists"
-            :key="`ref-${index}`"
-            :class="paper.is_relevant === 'yes' ? 'selected-item' : ''"
+          <h3
+            style="
+              position: absolute;
+              top: 10px;
+              left: 20px;
+              background-color: #fff;
+              width: 100%;
+              padding-bottom: 5px;
+            "
           >
-            <div class="paper-card">
-              <div class="paper-header">
-                <h4>{{ paper.title }}</h4>
-                <el-button
-                  type="success"
-                  size="mini"
-                  :plain="paper.is_relevant !== 'yes'"
-                  @click="togglePaperSelection(paper)"
-                >
-                  {{ paper.is_relevant === "yes" ? "已选中" : "选择" }}
-                </el-button>
-              </div>
-              <p :class="{ abstract: true, expanded: paper.isExpanded }">
-                <span v-if="!paper.isExpanded" class="abstract-content">
-                  {{ paper.abstract }}
-                </span>
-                <span v-else>
-                  {{ paper.abstract }}
-                </span>
-                <span class="toggle-button" @click="paperExpandClick(paper)">
-                  {{ paper.isExpanded ? "收起" : "展开" }}
-                </span>
-              </p>
-              <div class="paper-footer">
-                <p class="formPaper">
-                  <img
-                    style="height: 16px; width: 16px"
-                    src="@/assets/images/index/blue.png"
-                    alt=""
-                  />
-                  {{ paper.database }}
+            <div style="display: flex; align-items: center">
+              <p style="margin-right: 10px">没有合适的参考文献?</p>
+              <el-button
+                type="primary"
+                size="mini"
+                @click="dialogVisible = true"
+                >本地上传<i class="el-icon-upload el-icon--right"></i
+              ></el-button>
+            </div>
+            <div class="g_border"></div>
+
+            <p>系统检索文献列表</p>
+          </h3>
+          <div class="scrollBox">
+            <div
+              class="sidebar-item"
+              v-for="(paper, index) in reference_paper_fe_lists"
+              :key="`ref-${index}`"
+              :class="paper.is_relevant === 'yes' ? 'selected-item2' : ''"
+            >
+              <div class="paper-card">
+                <div class="paper-header">
+                  <h4>{{ paper.title }}</h4>
+                  <el-button
+                    type="success"
+                    size="mini"
+                    :plain="paper.is_relevant !== 'yes'"
+                    @click="togglePaperSelection(paper)"
+                  >
+                    {{ paper.is_relevant === "yes" ? "已选中" : "选择" }}
+                  </el-button>
+                </div>
+                <p :class="{ abstract: true, expanded: paper.isExpanded }">
+                  <span v-if="!paper.isExpanded" class="abstract-content">
+                    {{ paper.abstract }}
+                  </span>
+                  <span v-else>
+                    {{ paper.abstract }}
+                  </span>
+                  <span class="toggle-button" @click="paperExpandClick(paper)">
+                    {{ paper.isExpanded ? "收起" : "展开" }}
+                  </span>
                 </p>
-                <p>
-                  作者: <span>{{ paper.authors.join(", ") }}</span>
-                </p>
-                <p class="dateP">
-                  日期: <span>{{ paper.date }}</span>
-                </p>
+                <div class="paper-footer">
+                  <p class="formPaper">
+                    <img
+                      style="height: 16px; width: 16px"
+                      src="@/assets/images/index/blue.png"
+                      alt=""
+                    />
+                    {{ paper.database }}
+                  </p>
+                  <p>
+                    作者: <span>{{ paper.authors.join(", ") }}</span>
+                  </p>
+                  <p class="dateP">
+                    日期: <span>{{ paper.date }}</span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="content-main">
-          <h3>已选中的论文</h3>
-          <div v-for="(paper, index) in selectedPapers" :key="index">
-            <div class="paper-card">
-              <div class="paper-header">
-                <h4>{{ paper.title }}</h4>
-                <el-button
-                  type="danger"
-                  size="mini"
-                  @click="delSelectPaper(paper)"
-                  icon="el-icon-delete"
-                  circle
-                ></el-button>
-              </div>
-              <p
-                v-if="paper.search_type !== 'user_upload'"
-                :class="{ abstract: true, expanded: paper.isExpanded }"
-              >
-                <span v-if="!paper.isExpanded" class="abstract-content">
-                  {{ paper.abstract }}
-                </span>
-                <span v-else>
-                  {{ paper.abstract }}
-                </span>
-                <span
-                  class="toggle-button"
-                  @click="paper.isExpanded = !paper.isExpanded"
+          <h3
+            style="
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              background-color: #fff;
+            "
+          >
+            已选中的论文
+          </h3>
+          <div class="scrollBox">
+            <div v-for="(paper, index) in selectedPapers" :key="index">
+              <div class="paper-card">
+                <div class="paper-header">
+                  <h4>{{ paper.title }}</h4>
+                  <el-button
+                    type="danger"
+                    size="mini"
+                    @click="delSelectPaper(paper)"
+                    icon="el-icon-delete"
+                    circle
+                  ></el-button>
+                </div>
+                <p
+                  v-if="paper.search_type !== 'user_upload'"
+                  :class="{ abstract: true, expanded: paper.isExpanded }"
                 >
-                  {{ paper.isExpanded ? "收起" : "展开" }}
-                </span>
-              </p>
-              <div class="paper-footer">
-                <p class="formPaper">
-                  <img
-                    style="height: 16px; width: 16px"
-                    src="@/assets/images/index/blue.png"
-                    alt=""
-                  />
-                  {{ paper.database }}
+                  <span v-if="!paper.isExpanded" class="abstract-content">
+                    {{ paper.abstract }}
+                  </span>
+                  <span v-else>
+                    {{ paper.abstract }}
+                  </span>
+                  <span
+                    class="toggle-button"
+                    @click="paper.isExpanded = !paper.isExpanded"
+                  >
+                    {{ paper.isExpanded ? "收起" : "展开" }}
+                  </span>
                 </p>
-                <p>作者: {{ paper.authors.join(", ") }}</p>
-                <p class="dateP">日期: {{ paper.date }}</p>
+                <div class="paper-footer">
+                  <p class="formPaper">
+                    <img
+                      style="height: 16px; width: 16px"
+                      src="@/assets/images/index/blue.png"
+                      alt=""
+                    />
+                    {{ paper.database }}
+                  </p>
+                  <p>作者: {{ paper.authors.join(", ") }}</p>
+                  <p class="dateP">日期: {{ paper.date }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -757,7 +784,7 @@ li {
   padding: 10px;
   border-radius: 10px;
   max-height: 400px;
-  overflow-y: auto;
+  overflow: hidden;
   background: #fff;
 }
 
@@ -808,13 +835,24 @@ hr {
 .content-main {
   flex: 2;
   border: 1px solid #ccc;
-  padding: 20px;
   border-radius: 10px;
   background-color: #fff;
   max-height: 400px;
-  overflow-y: auto;
+  overflow: hidden;
+  padding-top: 50px;
+  position: relative;
 }
-
+.scrollBox {
+  overflow-y: auto;
+  height: 100%;
+  padding: 20px;
+  padding-top: 0px;
+}
+.g_border {
+  border-bottom: 1px solid #ccc;
+  margin: 10px 0;
+  width: 100%;
+}
 .upload-button {
   padding: 10px;
   background-color: #e6e6fa;
@@ -847,7 +885,7 @@ hr {
   overflow: hidden;
 }
 
-.selected-item {
+.selected-item2 {
   .paper-card {
     background-color: rgba(104, 250, 104, 0.1); /* 浅绿色背景 */
   }
