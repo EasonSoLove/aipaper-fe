@@ -592,7 +592,7 @@ export default {
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
-        user_upload_paper_fe_list: [],
+        user_upload_paper_fe_lists: [],
       };
       let message = "";
       let old_is_relevant = paper.is_relevant;
@@ -604,7 +604,7 @@ export default {
         message = "取消文献成功!";
       }
       if (paper.search_type == "user_upload") {
-        data.user_upload_paper_fe_list.push(paper);
+        data.user_upload_paper_fe_lists.push(paper);
       } else {
         data.reference_paper_fe_lists.push(paper);
       }
@@ -652,11 +652,11 @@ export default {
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
-        user_upload_paper_fe_list: [],
+        user_upload_paper_fe_lists: [],
       };
       paper.is_relevant = "no";
       if (paper.search_type == "user_upload") {
-        data.user_upload_paper_fe_list.push(paper);
+        data.user_upload_paper_fe_lists.push(paper);
       } else {
         data.reference_paper_fe_lists.push(paper);
       }
@@ -681,7 +681,7 @@ export default {
     saveUserSelect(data, message) {
       // this.selectedPapers.forEach((item) => {
       //   if (item.search_type == "user_upload") {
-      //     data.user_upload_paper_fe_list.push(item);
+      //     data.user_upload_paper_fe_lists.push(item);
       //   } else {
       //     data.reference_paper_fe_lists.push(item);
       //   }
