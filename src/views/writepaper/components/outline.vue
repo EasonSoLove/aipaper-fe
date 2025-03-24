@@ -157,8 +157,8 @@
                 class="radioSmall"
                 v-for="item in paper_levelList"
                 :key="item.name"
-                :label="item.name"
-                :value="item.name"
+                :label="item.value"
+                :value="item.value"
               >
                 <el-tooltip
                   class="item custom-tooltip"
@@ -173,7 +173,7 @@
                   <div class="labelBox">
                     <div class="left">
                       <img
-                        v-if="requestForm.paper_level == item.name"
+                        v-if="requestForm.paper_level == item.value"
                         class="home-icon"
                         src="@/assets/images/index/icon_24_lwsp_selected.png"
                         alt=""
@@ -402,7 +402,7 @@ export default {
         language: "中文",
         type: "本科",
         product: "毕业论文",
-        paper_level: "初级",
+        paper_level: 0,
         field: ["哲学", "哲学类"],
         key: "",
         word_count: 5000,
@@ -448,11 +448,14 @@ export default {
       paper_levelList: [
         {
           name: "初级",
+          value: 0,
           description:
             "选定学历等级会限定论文初始等级，在此基础上选择【初级】生成的论文相对通俗易懂，使用的方法不超过本科水平，论文写作深度和水平容易理解。",
         },
         {
           name: "高级",
+          value: 3,
+
           description:
             "选定学历等级会限定论文初始等级，在此基础上选择【高级】生成的论文会有相对专业的方法以及结论，论文写作深度高一些。",
         },
@@ -620,9 +623,17 @@ export default {
     // v2发送请求保存
     sendV2Fun() {
       // 保存用户输入数据
+      console.log("requestForm", this.requestForm);
+      console.log("requestForm", this.formdataV2);
       let data2 = {
         key: this.formdataV2.key || this.formdataV2.key1,
-        ...this.formdataV2,
+        title: "印度宗教的发展与研究",
+        language: this.requestForm.language,
+        field: this.requestForm.field,
+        type: this.requestForm.type,
+        product: this.requestForm.product,
+        word_count: this.requestForm.word_count,
+        paper_level: this.requestForm.paper_level,
       };
       this.loading = true;
       create_outline(data2)
@@ -707,7 +718,7 @@ export default {
             field: this.requestForm.field[1],
             type: this.requestForm.type,
             product: this.requestForm.product,
-            paper_level: this.requestForm.paper_level == "初级" ? 0 : 3,
+            paper_level: this.requestForm.paper_level,
             word_count: this.requestForm.word_count,
             extra_requirements: this.requestForm.extra_requirements,
           };

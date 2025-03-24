@@ -547,7 +547,7 @@ export default {
         type: this.parentForm.type,
         product: this.parentForm.product,
         word_count: this.parentForm.word_count,
-        paper_level: this.parentForm.paper_level == "初级" ? 0 : 3,
+        paper_level: this.parentForm.paper_level,
       };
       generate_keywords(data)
         .then((res) => {
