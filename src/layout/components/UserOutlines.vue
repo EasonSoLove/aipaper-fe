@@ -219,8 +219,12 @@ export default {
       outlineStatus({ key: row.key1 })
         .then((res) => {
           console.log("res", res);
+          let data = {
+            ...res.result,
+          };
+          data.field = ["哲学", row.field];
           this.$store.dispatch("paper/setFormdataV2", res.result);
-          this.$store.dispatch("app/setRequestForm", res.result);
+          this.$store.dispatch("app/setRequestForm", data);
           this.loading = false;
           // 记录大纲状态
           this.$store.dispatch("paper/setOutlineVersion", res.result.version);

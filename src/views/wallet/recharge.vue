@@ -167,7 +167,7 @@ export default {
         alert("请输入有效的自定义金额");
         return;
       }
-
+      this.formData.recharge_amount = parseInt(this.formData.recharge_amount);
       // 提交逻辑
       recharge(this.formData).then((res) => {
         this.$log("this.formdata", this.formData, res);

@@ -95,7 +95,7 @@
                   <p class="payTitle">
                     支付金额:
                     <span>
-                      <b> {{ currentOrder.pay_amount }} 10 </b> </span
+                      <b> {{ walletsOrder.recharge_amount }} </b> </span
                     >元
                   </p>
                   <div class="payment-method">

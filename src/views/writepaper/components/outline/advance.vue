@@ -110,7 +110,7 @@
           根据关键词, 检索文献
         </el-button>
       </div>
-      <div class="content">
+      <div v-loading="selectListLoading" class="content">
         <div class="sidebar" style="position: relative; padding-top: 80px">
           <!-- <h3>用户上传文献列表</h3>
           <div
@@ -360,6 +360,8 @@ export default {
   name: "DocumentManager",
   data() {
     return {
+      // pendingPapers: [],
+      // debounceTimer: null,
       dialogVisible: false,
       // isMenuOpen: true, // 控制整个内容区显示状态
       formDataV2: {
@@ -367,6 +369,7 @@ export default {
         search_en_keywords: [],
       },
       loading: false,
+      selectListLoading: false,
       newCnKeyword: "",
       activeCollapse: "", // 当前展开的折叠面板
       newEnKeyword: "",
@@ -589,6 +592,71 @@ export default {
     togglePaperSelection(paper) {
       // 切换选中状态
       Ming(paper, "ssddddel");
+      this.selectListLoading = true;
+      let data = {
+        key: this.formdataV2.key1 || this.formdataV2.key,
+        reference_paper_fe_lists: [],
+        user_upload_paper_fe_lists: [],
+      };
+      let message = "";
+      let old_is_relevant = paper.is_relevant;
+      if (paper.is_relevant == "no") {
+        paper.is_relevant = "yes";
+        message = "添加文献成功!";
+      } else {
+        paper.is_relevant = "no";
+        message = "取消文献成功!";
+      }
+      if (paper.search_type == "user_upload") {
+        data.user_upload_paper_fe_lists.push(paper);
+      } else {
+        data.reference_paper_fe_lists.push(paper);
+      }
+
+      save_papers_list(data)
+        .then((res) => {
+          this.$message({
+            type: "success",
+            message: message,
+          });
+          Ming("保存选中按钮请求, ", res.result);
+          let data = {
+            ...this.formdataV2,
+          };
+          // this.dealSelectList(res.result);
+          data.reference_paper_selected_lists =
+            res.result.reference_paper_selected_lists;
+          data.user_upload_paper_fe_lists =
+            res.result.user_upload_paper_fe_lists;
+          this.$store.dispatch("paper/setFormdataV2", data);
+          this.selectListLoading = false;
+        })
+        .catch((res) => {
+          paper.is_relevant = old_is_relevant;
+          this.selectListLoading = false;
+        });
+      // if (paper.is_relevant === "yes") {
+      //   paper.is_relevant = "no";
+      //   // 从选中列表中移除
+      //   this.selectedPapers = this.selectedPapers.filter(
+      //     (selected) => selected.title !== paper.title
+      //   );
+      // } else {
+      //   paper.is_relevant = "yes";
+      //   // 添加到选中列表
+      //   if (
+      //     !this.selectedPapers.some(
+      //       (selected) => selected.title === paper.title
+      //     )
+      //   ) {
+      //     let newPaper = JSON.parse(JSON.stringify(paper));
+      //     this.selectedPapers.push(newPaper);
+      //   }
+      // }
+    },
+    togglePaperSelection22(paper) {
+      // 切换选中状态
+      Ming(paper, "ssddddel");
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
@@ -649,6 +717,8 @@ export default {
       // }
     },
     delSelectPaper(paper, event) {
+      this.selectListLoading = true;
+
       let data = {
         key: this.formdataV2.key1 || this.formdataV2.key,
         reference_paper_fe_lists: [],
@@ -686,20 +756,26 @@ export default {
       //     data.reference_paper_fe_lists.push(item);
       //   }
       // });
-      save_papers_list(data).then((res) => {
-        this.$message({
-          type: "success",
-          message: message,
+      save_papers_list(data)
+        .then((res) => {
+          this.$message({
+            type: "success",
+            message: message,
+          });
+          let data = {
+            ...this.formdataV2,
+          };
+          // this.dealSelectList(res.result);
+          data.reference_paper_selected_lists =
+            res.result.reference_paper_selected_lists;
+          data.user_upload_paper_fe_lists =
+            res.result.user_upload_paper_fe_lists;
+          this.$store.dispatch("paper/setFormdataV2", data);
+          this.selectListLoading = false;
+        })
+        .catch(() => {
+          this.selectListLoading = false;
         });
-        let data = {
-          ...this.formdataV2,
-        };
-        // this.dealSelectList(res.result);
-        data.reference_paper_selected_lists =
-          res.result.reference_paper_selected_lists;
-        data.user_upload_paper_fe_lists = res.result.user_upload_paper_fe_lists;
-        this.$store.dispatch("paper/setFormdataV2", data);
-      });
     },
   },
 };
