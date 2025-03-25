@@ -29,7 +29,13 @@
               {{ requestForm.language }}
             </p>
             <p>
-              {{ requestForm.field && requestForm.field[1] }}
+              {{
+                requestForm.field
+                  ? typeof requestForm.field == "string"
+                    ? requestForm.field
+                    : requestForm.field[1]
+                  : ""
+              }}
             </p>
           </div>
           <!-- 写死正式版的内容 -->
@@ -114,7 +120,11 @@
               {{ requestForm.language }}
             </p>
             <p>
-              {{ requestForm.field && requestForm.field[1] }}
+              {{
+                requestForm.field && typeof requestForm.field == "string"
+                  ? requestForm.field
+                  : requestForm.field[1]
+              }}
             </p>
           </div>
           <!-- 写死正式版的内容 -->

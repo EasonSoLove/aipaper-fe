@@ -4,7 +4,11 @@
       <p class="oulineTitlePaper"><span>题目: </span>{{ requestForm.title }}</p>
       <p class="outlineTitleDesc">
         <span>科目: </span>
-        {{ requestForm.field ? requestForm.field[1] : "暂无" }}
+        {{
+          requestForm.field && typeof requestForm.field == "string"
+            ? requestForm.field
+            : requestForm.field[1]
+        }}
         <span style="margin-left: 50px">类型: </span>
         {{ requestForm.type ? requestForm.type : "暂无" }}
       </p>

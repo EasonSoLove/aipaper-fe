@@ -309,7 +309,7 @@ export default {
               threeCon: false,
               language: row.language,
               type: row.type,
-              field: ["哲学", row.field],
+              field: row.field,
               key: row.key1,
               product: row.product,
               word_count: row.word_count,

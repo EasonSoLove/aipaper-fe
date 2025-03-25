@@ -346,18 +346,19 @@ export default {
   beforeRouteEnter(to, from, next) {
     // 在路由进入前调用
     if (to.query.key1) {
+      console.log("ddd", to.query.key1);
       let data = {
         key: to.query.key1,
       };
       outlineStatus(data)
         .then((res) => {
           // 使用 next 的回调函数来访问组件实例
-          console.log("ddddddddddddddddddddddddd", res);
-          console.log("ddddddddddddddddddddddddd3333", res.result.vision);
           next((vm) => {
             vm.showOutLine(res.result.outline.outline);
-            if (vm.requestForm.key) {
-              this.$refs.outlineRef.returnDataToForm(this.requestForm);
+            console.log("dddddddddddddddddddddddd", vm.requestForm.key);
+
+            if (res.result.key) {
+              vm.$refs.outlineRef.returnDataToForm(res.result);
             }
             console.log("dddd", res);
             // 复现大纲接口
@@ -367,7 +368,7 @@ export default {
             // };
 
             // 保存大纲输入信息
-            // vm.$store.dispatch("app/setRequestForm", data);
+            vm.$store.dispatch("app/setRequestForm", res.result);
             // 填充大纲列表数据
           });
         })
@@ -388,6 +389,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     // 当路由的查询参数发生变化时，这个方法会被调用
+    console.log("ssssssssssssssssssssssssss");
     // this.activeIndex = to.query.activeIndex || 0;
     if (to.query.key1) {
       let data = {

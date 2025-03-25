@@ -112,11 +112,11 @@ export default {
     },
     value(newVal, oldVal) {
       console.log("new", newVal, oldVal);
-      if (oldVal && newVal && oldVal !== newVal) {
-        // 清空form
-        this.$store.dispatch("app/setRequestForm", {});
-        this.$store.dispatch("paper/setFormdataV2", {});
-      }
+      // if (oldVal && newVal && oldVal !== newVal) {
+      //   // 清空form
+      //   this.$store.dispatch("app/setRequestForm", {});
+      //   this.$store.dispatch("paper/setFormdataV2", {});
+      // }
       this.innerValue = newVal;
     },
   },

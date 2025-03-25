@@ -31,7 +31,14 @@
                 {{ requestForm.language ? requestForm.language : "暂无" }}
               </p>
               <p>
-                {{ requestForm.field && requestForm.field[1] }}
+                {
+                {{
+                  requestForm.field
+                    ? typeof requestForm.field == "string"
+                      ? requestForm.field
+                      : requestForm.field[1]
+                    : ""
+                }}
               </p>
             </div>
           </div>

@@ -532,10 +532,22 @@ export default {
       "formdataV2",
     ]),
   },
+  // watch: {
+  //   // 监听 formdataV2.reference_paper_selected_lists 的变化
+  //   "formdataV2.reference_paper_selected_lists": {
+  //     handler(newVal, oldVal) {
+  //       // 当数据改变时，你可以在这里执行任何你需要的操作
+  //       Ming("reference_paper_selected_lists has been updated", newVal, oldVal);
+  //       // 这里的操作可以是任何事情，比如调用一个方法或者更改其他数据
+  //       this.selectedPapers = newVal;
+  //     },
+  //     deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
+  //     immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true
+  //   },
+  // },
   methods: {
     // 如果有key值, 用户切换页面 数据复现
     returnDataToForm(data) {
-      console.log("页面的数据", data);
       // title: "",
       //   extra_requirements: "",
       //   threeCon: false,
@@ -548,7 +560,12 @@ export default {
       //   word_count: 5000,
       // this.requestForm.title = data.title
       this.requestForm = { ...data };
-      this.requestForm.field = data.field[1];
+      if (typeof data.field == "string") {
+        this.requestForm.field = data.field;
+      } else {
+        this.requestForm.field = data.field[1];
+      }
+
       // this.requestForm.paper_level = parseInt(data.paper_level);
     },
     showAdv() {
@@ -659,16 +676,22 @@ export default {
       // 保存用户输入数据
       console.log("requestForm", this.requestForm);
       console.log("requestForm", this.formdataV2);
+
       let data2 = {
         key: this.formdataV2.key || this.formdataV2.key1,
         title: this.requestForm.title,
         language: this.requestForm.language,
-        field: this.requestForm.field[1],
+        field: "",
         type: this.requestForm.type,
         product: this.requestForm.product,
         word_count: this.requestForm.word_count,
         paper_level: this.requestForm.paper_level,
       };
+      if (typeof this.requestForm.field === "string") {
+        data2.field = this.requestForm.field;
+      } else {
+        data2.field = this.requestForm.field[1];
+      }
       this.loading = true;
       create_outline(data2)
         .then((res) => {
@@ -749,13 +772,18 @@ export default {
           let data = {
             title: this.requestForm.title,
             language: this.requestForm.language,
-            field: this.requestForm.field[1],
+            field: "",
             type: this.requestForm.type,
             product: this.requestForm.product,
             paper_level: this.requestForm.paper_level,
             word_count: this.requestForm.word_count,
             extra_requirements: this.requestForm.extra_requirements,
           };
+          if (typeof this.requestForm.field === "string") {
+            data.field = this.requestForm.field;
+          } else {
+            data.field = this.requestForm.field[1];
+          }
           outlineCreate(data)
             .then((res) => {
               window.zhuge.track("生成大纲", {
