@@ -629,7 +629,7 @@ export default {
         key: this.formdataV2.key || this.formdataV2.key1,
         title: "印度宗教的发展与研究",
         language: this.requestForm.language,
-        field: this.requestForm.field,
+        field: this.requestForm.field[1],
         type: this.requestForm.type,
         product: this.requestForm.product,
         word_count: this.requestForm.word_count,

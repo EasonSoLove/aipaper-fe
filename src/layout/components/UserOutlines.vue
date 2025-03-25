@@ -49,10 +49,10 @@
                     查看大纲
                   </el-button>
 
-                  <template v-show="orderObj.version == 'v2'">
+                  <template v-if="orderObj.version == 'v2'">
                     <el-button
                       @click="jumpV2Outline(orderObj)"
-                      v-show="orderObj.status == '等待中'"
+                      v-if="orderObj.status == '等待中'"
                       icon="el-icon-view"
                       type="text"
                     >
@@ -60,7 +60,8 @@
                     </el-button>
                     <el-button
                       @click="jumpV2Outline(orderObj)"
-                      v-show="orderObj.status == '生成成功'"
+                      :disabled="orderObj.status != '生成成功'"
+                      v-else
                       icon="el-icon-view"
                       type="text"
                     >
