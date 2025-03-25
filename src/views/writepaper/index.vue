@@ -80,7 +80,7 @@
     </div>
     <!-- step3不展示论文 -->
     <div v-if="activeIndex !== 3" class="outlineBox" id="outlineTop">
-      <outline @errorBack="errorBack"></outline>
+      <outline ref="outlineRef" @errorBack="errorBack"></outline>
     </div>
 
     <div class="stepContent">
@@ -356,6 +356,9 @@ export default {
           console.log("ddddddddddddddddddddddddd3333", res.result.vision);
           next((vm) => {
             vm.showOutLine(res.result.outline.outline);
+            if (vm.requestForm.key) {
+              this.$refs.outlineRef.returnDataToForm(this.requestForm);
+            }
             console.log("dddd", res);
             // 复现大纲接口
             // let data = {
@@ -376,6 +379,9 @@ export default {
     } else {
       next((vm) => {
         // 直接在这使用 vm 进行 store 操作
+        if (vm.requestForm.key || vm.requestForm.key1) {
+          vm.$refs.outlineRef.returnDataToForm(vm.requestForm);
+        }
         vm.$store.dispatch("app/setActiveIndex", 0);
       });
     }

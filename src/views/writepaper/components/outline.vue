@@ -405,6 +405,7 @@ export default {
         paper_level: 0,
         field: ["哲学", "哲学类"],
         key: "",
+
         word_count: 5000,
       },
       OrderType: OrderType,
@@ -532,6 +533,23 @@ export default {
     ]),
   },
   methods: {
+    // 如果有key值, 用户切换页面 数据复现
+    returnDataToForm(data) {
+      console.log("页面的数据", data);
+      // title: "",
+      //   extra_requirements: "",
+      //   threeCon: false,
+      //   language: "中文",
+      //   type: "本科",
+      //   product: "毕业论文",
+      //   paper_level: 0,
+      //   field: ["哲学", "哲学类"],
+      //   key: "",
+      //   word_count: 5000,
+      // this.requestForm.title = data.title
+      this.requestForm = { ...data };
+      // this.requestForm.paper_level = parseInt(data.paper_level);
+    },
     showAdv() {
       zhuge.track(`访问质量对比`);
       this.$refs.advantageDia.showDia();
@@ -607,7 +625,7 @@ export default {
     // 用户投喂保存
     saveExtraFun(vision) {
       this.$confirm(
-        "请您仔细检查大纲信息以及所勾选文献与论文题目的相关性，万象学术模型会根据文献相关性进行引用，逐级生成大纲。 是否继续?",
+        "请仔细检查所勾选文献与您专业和论文题目的相关性，万象学术模型会进行参考文献相关性进行引用逐级生成大纲，若相关性不大，可能不会引用！ 是否继续?",
         "温馨提示",
         {
           confirmButtonText: "确定",
@@ -642,7 +660,7 @@ export default {
       console.log("requestForm", this.formdataV2);
       let data2 = {
         key: this.formdataV2.key || this.formdataV2.key1,
-        title: "印度宗教的发展与研究",
+        title: this.requestForm.title,
         language: this.requestForm.language,
         field: this.requestForm.field[1],
         type: this.requestForm.type,

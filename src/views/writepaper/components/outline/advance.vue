@@ -300,7 +300,7 @@
           <div v-loading="uploading" class="upload-section">
             <div class="upload-box">
               <el-upload
-                class="upload-demo"
+                class="upload-demo1"
                 style="width: 100%"
                 drag
                 action="https://jsonplaceholder.typicode.com/posts/"
@@ -928,6 +928,12 @@ hr {
   border-bottom: 1px solid #ccc;
   margin: 10px 0;
   width: 100%;
+}
+.upload-demo1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 .upload-button {
   padding: 10px;
