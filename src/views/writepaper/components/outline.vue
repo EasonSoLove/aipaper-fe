@@ -548,6 +548,7 @@ export default {
       //   word_count: 5000,
       // this.requestForm.title = data.title
       this.requestForm = { ...data };
+      this.requestForm.field = data.field[1];
       // this.requestForm.paper_level = parseInt(data.paper_level);
     },
     showAdv() {
