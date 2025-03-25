@@ -497,22 +497,20 @@ export default {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
     // 查看用户输入数据是否存在
-    let jsonStr = localStorage.getItem("userInput");
-
-    this.$log("outline_----", jsonStr);
-
-    if (!!jsonStr) {
-      this.requestForm = JSON.parse(jsonStr);
-      this.$log("用户输入有数据", this.requestForm);
-      this.$nextTick(() => {
-        localStorage.removeItem("userInput");
-      });
-    } else {
-      // let _this = this;
-      // setTimeout(() => {
-      //   _this.requestForm.type = _this.homeData.category_list[0].name;
-      // }, 1000);
-    }
+    // let jsonStr = localStorage.getItem("userInput");
+    // this.$log("outline_----", jsonStr);
+    // if (!!jsonStr) {
+    //   // this.requestForm = JSON.parse(jsonStr);
+    //   // this.$log("用户输入有数据", this.requestForm);
+    //   // this.$nextTick(() => {
+    //   //   localStorage.removeItem("userInput");
+    //   // });
+    // } else {
+    //   // let _this = this;
+    //   // setTimeout(() => {
+    //   //   _this.requestForm.type = _this.homeData.category_list[0].name;
+    //   // }, 1000);
+    // }
   },
   created() {
     // step2点击重新生成大纲
@@ -608,17 +606,34 @@ export default {
     },
     // 用户投喂保存
     saveExtraFun(vision) {
-      let data = {
-        key: this.formdataV2.key || this.formdataV2.key1,
-        extra_requirements: this.requestForm.extra_requirements,
-      };
-      if (this.requestForm.extra_requirements) {
-        save_extra_requirements(data).then((res) => {
-          this.sendV2Fun();
+      this.$confirm(
+        "请您仔细检查大纲信息以及所勾选文献与论文题目的相关性，万象学术模型会根据文献相关性进行引用，逐级生成大纲。 是否继续?",
+        "温馨提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          let data = {
+            key: this.formdataV2.key || this.formdataV2.key1,
+            extra_requirements: this.requestForm.extra_requirements,
+          };
+          if (this.requestForm.extra_requirements) {
+            save_extra_requirements(data).then((res) => {
+              this.sendV2Fun();
+            });
+          } else {
+            this.sendV2Fun();
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消生成",
+          });
         });
-      } else {
-        this.sendV2Fun();
-      }
     },
     // v2发送请求保存
     sendV2Fun() {
