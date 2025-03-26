@@ -65,7 +65,7 @@
                   orderObj.updated_at | dateFormatter
                 }}</span>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -380,7 +380,7 @@ export default {
         word_count: 0,
       },
       minCount: 3000,
-      maxCount: 30000,
+      maxCount: 25000,
       original_item: {},
       generated_items: [],
       currentDialogRow: {},
@@ -397,12 +397,12 @@ export default {
           label: this.$createElement("strong", "20000"),
         },
 
-        30000: {
+        25000: {
           style: {
             color: "#E6A23C",
             width: "90px",
           },
-          label: this.$createElement("strong", "30000"),
+          label: this.$createElement("strong", "25000"),
         },
       },
     };
@@ -575,26 +575,26 @@ export default {
     // 定义方法
     handleCurrentChange: throttle(async function () {
       // 这里可以添加你的分页逻辑，例如发送请求获取新的数据
-      let params = {
-        page_num: 1,
-        page_size: 5,
-      };
-      // 查询大纲
-      getOutlineList(params).then((res) => {
-        let data = res.result;
-        if (Object.keys(data).length > 0) {
-          this.outlinesList = data.outline_list || [];
-          // this.page.page_num = data.page_num - 0;
-          // this.page.total = data.total;
-        }
-      });
-      // 查询订单
-      getOrderList(params).then((res) => {
-        let data = res.result;
-        if (Object.keys(data).length > 0) {
-          this.orderList = data.order_resp_list || [];
-        }
-      });
+      // let params = {
+      //   page_num: 1,
+      //   page_size: 5,
+      // };
+      // // 查询大纲
+      // getOutlineList(params).then((res) => {
+      //   let data = res.result;
+      //   if (Object.keys(data).length > 0) {
+      //     this.outlinesList = data.outline_list || [];
+      //     // this.page.page_num = data.page_num - 0;
+      //     // this.page.total = data.total;
+      //   }
+      // });
+      // // 查询订单
+      // getOrderList(params).then((res) => {
+      //   let data = res.result;
+      //   if (Object.keys(data).length > 0) {
+      //     this.orderList = data.order_resp_list || [];
+      //   }
+      // });
     }, 300), // 300毫秒内最多执行一次
 
     downLoadPaper: _.debounce(function (item) {

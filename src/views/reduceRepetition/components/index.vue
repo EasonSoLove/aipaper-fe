@@ -8,7 +8,7 @@
       :close-on-click-modal="false"
       title="支付订单"
       :visible.sync="popupStatus"
-      :width="device == 'mobile' ? '90%' : '70%'"
+      :width="device == 'mobile' ? '90%' : '40%'"
       class="order-dialog"
       :before-close="handleClose"
     >
@@ -30,75 +30,14 @@
           }}</span>
         </p> -->
 
-        <div class="payCodeBox">
-          <div class="payRightPrice">
-            <!-- <div class="markBox">
-              <img src="@/assets/images/mark.png" alt="" />
-            </div> -->
-            <!-- left code -->
-            <!-- 付费下载大纲不展示 -->
-            <!-- {{ currentOrder }} -->
+        <div class="payCodeBox" style="justify-content: center">
+          <div style="margin-right: 50px">
             <div class="reduceCard">
-              <p>{{ requestForm.title }}</p>
+              <p>文件查重付款</p>
               <div class="cardChildList">
-                <p>
-                  {{ requestForm.type }}
-                </p>
-                <p>
-                  {{ requestForm.word_count ? requestForm.word_count : "暂无" }}
-                </p>
-                <p>
-                  {{ requestForm.language }}
-                </p>
-                <p>
-                  {{
-                    requestForm.field
-                      ? typeof requestForm.field == "string"
-                        ? requestForm.field
-                        : requestForm.field[1]
-                      : ""
-                  }}
-                </p>
+                <p>总字数: {{ currentOrder.word_count }}</p>
               </div>
             </div>
-            <!-- <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-              <el-tab-pane
-                :disabled="orderPayDisabled"
-                label="正式版"
-                name="PAY_ALL"
-              >
-              </el-tab-pane>
-              <el-tab-pane
-                :disabled="orderPayDisabled"
-                label="预览版"
-                name="PAY_STAGES"
-              >
-              </el-tab-pane>
-            </el-tabs> -->
-            <payadditional
-              :orderPayDisabled="orderPayDisabled"
-              v-model="activeName"
-              @changeCard="handleClick"
-            ></payadditional>
-            <!-- <p class="popupSpan">
-              您选择了 <span>{{ additionalList.length }}</span>
-              项增值服务(仅限单次生成)
-            </p> -->
-            <!-- <div class="fujia">
-              <div
-                class="liFu"
-                v-for="(item, index) in additionalList"
-                :key="index + 'pop'"
-              >
-                <p class="topIntro" v-show="item.intro">{{ item.intro }}</p>
-
-                <p>{{ item.name }}</p>
-                <p class="liFuRight">
-                  <span>0.0元</span>
-                  <span>{{ item.price }}元</span>
-                </p>
-              </div>
-            </div> -->
           </div>
           <div class="payLeftCode">
             <p class="plTitle">支付信息</p>
@@ -153,14 +92,14 @@
                 class="newJuan"
                 style="margin-top: 10px; margin-bottom: 10px"
               >
-                <span>优惠卷: </span>
+                <!-- <span>优惠卷: </span> -->
 
-                <input
+                <!-- <input
                   type="text"
                   placeholder="请输入优惠卷编号"
                   v-model="coupon_code"
                   @blur="useCoupon"
-                />
+                /> -->
                 <!-- <el-button size="mini" type="primary" plain
                   >兑换</el-button
                 > -->
@@ -207,7 +146,6 @@ import {
   balance_pay,
 } from "@/api/user";
 import { mapGetters } from "vuex";
-import payadditional from "./payadditional.vue";
 import OrderType from "@/utils/orderTypes";
 
 export default {
@@ -269,7 +207,6 @@ export default {
     },
   },
   components: {
-    payadditional,
     // webinfo,
   },
   mounted() {
@@ -640,15 +577,11 @@ export default {
     paySend() {
       // this.$bdSave();
       window.zhuge.track("用户成功付款", {
-        价格: this.currentOrder.pay_amount,
-        语言: this.requestForm.language,
-        科目: this.requestForm.field && this.requestForm.field[1],
-        学历: this.requestForm.type,
-        论文字数: this.requestForm.word_count,
+        类目: "查重付费",
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
 
-      eventBus.emit("showEmitPaperDialog", {
+      eventBus.emit("showEmitReduceDialog", {
         requestKey: this.currentOrder.out_trade_no,
         payStatus: 2,
         paperPercent: 0,

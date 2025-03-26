@@ -79,12 +79,12 @@
       </div>
     </div>
     <!-- step3不展示论文 -->
-    <div v-if="activeIndex !== 3" class="outlineBox">
-      <outline @errorBack="errorBack"></outline>
+    <div v-if="activeIndex !== 3" class="outlineBox" id="outlineTop">
+      <outline ref="outlineRef" @errorBack="errorBack"></outline>
     </div>
 
     <div class="stepContent">
-      <step0 ref="step0" v-if="activeIndex != 3"></step0>
+      <!-- <step0 ref="step0" v-if="activeIndex != 3"></step0> -->
 
       <step1 v-if="activeIndex == 1"></step1>
       <step2 :outlineData="outlineData" v-if="activeIndex == 2"></step2>
@@ -228,13 +228,13 @@ export default {
       handler(val) {
         this.$log("activeIndexval", val);
         // 更新首页大纲列表
-        eventBus.emit("step0Reload", true); // 发布事件
+        // eventBus.emit("step0Reload", true); // 发布事件
       },
     },
   },
   computed: {
     // 计算属性
-    ...mapGetters(["activeIndex", "device", "requestForm"]),
+    ...mapGetters(["activeIndex", "device", "requestForm", "formdataV2"]),
   },
   methods: {
     fetchDataBasedOnRoute(to) {
@@ -353,6 +353,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     // 在路由进入前调用
     if (to.query.key1) {
+      console.log("ddd", to.query.key1);
       let data = {
         key: to.query.key1,
       };
@@ -361,6 +362,11 @@ export default {
           // 使用 next 的回调函数来访问组件实例
           next((vm) => {
             vm.showOutLine(res.result.outline.outline);
+            console.log("dddddddddddddddddddddddd", vm.requestForm.key);
+
+            if (res.result.key) {
+              vm.$refs.outlineRef.returnDataToForm(res.result);
+            }
             console.log("dddd", res);
             // 复现大纲接口
             // let data = {
@@ -369,7 +375,7 @@ export default {
             // };
 
             // 保存大纲输入信息
-            // vm.$store.dispatch("app/setRequestForm", data);
+            vm.$store.dispatch("app/setRequestForm", res.result);
             // 填充大纲列表数据
           });
         })
@@ -379,11 +385,18 @@ export default {
           next(); // 确保在发生错误时仍然导航到组件
         });
     } else {
-      next(); // 如果没有 key1，直接继续导航
+      next((vm) => {
+        // 直接在这使用 vm 进行 store 操作
+        if (vm.requestForm.key || vm.requestForm.key1) {
+          vm.$refs.outlineRef.returnDataToForm(vm.requestForm);
+        }
+        vm.$store.dispatch("app/setActiveIndex", 0);
+      });
     }
   },
   beforeRouteUpdate(to, from, next) {
     // 当路由的查询参数发生变化时，这个方法会被调用
+    console.log("ssssssssssssssssssssssssss");
     // this.activeIndex = to.query.activeIndex || 0;
     if (to.query.key1) {
       let data = {
@@ -401,6 +414,8 @@ export default {
         this.$store.dispatch("app/setRequestForm", data);
         // 填充大纲列表数据
       });
+    } else {
+      this.$store.dispatch("app/setActiveIndex", 0);
     }
     next();
   },

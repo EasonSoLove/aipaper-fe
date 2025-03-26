@@ -1,5 +1,5 @@
 <template>
-  <div class="ordersList">
+  <div class="ordersList" v-loading="loading">
     <div class="btns">
       <!-- <el-button type="primary" round @click="delList">删除大纲</el-button> -->
       <el-button type="primary" round @click="refresh">刷新大纲</el-button>
@@ -42,11 +42,32 @@
                   <el-button
                     @click="jumpStep2(orderObj)"
                     icon="el-icon-view"
+                    v-show="orderObj.version == 'v1'"
                     :disabled="orderObj.status != '生成成功'"
                     type="text"
                   >
                     查看大纲
                   </el-button>
+
+                  <template v-if="orderObj.version == 'v2'">
+                    <el-button
+                      @click="jumpV2Outline(orderObj)"
+                      v-if="orderObj.status == '等待中'"
+                      icon="el-icon-view"
+                      type="text"
+                    >
+                      继续编辑大纲
+                    </el-button>
+                    <el-button
+                      @click="jumpV2Outline(orderObj)"
+                      :disabled="orderObj.status != '生成成功'"
+                      v-else
+                      icon="el-icon-view"
+                      type="text"
+                    >
+                      查看大纲
+                    </el-button>
+                  </template>
                 </div>
                 <div>
                   <el-button
@@ -64,8 +85,14 @@
 
           <div class="orderText rowBetween handleRow">
             <div class="left">
-              类型:
+              学业类型:
               <span class="price">{{ orderObj.type }}</span>
+            </div>
+            <div class="left">
+              万象大纲:
+              <span class="price">{{
+                orderObj.version == "v1" ? "万象专业版" : "万象定制版"
+              }}</span>
             </div>
             <div class="left">
               科目:
@@ -103,7 +130,7 @@
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import { getList } from "@/api/table";
-import { getOutlineList } from "@/api/user";
+import { getOutlineList, outlineStatus } from "@/api/user";
 import { throttle } from "lodash";
 import eventBus from "@/utils/eventBus";
 import { product } from "@/api/gpt";
@@ -121,6 +148,7 @@ export default {
       // 定义变量
       checkList: [],
       orderList: [],
+      loading: false,
       page: {
         page_num: 0,
         page_size: 5,
@@ -182,11 +210,88 @@ export default {
       eventBus.emit("showDownOutline", requestForm);
       eventBus.emit("orderDialogChange", false);
     },
+    jumpV2Outline(row) {
+      zhuge.track(`用户编辑定制版大纲`, {
+        大纲标题: row.title,
+        大纲key: row.key1,
+      });
+      // 获取数据再跳转
+      this.loading = true;
+      outlineStatus({ key: row.key1 })
+        .then((res) => {
+          console.log("res", res);
+          let data = {
+            ...res.result,
+          };
+          data.field = ["哲学", row.field];
+          this.$store.dispatch("paper/setFormdataV2", res.result);
+          this.$store.dispatch("app/setRequestForm", data);
+          this.loading = false;
+          // 记录大纲状态
+          this.$store.dispatch("paper/setOutlineVersion", res.result.version);
+
+          this.jumpSelfOutline(res.result);
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    // 跳转大纲及打开定制版
+    jumpSelfOutline(requestForm) {
+      this.$log("setFormdata111-----------", requestForm, 2);
+
+      if (this.$route.path !== "/main/writepaper") {
+        this.$router.push(
+          {
+            path: "/main/writepaper",
+          },
+          () => {
+            this.$nextTick(() => {
+              eventBus.emit("setFormData", requestForm, 2); // 发布事件
+              eventBus.emit("orderDialogChange", false);
+
+              if (requestForm.outline && requestForm.outline.outline) {
+                setTimeout(() => {
+                  eventBus.emit("successOutline", requestForm.outline.outline);
+                }, 200);
+              } else {
+                this.$store.dispatch("app/setActiveIndex", 0);
+                let _this = this;
+                setTimeout(() => {
+                  _this.$nextTick(() => {
+                    _this.$scrollTo("#outlineTop", 500, { offset: -1500 });
+                  });
+                }, 200);
+              }
+            });
+          }
+        );
+      } else {
+        eventBus.emit("setFormData", requestForm, 2); // 发布事件
+        eventBus.emit("orderDialogChange", false);
+        let _this = this;
+        if (requestForm.outline && requestForm.outline.outline) {
+          setTimeout(() => {
+            eventBus.emit("successOutline", requestForm.outline.outline);
+          }, 200);
+        } else {
+          this.$store.dispatch("app/setActiveIndex", 0);
+          setTimeout(() => {
+            _this.$nextTick(() => {
+              _this.$scrollTo("#outlineTop", 500, { offset: -1500 });
+            });
+          }, 200);
+        }
+      }
+    },
     jumpStep2(row) {
       zhuge.track(`用户查看大纲`, {
         大纲标题: row.title,
         大纲key: row.key1,
       });
+
+      this.$store.dispatch("paper/setOutlineVersion", row.version);
+
       // row.key1
       this.$router.push(
         {
@@ -204,14 +309,14 @@ export default {
               threeCon: false,
               language: row.language,
               type: row.type,
-              field: ["哲学", row.field],
+              field: row.field,
               key: row.key1,
               product: row.product,
               word_count: row.word_count,
             };
             this.$store.dispatch("app/setRequestForm", requestForm);
 
-            eventBus.emit("setFormData", requestForm); // 发布事件
+            eventBus.emit("setFormData", requestForm, 1); // 发布事件
             eventBus.emit("orderDialogChange", false);
           });
         }
@@ -234,19 +339,26 @@ export default {
       // });
     },
     handleCurrentChange: throttle(function (newPage) {
+      this.loading = true;
       // 这里可以添加你的分页逻辑，例如发送请求获取新的数据
       let params = {
         page_num: newPage,
         page_size: this.page.page_size,
       };
-      getOutlineList(params).then((res) => {
-        let data = res.result;
-        if (Object.keys(data).length > 0) {
-          this.orderList = data.outline_list || [];
-          this.page.page_num = data.page_num - 0;
-          this.page.total = data.total;
-        }
-      });
+      getOutlineList(params)
+        .then((res) => {
+          this.loading = false;
+
+          let data = res.result;
+          if (Object.keys(data).length > 0) {
+            this.orderList = data.outline_list || [];
+            this.page.page_num = data.page_num - 0;
+            this.page.total = data.total;
+          }
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     }, 300), // 300毫秒内最多执行一次
   },
 };

@@ -6,14 +6,17 @@
       :append-to-body="true"
       :lock-scroll="false"
       :close-on-click-modal="false"
-      title="订单支付"
+      title="订单生成"
       :visible.sync="ownPayStatus"
       :width="device == 'mobile' ? '90%' : '55%'"
       :before-close="handleClose"
     >
       <div class="reduceBox">
         <div class="boxLeft">
-          <div class="reduceCard">
+          <div
+            v-if="!currentOrder.order_type == 'REDUCE_AIGC'"
+            class="reduceCard"
+          >
             <p>
               {{ requestForm.title ? requestForm.title : "暂无" }}
             </p>
@@ -28,6 +31,7 @@
                 {{ requestForm.language ? requestForm.language : "暂无" }}
               </p>
               <p>
+                {
                 {{
                   requestForm.field
                     ? typeof requestForm.field == "string"
@@ -53,32 +57,55 @@
                 :percentage="currentNumber"
               ></el-progress>
             </div>
-            <p class="reduceP1">努力生成中</p>
-            <p class="reduceP2">
-              正在拼命查询, 学习大量
-              <span style="font-weight: bold" class="primary">真实文献</span>
-            </p>
-            <p class="dialog-text">
-              预计
-              <span
-                v-if="
-                  currentOrder.product == '文献综述' ||
-                  currentOrder.product == '任务书' ||
-                  currentOrder.product == '结课论文' ||
-                  currentOrder.product == '开题报告'
-                "
-                class="primary"
-              >
-                10分钟
-              </span>
-              <span v-else class="primary"> 60分钟 </span>左右完成 ，请耐心等待
-            </p>
-            <p class="dialog-text">如果您有事离开, 此弹窗可以放心关闭</p>
-            <p class="dialog-text">
-              后续,在
-              <span style="color: #1b2126">顶部栏 - 我的订单</span>
-              , 查看您的正文
-            </p>
+            <template v-if="!currentOrder.order_type == 'REDUCE_AIGC'">
+              <p class="reduceP1">努力生成中</p>
+              <p class="reduceP2">
+                正在拼命查询, 学习大量
+                <span style="font-weight: bold" class="primary">真实文献</span>
+              </p>
+              <p class="dialog-text">
+                预计
+                <span
+                  v-if="
+                    currentOrder.product == '文献综述' ||
+                    currentOrder.product == '任务书' ||
+                    currentOrder.product == '结课论文' ||
+                    currentOrder.product == '开题报告'
+                  "
+                  class="primary"
+                >
+                  10分钟
+                </span>
+                <span v-else class="primary"> 60分钟 </span>左右完成
+                ，请耐心等待
+              </p>
+              <p class="dialog-text">如果您有事离开, 此弹窗可以放心关闭</p>
+              <p class="dialog-text">
+                后续,在
+                <span style="color: #1b2126">顶部栏 - 我的订单</span>
+                , 查看您的正文
+              </p>
+            </template>
+            <template v-else>
+              <p class="reduceP1">努力降重中,</p>
+              <p class="reduceP2">
+                成功后会<span style="font-weight: bold" class="primary">
+                  自动下载
+                </span>
+                压缩包文件
+              </p>
+              <p class="dialog-text">
+                预计
+                <span class="primary"> 10分钟 </span>
+                左右完成 ，请耐心等待
+              </p>
+              <p class="dialog-text">如果您有事离开, 此弹窗可以放心关闭</p>
+              <p class="dialog-text">
+                后续,在
+                <span style="color: #1b2126">顶部栏 - 我的订单</span>
+                , 查看您的降重报告
+              </p>
+            </template>
           </div>
         </div>
         <!-- 右边开始 -->
@@ -294,8 +321,19 @@ export default {
               "case",
               order_item_response[0].case.paper_case.stage == 2
             );
-            if (order_item_response[0].case.paper_case.stage == 2) {
+            if (
+              order_item_response[0].case.paper_case.stage == 2 &&
+              order_item_response[0].case.file_urls.word
+            ) {
               caseStatus = false;
+            }
+            if (order_item_response[0].case.paper_case.stage == 3) {
+              this.$message({
+                type: "error",
+                message: "降重失败, 请在我的订单重试!",
+              });
+              this.$store.dispatch("paper/setPollingStatus", false);
+              this.ownPayStatus = false;
             }
           }
 
@@ -306,82 +344,15 @@ export default {
               _this.getList(data, delay, maxRetries, currentRetry);
             }, delay);
           } else {
-            let wordTypeList = [
-              "EXTRA_PROPOSAL",
-              "EXTRA_TASK_ASSIGNMENT",
-              "EXTRA_JOURNAL_REVIEWED",
-            ];
-            // 请求成功, 激活tab3
-            if (wordTypeList.includes(orderData.order_type)) {
-              // word
-              this.$store.dispatch("paper/setPollingStatus", false);
-              // 保存数据， 用于step3下载
-              this.$store.dispatch("app/toggleCurrentOrder", orderData);
-              this.ownPayStatus = false;
-              // 提示用户下载
-              this.$confirm("文件已生成, 是否下载?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-              })
-                .then(() => {
-                  // 下载word
-                  paperPack({ out_trade_no: order.out_trade_no }).then(
-                    (res) => {
-                      // window.open(res.result.zip_url, "_blank");
-                      // Create a temporary link element
-                      const link = document.createElement("a");
-                      link.href = res.result.zip_url;
+            // if()
+            let zipUrl = order_item_response[0].case.file_urls.word;
 
-                      // Set the download attribute to suggest a filename
-                      link.download = outline.title + ".zip"; // Change 'filename.zip' to the desired file name
-
-                      // Append the link to the body
-                      document.body.appendChild(link);
-
-                      // Programmatically click the link to trigger the download
-                      link.click();
-
-                      // Remove the link from the document
-                      document.body.removeChild(link);
-                      // let _this = this;
-                      // setTimeout(() => {
-                      //   _this.$message({
-                      //     type: "success",
-                      //     message: "已开始下载文件!",
-                      //   });
-                      //   _this.$store.dispatch("app/setActiveIndex", 0);
-                      //   eventBus.emit("outlineGen", this.requestForm);
-                      // }, 1000);
-                    }
-                  );
-                  // 结束
-                })
-                .catch(() => {
-                  this.$message({
-                    type: "info",
-                    message: "我的订单可下载已生成文件!",
-                  });
-                });
-            } else {
-              // pdf
-              let pdfUrl2 = order_item_response[0].case.file_urls.pdf;
-              let realUrl = pdfUrl2 ? pdfUrl2 : "";
-              this.$log("realUrl", realUrl);
-
-              // 满足停止轮询的条件，更新数据并结束轮询
-              this.listData = order_item_response; // 假设这里是你想更新的数据
-              this.$store.dispatch("paper/setPollingStatus", false);
-              // 保存数据， 用于step3下载
-              this.$store.dispatch("app/toggleCurrentOrder", order);
-              this.ownPayStatus = false;
-              eventBus.emit("pdfSuccessClick", realUrl); // 发布事件
+            if (zipUrl) {
+              window.open(zipUrl);
             }
-            // let pdfUrl = "https://file.mixpaper.cn/pdf/third_output.pdf";
 
-            // this.$nextTick(() => {
-            //   this.$store.dispatch("app/togglePDFUrl", realUrl);
-            // });
+            this.$store.dispatch("paper/setPollingStatus", false);
+            this.ownPayStatus = false;
           }
         })
         .catch((error) => {

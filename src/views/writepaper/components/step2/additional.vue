@@ -36,7 +36,13 @@
               {{ requestForm.language }}
             </p>
             <p>
-              {{ requestForm.field && requestForm.field[1] }}
+              {{
+                requestForm.field
+                  ? typeof requestForm.field == "string"
+                    ? requestForm.field
+                    : requestForm.field[1]
+                  : ""
+              }}
             </p>
           </div>
           <!-- 写死正式版的内容 -->
@@ -115,7 +121,11 @@
               {{ requestForm.language }}
             </p>
             <p>
-              {{ requestForm.field && requestForm.field[1] }}
+              {{
+                requestForm.field && typeof requestForm.field == "string"
+                  ? requestForm.field
+                  : requestForm.field[1]
+              }}
             </p>
           </div>
           <!-- 写死正式版的内容 -->
@@ -296,7 +306,7 @@ export default {
           literatureReview: 29,
         },
         {
-          wordCount: "21000 - 30000",
+          wordCount: "21000 - 25000",
           vocational: 196,
           undergraduate: 216,
           master: 256,
@@ -388,9 +398,9 @@ export default {
     getDefaultPrice() {
       // 获取预估价格
       console.log("预估价格", this.requestForm);
-      if (this.requestForm.key) {
+      if (this.requestForm.key || this.requestForm.key1) {
         let data = {
-          key: this.requestForm.key,
+          key: this.requestForm.key || this.requestForm.key1,
           type: this.requestForm.type,
           product: this.requestForm.product,
           word_count: this.requestForm.word_count,

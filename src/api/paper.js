@@ -102,9 +102,80 @@ export function title_recommend(data) {
     data,
   });
 }
+export function remove_reduce_file(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/edit/remove_reduce_file",
+    method: "post",
+    data,
+  });
+}
+export function save_papers_list(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/save_papers_list",
+    method: "post",
+    data,
+  });
+}
+export function create_outline(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/create_outline",
+    method: "post",
+    data,
+  });
+}
+export function upload_papers(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/upload_papers",
+    method: "post",
+    data,
+  });
+}
+
+export function re_reduce(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/edit/re_reduce",
+    method: "post",
+    data,
+  });
+}
 export function pay_order(data) {
   return request({
     url: baseUrl + "/api/ai-paper/pass/pay_order",
+    method: "post",
+    data,
+  });
+}
+export function upload_reduce_file(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/edit/upload_reduce_file",
+    method: "post",
+    data,
+  });
+}
+export function generate_keywords(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/generate_keywords",
+    method: "post",
+    data,
+  });
+}
+export function save_keywords(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/save_keywords",
+    method: "post",
+    data,
+  });
+}
+export function search_papers(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/search_papers",
+    method: "post",
+    data,
+  });
+}
+export function save_extra_requirements(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/step_outline/save_extra_requirements",
     method: "post",
     data,
   });
@@ -113,6 +184,13 @@ export function pay_order(data) {
 export function pay_download(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/outline/pay_download",
+    method: "post",
+    data,
+  });
+}
+export function reduce_aigc_pay(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/orders/reduce_aigc_pay",
     method: "post",
     data,
   });

@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-// import { mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 // import { sms } from "@/api/login";
 
 import inputMain from "./components/inputMain.vue";
@@ -64,6 +64,10 @@ export default {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // window.zhuge.load("aecb263210174e7994293e947ccaedba", { debug: true });
   },
+  computed: {
+    // 计算属性
+    // ...mapGetters(["activeIndex", "device", "requestForm", "formdataV2"]),
+  },
   created() {
     // console.log("getDomain", getDomain());
     // // eventBus.on("sendOutline", this.addE); // 订阅事件
@@ -78,9 +82,6 @@ export default {
   },
   beforeDestroy() {
     // eventBus.off("sendOutline", this.addE); // 移除事件监听
-  },
-  computed: {
-    // 计算属性
   },
   methods: {
     // 定义方法

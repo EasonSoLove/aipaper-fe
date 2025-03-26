@@ -406,7 +406,7 @@ export default {
           literatureReview: 29,
         },
         {
-          wordCount: "21000 - 30000",
+          wordCount: "21000 - 25000",
           vocational: 196,
           undergraduate: 216,
           master: 256,
@@ -481,7 +481,7 @@ export default {
     getDefaultPrice() {
       // 获取预估价格
       let data = {
-        key: this.requestForm.key,
+        key: this.requestForm.key || this.requestForm.key1,
         type: this.requestForm.type,
         product: this.requestForm.product,
         word_count: this.requestForm.word_count,

@@ -1,23 +1,27 @@
 <template>
-  <div class="outlineMain">
+  <div class="outlineMain" v-loading="loading">
     <!-- 页面名称 -->
     <div class="outlineTab">
       <div class="outLeft">
         <p
-          @click="checkoutPaper(1)"
-          :class="['outLeftTitle', index == 1 ? 'activeLT' : '']"
+          @click="checkoutPaper('v1')"
+          :class="['outLeftTitle', outlineVersion == 'v1' ? 'activeLT' : '']"
         >
           万象专业版
           <span class="underLeft"></span>
         </p>
         <!-- checkoutPaper(2) -->
-        <!-- <p
-          @click="$devf"
-          :class="['outLeftTitle', 'paperClass', index == 2 ? 'activeLT' : '']"
+        <p
+          @click="checkoutPaper('v2')"
+          :class="[
+            'outLeftTitle',
+            'paperClass',
+            outlineVersion == 'v2' ? 'activeLT' : '',
+          ]"
         >
-          万象学术版
+          万象定制版
           <span class="underLeft"></span>
-        </p> -->
+        </p>
       </div>
       <div class="outRight">
         <div
@@ -33,7 +37,9 @@
       </div>
     </div>
     <!-- 用户输入页面 -->
-    <div :class="['uesrInputBox', index == 2 ? 'tabMainActive' : '']">
+    <div
+      :class="['uesrInputBox', outlineVersion == 'v2' ? 'tabMainActive' : '']"
+    >
       <!-- 科目与题目 -->
       <div class="selectLang formItem">
         <el-tooltip
@@ -67,15 +73,6 @@
           </div>
         </div>
       </div>
-      <!-- <div
-        :class="[
-          'firstItem',
-          'secondItem',
-          device == 'mobile' ? 'mobilebox' : '',
-        ]"
-      >
-        <advance></advance>
-      </div> -->
 
       <div
         :class="[
@@ -160,8 +157,8 @@
                 class="radioSmall"
                 v-for="item in paper_levelList"
                 :key="item.name"
-                :label="item.name"
-                :value="item.name"
+                :label="item.value"
+                :value="item.value"
               >
                 <el-tooltip
                   class="item custom-tooltip"
@@ -176,7 +173,7 @@
                   <div class="labelBox">
                     <div class="left">
                       <img
-                        v-if="requestForm.paper_level == item.name"
+                        v-if="requestForm.paper_level == item.value"
                         class="home-icon"
                         src="@/assets/images/index/icon_24_lwsp_selected.png"
                         alt=""
@@ -302,6 +299,40 @@
           </div>
         </div>
       </div>
+      <!-- start 检索文献 -->
+
+      <div
+        :class="[
+          'firstItem',
+          'secondItem',
+          device == 'mobile' ? 'mobilebox' : '',
+        ]"
+        v-if="outlineVersion == 'v2'"
+      >
+        <advance :parentForm="requestForm"></advance>
+      </div>
+      <!-- end 检索文献 -->
+      <div
+        :class="[
+          'firstItem',
+          'secondItem',
+          device == 'mobile' ? 'mobilebox' : '',
+        ]"
+      >
+        <!-- 投喂信息 -->
+        <div class="selectLang formItem firstItem" style="padding-right: 0">
+          <p class="formItemLabel">投喂信息</p>
+          <div class="formItemCon">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 6, maxRows: 10 }"
+              placeholder="可投喂信息： 开题报告， 设计思路等内容"
+              v-model="requestForm.extra_requirements"
+            >
+            </el-input>
+          </div>
+        </div>
+      </div>
 
       <!-- 三级大纲 -->
       <!-- <div class="selectLang formItem">
@@ -315,11 +346,24 @@
       </div> -->
       <!-- 生成大纲 -->
       <div
-        @click="sendOutlineForm"
+        @click="sendOutlineForm('v1')"
+        v-if="outlineVersion == 'v1'"
         :class="[
           'outlineBtn',
           'g_poin',
-          index == 2 ? 'paperMain' : '',
+          outlineVersion == 'v2' ? 'paperMain' : '',
+          produceLineStatus ? 'produceClass' : '',
+        ]"
+      >
+        <p>生成大纲</p>
+      </div>
+      <div
+        v-if="outlineVersion == 'v2'"
+        @click="sendV2Form"
+        :class="[
+          'outlineBtn',
+          'g_poin',
+          outlineVersion == 'v2' ? 'paperMain' : '',
           produceLineStatus ? 'produceClass' : '',
         ]"
       >
@@ -339,6 +383,7 @@ import { mapGetters } from "vuex";
 import eventBus from "@/utils/eventBus";
 import { getToken } from "@/utils/auth"; //
 import { outlineCreate } from "@/api/user";
+import { create_outline, save_extra_requirements } from "@/api/paper";
 import polling from "@/utils/polling-utils";
 import advantage from "@/views/dashboard/components/advantage";
 import example from "./example/index.vue";
@@ -349,19 +394,22 @@ export default {
   data() {
     return {
       // 定义变量
+      loading: false,
       requestForm: {
         title: "",
+        extra_requirements: "",
         threeCon: false,
         language: "中文",
         type: "本科",
         product: "毕业论文",
-        paper_level: "初级",
+        paper_level: 0,
         field: ["哲学", "哲学类"],
         key: "",
+
         word_count: 5000,
       },
       OrderType: OrderType,
-      index: 1,
+      // outlineActiveIndex: 2,
       carProp: {
         value: "name",
         label: "name",
@@ -375,7 +423,7 @@ export default {
         结课论文: "专科、本科课论文水准，可通过论文水平进一步控制论文深度",
       },
       minCount: 3000,
-      maxCount: 30000,
+      maxCount: 25000,
       options: [
         {
           value: "中文",
@@ -401,11 +449,14 @@ export default {
       paper_levelList: [
         {
           name: "初级",
+          value: 0,
           description:
             "选定学历等级会限定论文初始等级，在此基础上选择【初级】生成的论文相对通俗易懂，使用的方法不超过本科水平，论文写作深度和水平容易理解。",
         },
         {
           name: "高级",
+          value: 3,
+
           description:
             "选定学历等级会限定论文初始等级，在此基础上选择【高级】生成的论文会有相对专业的方法以及结论，论文写作深度高一些。",
         },
@@ -425,12 +476,12 @@ export default {
           label: this.$createElement("strong", "20000"),
         },
 
-        30000: {
+        25000: {
           style: {
             width: "90px",
             color: "#E6A23C",
           },
-          label: this.$createElement("strong", "30000"),
+          label: this.$createElement("strong", "25000"),
         },
       },
       showContrast: false,
@@ -447,22 +498,20 @@ export default {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
     // 查看用户输入数据是否存在
-    let jsonStr = localStorage.getItem("userInput");
-
-    this.$log("outline_----", jsonStr);
-
-    if (!!jsonStr) {
-      this.requestForm = JSON.parse(jsonStr);
-      this.$log("用户输入有数据", this.requestForm);
-      this.$nextTick(() => {
-        localStorage.removeItem("userInput");
-      });
-    } else {
-      // let _this = this;
-      // setTimeout(() => {
-      //   _this.requestForm.type = _this.homeData.category_list[0].name;
-      // }, 1000);
-    }
+    // let jsonStr = localStorage.getItem("userInput");
+    // this.$log("outline_----", jsonStr);
+    // if (!!jsonStr) {
+    //   // this.requestForm = JSON.parse(jsonStr);
+    //   // this.$log("用户输入有数据", this.requestForm);
+    //   // this.$nextTick(() => {
+    //   //   localStorage.removeItem("userInput");
+    //   // });
+    // } else {
+    //   // let _this = this;
+    //   // setTimeout(() => {
+    //   //   _this.requestForm.type = _this.homeData.category_list[0].name;
+    //   // }, 1000);
+    // }
   },
   created() {
     // step2点击重新生成大纲
@@ -475,9 +524,50 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["homeData", "produceLineStatus", "device"]),
+    ...mapGetters([
+      "homeData",
+      "outlineVersion",
+      "produceLineStatus",
+      "device",
+      "formdataV2",
+    ]),
   },
+  // watch: {
+  //   // 监听 formdataV2.reference_paper_selected_lists 的变化
+  //   "formdataV2.reference_paper_selected_lists": {
+  //     handler(newVal, oldVal) {
+  //       // 当数据改变时，你可以在这里执行任何你需要的操作
+  //       Ming("reference_paper_selected_lists has been updated", newVal, oldVal);
+  //       // 这里的操作可以是任何事情，比如调用一个方法或者更改其他数据
+  //       this.selectedPapers = newVal;
+  //     },
+  //     deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
+  //     immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true
+  //   },
+  // },
   methods: {
+    // 如果有key值, 用户切换页面 数据复现
+    returnDataToForm(data) {
+      // title: "",
+      //   extra_requirements: "",
+      //   threeCon: false,
+      //   language: "中文",
+      //   type: "本科",
+      //   product: "毕业论文",
+      //   paper_level: 0,
+      //   field: ["哲学", "哲学类"],
+      //   key: "",
+      //   word_count: 5000,
+      // this.requestForm.title = data.title
+      this.requestForm = { ...data };
+      if (typeof data.field == "string") {
+        this.requestForm.field = data.field;
+      } else {
+        this.requestForm.field = data.field[1];
+      }
+
+      // this.requestForm.paper_level = parseInt(data.paper_level);
+    },
     showAdv() {
       zhuge.track(`访问质量对比`);
       this.$refs.advantageDia.showDia();
@@ -528,8 +618,8 @@ export default {
         }
       }
     },
-    setFormData(data) {
-      this.$log("setFormdata-----------", data);
+    setFormData(data, index) {
+      this.$log("setFormdata-----------", data, index);
       if (data) {
         this.requestForm = { ...data };
       }
@@ -538,7 +628,116 @@ export default {
     //   this.produceLineStatus = true;
     //   this.sendOutlineForm();
     // },
-    sendOutlineForm: function () {
+    sendV2Form() {
+      // let data = {
+      //   key: this.formdataV2.key,
+      // };
+      // create_outline(data).then((res) => {
+      //   this.$message({
+      //     type: "success",
+      //     message: "申城大纲成功!",
+      //   });
+      // });
+      this.sendOutlineForm("v2");
+    },
+    // 用户投喂保存
+    saveExtraFun(vision) {
+      this.$confirm(
+        "请仔细检查所勾选文献与您专业和论文题目的相关性，万象学术模型会进行参考文献相关性进行引用逐级生成大纲，若相关性不大，可能不会引用！ 是否继续?",
+        "温馨提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          let data = {
+            key: this.formdataV2.key || this.formdataV2.key1,
+            extra_requirements: this.requestForm.extra_requirements,
+          };
+          if (this.requestForm.extra_requirements) {
+            save_extra_requirements(data).then((res) => {
+              this.sendV2Fun();
+            });
+          } else {
+            this.sendV2Fun();
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消生成",
+          });
+        });
+    },
+    // v2发送请求保存
+    sendV2Fun() {
+      // 保存用户输入数据
+      console.log("requestForm", this.requestForm);
+      console.log("requestForm", this.formdataV2);
+
+      let data2 = {
+        key: this.formdataV2.key || this.formdataV2.key1,
+        title: this.requestForm.title,
+        language: this.requestForm.language,
+        field: "",
+        type: this.requestForm.type,
+        product: this.requestForm.product,
+        word_count: this.requestForm.word_count,
+        paper_level: this.requestForm.paper_level,
+      };
+      if (typeof this.requestForm.field === "string") {
+        data2.field = this.requestForm.field;
+      } else {
+        data2.field = this.requestForm.field[1];
+      }
+      this.loading = true;
+      create_outline(data2)
+        .then((res) => {
+          window.zhuge.track("生成大纲", {
+            语言: this.requestForm.language,
+            科目: this.requestForm.field[1],
+            学业类型: this.requestForm.type,
+            论文类型: this.requestForm.product,
+            论文水平: this.requestForm.paper_level,
+            论文字数: this.requestForm.word_count,
+          });
+          this.loading = false;
+          this.$store.dispatch("app/setProStatus", true);
+
+          this.$log("outlineCreateres", res);
+          eventBus.emit("emitOulineClick", 3); // 发布事件
+          this.$log("lunwen", this.requestForm);
+          this.requestForm.key = res.result.key;
+          this.$store.dispatch("app/setRequestForm", this.requestForm);
+          this.requestKey = res.result.key;
+          // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
+          polling({ key: this.requestKey }, 5000)
+            .then((res) => {
+              this.$log("ddddd", res);
+              if (res == "生成失败") {
+                eventBus.emit("errorOutline", res); // 发布事件
+              } else {
+                eventBus.emit("successOutline", res); // 发布事件
+              }
+            })
+            .catch((error) => {
+              this.$log(error, "eeeeeerrrror");
+              this.$message({
+                type: "error",
+                message: "大纲生成失败, 请稍后重试",
+              });
+              eventBus.emit("errorOutline"); // 发布事件
+              this.$emit("errorBack", "关闭index");
+            });
+        })
+        .catch(() => {
+          this.loading = false;
+          this.$store.dispatch("app/setProStatus", false);
+        });
+    },
+    sendOutlineForm: function (vision) {
       if (this.produceLineStatus) {
         this.$message({
           type: "warning",
@@ -568,59 +767,70 @@ export default {
 
           return false;
         }
-
-        // 保存用户输入数据
-        let data = {
-          title: this.requestForm.title,
-          language: this.requestForm.language,
-          field: this.requestForm.field[1],
-          type: this.requestForm.type,
-          product: this.requestForm.product,
-          paper_level: this.requestForm.paper_level == "初级" ? 0 : 3,
-          word_count: this.requestForm.word_count,
-        };
-        outlineCreate(data)
-          .then((res) => {
-            window.zhuge.track("生成大纲", {
-              语言: this.requestForm.language,
-              科目: this.requestForm.field[1],
-              学业类型: this.requestForm.type,
-              论文类型: this.requestForm.product,
-              论文水平: this.requestForm.paper_level,
-              论文字数: this.requestForm.word_count,
-            });
-
-            this.$store.dispatch("app/setProStatus", true);
-
-            this.$log("outlineCreateres", res);
-            eventBus.emit("emitOulineClick", 3); // 发布事件
-            this.$log("lunwen", this.requestForm);
-            this.requestForm.key = res.result.key;
-            this.$store.dispatch("app/setRequestForm", this.requestForm);
-            this.requestKey = res.result.key;
-            // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
-            polling({ key: this.requestKey }, 5000)
-              .then((res) => {
-                this.$log("ddddd", res);
-                if (res == "生成失败") {
-                  eventBus.emit("errorOutline", res); // 发布事件
-                } else {
-                  eventBus.emit("successOutline", res); // 发布事件
-                }
-              })
-              .catch((error) => {
-                this.$log(error, "eeeeeerrrror");
-                this.$message({
-                  type: "error",
-                  message: "大纲生成失败, 请稍后重试",
-                });
-                eventBus.emit("errorOutline"); // 发布事件
-                this.$emit("errorBack", "关闭index");
+        if (vision == "v1") {
+          // 保存用户输入数据
+          let data = {
+            title: this.requestForm.title,
+            language: this.requestForm.language,
+            field: "",
+            type: this.requestForm.type,
+            product: this.requestForm.product,
+            paper_level: this.requestForm.paper_level,
+            word_count: this.requestForm.word_count,
+            extra_requirements: this.requestForm.extra_requirements,
+          };
+          if (typeof this.requestForm.field === "string") {
+            data.field = this.requestForm.field;
+          } else {
+            data.field = this.requestForm.field[1];
+          }
+          outlineCreate(data)
+            .then((res) => {
+              window.zhuge.track("生成大纲", {
+                语言: this.requestForm.language,
+                科目: this.requestForm.field[1],
+                学业类型: this.requestForm.type,
+                论文类型: this.requestForm.product,
+                论文水平: this.requestForm.paper_level,
+                论文字数: this.requestForm.word_count,
               });
-          })
-          .catch(() => {
-            this.$store.dispatch("app/setProStatus", false);
-          });
+
+              this.$store.dispatch("app/setProStatus", true);
+
+              this.$log("outlineCreateres", res);
+              eventBus.emit("emitOulineClick", 3); // 发布事件
+              this.$log("lunwen", this.requestForm);
+              this.requestForm.key = res.result.key;
+              this.$store.dispatch("app/setRequestForm", this.requestForm);
+              this.requestKey = res.result.key;
+              // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
+              polling({ key: this.requestKey }, 5000)
+                .then((res) => {
+                  this.$log("ddddd", res);
+                  if (res == "生成失败") {
+                    eventBus.emit("errorOutline", res); // 发布事件
+                  } else {
+                    eventBus.emit("successOutline", res); // 发布事件
+                  }
+                })
+                .catch((error) => {
+                  this.$log(error, "eeeeeerrrror");
+                  this.$message({
+                    type: "error",
+                    message: "大纲生成失败, 请稍后重试",
+                  });
+                  eventBus.emit("errorOutline"); // 发布事件
+                  this.$emit("errorBack", "关闭index");
+                });
+            })
+            .catch(() => {
+              this.$store.dispatch("app/setProStatus", false);
+            });
+        }
+        if (vision == "v2") {
+          // 先保存自定一内容  然后生成大纲
+          this.saveExtraFun();
+        }
       } else {
         this.$store.dispatch("app/setProStatus", false);
         this.$confirm(
@@ -661,6 +871,9 @@ export default {
     },
     checkoutPaper(val) {
       this.index = val;
+      this.$emit("errorBack", "关闭index");
+      this.$store.dispatch("paper/setOutlineVersion", val);
+
       this.$log("homeData", this.homeData);
     },
   },
@@ -800,6 +1013,7 @@ export default {
 }
 .uesrInputBox {
   padding-top: 25px;
+  padding-right: 40px;
   padding-bottom: 40px;
   .selectLang:first-child {
     margin-top: 0px;

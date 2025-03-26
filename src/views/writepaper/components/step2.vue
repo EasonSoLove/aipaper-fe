@@ -4,7 +4,11 @@
       <p class="oulineTitlePaper"><span>题目: </span>{{ requestForm.title }}</p>
       <p class="outlineTitleDesc">
         <span>科目: </span>
-        {{ requestForm.field ? requestForm.field[1] : "暂无" }}
+        {{
+          requestForm.field && typeof requestForm.field == "string"
+            ? requestForm.field
+            : requestForm.field[1]
+        }}
         <span style="margin-left: 50px">类型: </span>
         {{ requestForm.type ? requestForm.type : "暂无" }}
       </p>
@@ -534,7 +538,7 @@
         <el-slider
           v-model="paper_words"
           :min="1000"
-          :max="30000"
+          :max="25000"
           :marks="marks"
           :step="1000"
         >
@@ -894,11 +898,11 @@ export default {
           },
           label: this.$createElement("strong", "20000字"),
         },
-        30000: {
+        25000: {
           style: {
             color: "#E6A23C",
           },
-          label: this.$createElement("strong", "三万字"),
+          label: this.$createElement("strong", "25000字"),
         },
       },
       numberValidateForm: {
@@ -1036,7 +1040,7 @@ export default {
       this.loading = true;
       let data = {
         title: this.requestForm.title,
-        key1: this.requestForm.key,
+        key1: this.requestForm.key || this.requestForm.key1,
         outline: {
           outline: this.outline,
         },
@@ -1055,14 +1059,14 @@ export default {
       this.sliderStatus = false;
       let data = {
         title: this.requestForm.title,
-        key1: this.requestForm.key,
+        key1: this.requestForm.key || this.requestForm.key1,
         outline: {
           outline: this.outline,
         },
       };
       if (status == "aitype") {
         zhuge.track(`AI帮写`, {
-          大纲key: this.requestForm.key,
+          大纲key: this.requestForm.key || this.requestForm.key1,
           所选学历: this.requestForm.type,
           大纲字数: this.requestForm.word_count,
           大纲类型: this.requestForm.product,
@@ -1070,7 +1074,7 @@ export default {
         data.aitype = true;
       } else {
         zhuge.track(`编辑大纲`, {
-          大纲key: this.requestForm.key,
+          大纲key: this.requestForm.key || this.requestForm.key1,
           所选学历: this.requestForm.type,
           大纲字数: this.requestForm.word_count,
           大纲类型: this.requestForm.product,
@@ -1095,7 +1099,7 @@ export default {
       });
     },
     getList() {
-      polling({ key: this.requestForm.key })
+      polling({ key: this.requestForm.key || this.requestForm.key1 })
         .then((res) => {
           if (res == "生成失败") {
             this.$message({
@@ -1120,7 +1124,7 @@ export default {
 
     reloadSave(status) {
       let data = {
-        key: this.requestForm.key,
+        key: this.requestForm.key || this.requestForm.key1,
       };
       outlineStatus(data).then((res) => {
         this.outline = res.result.outline.outline;
@@ -1399,13 +1403,13 @@ export default {
     onlySave() {
       let data = {
         title: this.requestForm.title,
-        key1: this.requestForm.key,
+        key1: this.requestForm.key || this.requestForm.key1,
         outline: {
           outline: this.outline,
         },
       };
       zhuge.track(`编辑大纲`, {
-        大纲key: this.requestForm.key,
+        大纲key: this.requestForm.key || this.requestForm.key1,
         所选学历: this.requestForm.type,
         大纲字数: this.requestForm.word_count,
         大纲类型: this.requestForm.product,
@@ -1497,7 +1501,7 @@ export default {
             payment_method: "alipay", // 支付方式
             total_amount: 149.85, // 总价
             pay_type: this.selectValue == "left" ? "PAY_ALL" : "PAY_STAGES",
-            key: this.requestForm.key, // 大纲的key
+            key: this.requestForm.key || this.requestForm.key1, // 大纲的key
             product: this.requestForm.product, // 大纲的key
             type: this.requestForm.type, // 大纲的key
             word_count: this.requestForm.word_count, // 大纲的key
