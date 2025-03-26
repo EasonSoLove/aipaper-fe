@@ -7,7 +7,7 @@
         @click="getkeyWords"
         round
         style="width: 50%"
-        >检索论文关键词</el-button
+        >生成检索论文的关键词</el-button
       >
     </header>
     <div class="keywordBox">
@@ -401,9 +401,20 @@ export default {
     "formdataV2.reference_paper_selected_lists": {
       handler(newVal, oldVal) {
         // 当数据改变时，你可以在这里执行任何你需要的操作
-        Ming("reference_paper_selected_lists has been updated", newVal, oldVal);
         // 这里的操作可以是任何事情，比如调用一个方法或者更改其他数据
         this.selectedPapers = newVal;
+      },
+      deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
+      immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true
+    },
+    "formdataV2.key": {
+      handler(newVal, oldVal) {
+        Ming("keyyyyyyyyyyyyyyyyy has been updated", newVal, oldVal);
+        Ming("keyyyyyyyyyyyyyyyyy has been updated", newVal !== oldVal);
+
+        if (newVal !== oldVal) {
+          this.reference_paper_fe_lists = [];
+        }
       },
       deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
       immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true

@@ -851,7 +851,7 @@ export default {
     background: #fff7e8;
     border: 1px solid #ff7d00;
     border-radius: 2px;
-    padding: 0px 8px;
+    padding: 0px 6px;
     color: #ff7d00;
     font-weight: bold;
     font-size: 12px;
