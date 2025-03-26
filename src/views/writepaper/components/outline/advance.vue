@@ -240,12 +240,25 @@
           <h3
             style="
               position: absolute;
-              top: 20px;
+              top: 12px;
               left: 20px;
               background-color: #fff;
+              display: flex;
+              width: 100%;
+              align-items: center;
+              justify-content: space-between;
+              padding-right: 50px;
             "
           >
-            已选中的论文
+            <p>已选中的论文</p>
+
+            <el-button
+              type="primary"
+              size="mini"
+              icon="el-icon-delete"
+              @click="clearAllFun"
+              >清空文献</el-button
+            >
           </h3>
           <div class="scrollBox">
             <div v-for="(paper, index) in selectedPapers" :key="index">
@@ -403,6 +416,64 @@ export default {
     },
   },
   methods: {
+    clearAllFun() {
+      Ming("selectedPapers", this.selectedPapers);
+      if (this.selectedPapers && this.selectedPapers.length > 0) {
+        this.selectListLoading = true;
+
+        let data = {
+          key: this.formdataV2.key1 || this.formdataV2.key,
+          reference_paper_fe_lists: [],
+          user_upload_paper_fe_lists: [],
+        };
+        this.selectedPapers.forEach((item) => {
+          item.is_relevant = "no";
+          if (item.search_type == "user_upload") {
+            data.user_upload_paper_fe_lists.push(item);
+          } else {
+            data.reference_paper_fe_lists.push(item);
+          }
+        });
+        save_papers_list(data)
+          .then((res) => {
+            this.setLeftPaperStatus(this.selectedPapers);
+
+            this.$message({
+              type: "success",
+              message: "清空文献成功",
+            });
+            let data = {
+              ...this.formdataV2,
+            };
+            // this.dealSelectList(res.result);
+            data.reference_paper_selected_lists =
+              res.result.reference_paper_selected_lists;
+            data.user_upload_paper_fe_lists =
+              res.result.user_upload_paper_fe_lists;
+            this.$store.dispatch("paper/setFormdataV2", data);
+            this.selectListLoading = false;
+            // 取消左侧的选中状态
+          })
+          .catch((res) => {
+            // paper.is_relevant = old_is_relevant;
+            this.selectListLoading = false;
+          });
+      }
+    },
+    setLeftPaperStatus(clearList) {
+      if (
+        this.reference_paper_fe_lists &&
+        this.reference_paper_fe_lists.length > 0
+      ) {
+        this.reference_paper_fe_lists.forEach((paper) => {
+          clearList.forEach((item) => {
+            if (paper.title == item.title) {
+              this.$set(paper, "is_relevant", "no");
+            }
+          });
+        });
+      }
+    },
     beforeUpload(file, fileList) {
       // 检查文件是否为 PDF 格式
       const isPDF = file.type === "application/pdf";
