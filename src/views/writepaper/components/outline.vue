@@ -321,7 +321,12 @@
       >
         <!-- 投喂信息 -->
         <div class="selectLang formItem firstItem" style="padding-right: 0">
-          <p class="formItemLabel">投喂信息</p>
+          <p class="formItemLabel">
+            投喂信息
+            <span style="font-size: 14px"
+              >（可以提供 开题报告， 设计思路等各种参考内容）</span
+            >
+          </p>
           <div class="formItemCon">
             <el-input
               type="textarea"

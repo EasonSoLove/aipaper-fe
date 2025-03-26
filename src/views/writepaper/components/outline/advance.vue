@@ -7,7 +7,7 @@
         @click="getkeyWords"
         round
         style="width: 50%"
-        >根据题目,生成关键词</el-button
+        >检索论文关键词</el-button
       >
     </header>
     <div class="keywordBox">
@@ -107,7 +107,7 @@
         "
       >
         <el-button type="primary" @click="seachPaperS" round style="width: 50%">
-          根据关键词, 检索文献
+          检索文献（可自定义挑选）
         </el-button>
       </div>
       <div v-loading="selectListLoading" class="content">
@@ -273,20 +273,14 @@
                     circle
                   ></el-button>
                 </div>
-                <p
-                  v-if="paper.search_type !== 'user_upload'"
-                  :class="{ abstract: true, expanded: paper.isExpanded }"
-                >
+                <p :class="{ abstract: true, expanded: paper.isExpanded }">
                   <span v-if="!paper.isExpanded" class="abstract-content">
                     {{ paper.abstract }}
                   </span>
                   <span v-else>
                     {{ paper.abstract }}
                   </span>
-                  <span
-                    class="toggle-button"
-                    @click="paper.isExpanded = !paper.isExpanded"
-                  >
+                  <span class="toggle-button" @click="paperExpandClick(paper)">
                     {{ paper.isExpanded ? "收起" : "展开" }}
                   </span>
                 </p>
@@ -601,7 +595,8 @@ export default {
     paperExpandClick(paper) {
       Ming(paper, "收齐切换");
       Ming(paper.isExpanded, "收齐切换1111");
-      paper.isExpanded = !paper.isExpanded;
+      // paper.isExpanded = !paper.isExpanded;
+      this.$set(paper, "isExpanded", !paper.isExpanded);
       Ming(paper.isExpanded, "收齐切换2222");
     },
 
