@@ -226,6 +226,9 @@ export default {
           data.field = ["哲学", row.field];
           this.$store.dispatch("paper/setFormdataV2", res.result);
           this.$store.dispatch("app/setRequestForm", data);
+          // 生成大纲可点击
+          this.$store.dispatch("app/setProStatus", false);
+
           this.loading = false;
           // 记录大纲状态
           this.$store.dispatch("paper/setOutlineVersion", res.result.version);

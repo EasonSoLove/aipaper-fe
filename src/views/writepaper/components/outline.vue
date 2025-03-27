@@ -11,17 +11,18 @@
           <span class="underLeft"></span>
         </p>
         <!-- checkoutPaper(2) -->
-        <p
+        <div
           @click="checkoutPaper('v2')"
+          style="position: relative"
           :class="[
             'outLeftTitle',
             'paperClass',
             outlineVersion == 'v2' ? 'activeLT' : '',
           ]"
         >
-          万象定制版
+          万象定制版 <b style="font-size: 14px">让你的论文更懂你</b>
           <span class="underLeft"></span>
-        </p>
+        </div>
       </div>
       <div class="outRight">
         <div
@@ -372,6 +373,7 @@
           produceLineStatus ? 'produceClass' : '',
         ]"
       >
+        <span style="margin-right: 10px">Step 3</span>
         <p>生成大纲</p>
       </div>
     </div>
@@ -648,6 +650,14 @@ export default {
     // 用户投喂保存
     saveExtraFun(vision) {
       console.log("已选择蚊香", this.formdataV2.reference_paper_selected_lists);
+      if (!this.formdataV2.reference_paper_selected_lists) {
+        this.$message({
+          type: "warning",
+          message: "请在论文选择区, 选择至少10篇参考文献!",
+        });
+        this.$store.dispatch("app/setProStatus", false);
+        return false;
+      }
       if (this.formdataV2.reference_paper_selected_lists.length < 10) {
         this.$message({
           type: "warning",
@@ -682,9 +692,13 @@ export default {
             extra_requirements: this.requestForm.extra_requirements,
           };
           if (this.requestForm.extra_requirements) {
-            save_extra_requirements(data).then((res) => {
-              this.sendV2Fun();
-            });
+            save_extra_requirements(data)
+              .then((res) => {
+                this.sendV2Fun();
+              })
+              .catch(() => {
+                this.$store.dispatch("app/setProStatus", false);
+              });
           } else {
             this.sendV2Fun();
           }
@@ -772,7 +786,6 @@ export default {
         });
         return false;
       }
-      this.$store.dispatch("app/setProStatus", true);
 
       // 判断是否登录,否则跳转到登录页面
       const hasToken = getToken();
@@ -782,7 +795,6 @@ export default {
             type: "warning",
             message: "请输入论文题目!",
           });
-          this.$store.dispatch("app/setProStatus", false);
           return false;
         }
         if (this.requestForm.title.length < 5) {
@@ -790,10 +802,11 @@ export default {
             type: "warning",
             message: "标题请至少输入5个字!",
           });
-          this.$store.dispatch("app/setProStatus", false);
 
           return false;
         }
+        this.$store.dispatch("app/setProStatus", true);
+
         if (vision == "v1") {
           // 保存用户输入数据
           let data = {

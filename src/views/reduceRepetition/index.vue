@@ -205,7 +205,7 @@ export default {
       this.sendStatus = true;
       editReduce(data).then((res) => {
         this.sendStatus = false;
-        this.textareaOut = res.result;
+        this.textareaOut = res.result.reduce_paragraph;
       });
     },
     checkoutPaper(val) {

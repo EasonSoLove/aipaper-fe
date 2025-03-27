@@ -7,7 +7,9 @@
         @click="getkeyWords"
         round
         style="width: 50%"
-        >生成检索论文的关键词</el-button
+      >
+        <span style="margin-right: 10px">Step 1</span>
+        生成检索论文的关键词</el-button
       >
     </header>
     <div class="keywordBox">
@@ -106,12 +108,26 @@
           justify-content: center;
         "
       >
-        <el-button type="primary" @click="seachPaperS" round style="width: 50%">
+        <el-button
+          type="primary"
+          :disabled="
+            !(
+              (formdataV2.search_cn_keywords &&
+                formdataV2.search_cn_keywords.length > 0) ||
+              (formdataV2.search_en_keywords &&
+                formdataV2.search_en_keywords.length > 0)
+            )
+          "
+          @click="seachPaperS"
+          round
+          style="width: 50%"
+        >
+          <span style="margin-right: 10px">Step 2</span>
           检索文献（可自定义挑选）
         </el-button>
       </div>
       <div v-loading="selectListLoading" class="content">
-        <div class="sidebar" style="position: relative; padding-top: 80px">
+        <div class="sidebar" style="position: relative; padding-top: 10px">
           <!-- <h3>用户上传文献列表</h3>
           <div
             class="sidebar-item"
@@ -163,28 +179,17 @@
               </div>
             </div>
           </div> -->
-          <h3
-            style="
-              position: absolute;
-              top: 10px;
-              left: 20px;
-              background-color: #fff;
-              width: 100%;
-              padding-bottom: 5px;
-            "
-          >
-            <div style="display: flex; align-items: center">
-              <p style="margin-right: 10px">没有合适的参考文献?</p>
-              <el-button
-                type="primary"
-                size="mini"
-                @click="dialogVisible = true"
-                >本地上传<i class="el-icon-upload el-icon--right"></i
-              ></el-button>
-            </div>
-            <div class="g_border"></div>
 
-            <p>
+          <h3>
+            <p
+              style="
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-right: 20px;
+              "
+            >
               系统检索文献列表
               <span
                 style="margin-left: 20px; color: #409eff"
@@ -262,11 +267,34 @@
         >
           <i class="el-icon-d-arrow-right"></i>
         </div>
-        <div class="content-main">
+        <div class="content-main" style="padding-top: 88px">
           <h3
             style="
               position: absolute;
-              top: 12px;
+              top: 10px;
+              left: 20px;
+              background-color: #fff;
+              width: 100%;
+              padding-bottom: 5px;
+            "
+          >
+            <div
+              style="display: flex; align-items: center; padding-right: 40px"
+            >
+              <p style="margin-right: 10px">没有合适的参考文献?</p>
+              <el-button
+                type="primary"
+                size="mini"
+                @click="dialogVisible = true"
+                >本地上传<i class="el-icon-upload el-icon--right"></i
+              ></el-button>
+            </div>
+            <div class="g_border"></div>
+          </h3>
+          <h3
+            style="
+              position: absolute;
+              top: 52px;
               left: 20px;
               background-color: #fff;
               display: flex;
@@ -439,15 +467,15 @@ export default {
         // 当数据改变时，你可以在这里执行任何你需要的操作
         // 这里的操作可以是任何事情，比如调用一个方法或者更改其他数据
         this.selectedPapers = newVal;
+        if (this.selectedPapers && this.selectedPapers.length > 1) {
+          this.$store.dispatch("app/setProStatus", false);
+        }
       },
       deep: true, // 使用深度监听，以便能够感知到数组或对象内部值的变化
       immediate: true, // 如果你也需要在 watcher 创建时立即执行一次，则设置为 true
     },
     "formdataV2.key": {
       handler(newVal, oldVal) {
-        Ming("keyyyyyyyyyyyyyyyyy has been updated", newVal, oldVal);
-        Ming("keyyyyyyyyyyyyyyyyy has been updated", newVal !== oldVal);
-
         if (newVal !== oldVal) {
           this.reference_paper_fe_lists = [];
         }
@@ -590,7 +618,20 @@ export default {
     },
     seachPaperS() {
       this.loading = true;
-
+      let num1 = !!this.formdataV2.search_cn_keywords
+        ? this.formdataV2.search_cn_keywords.length
+        : 0;
+      let num2 = !!this.formdataV2.search_en_keywords
+        ? this.formdataV2.search_en_keywords.length
+        : 0;
+      if (num1 + num2 <= 1) {
+        this.$message({
+          type: "warning",
+          message: "至少需要两个关键词,请再新增一个关键词!",
+        });
+        this.loading = false;
+        return false;
+      }
       this.saveKeywords();
     },
     getPaperList(resultData) {
@@ -687,6 +728,20 @@ export default {
       }
     },
     addKeyword(type) {
+      if (
+        !this.formdataV2.search_cn_keywords ||
+        !this.formdataV2.search_en_keywords
+      ) {
+        this.$message({
+          type: "warning",
+          message: "请先点击Step 1, 生成关键词!",
+        });
+        return false;
+      }
+      // if () {
+      // this.formdataV2.search_cn_keywords = [];
+      //   this.formdataV2.search_en_keywords = [];
+      // }
       if (type === "cn" && this.formdataV2.search_cn_keywords.length < 4) {
         if (this.newCnKeyword.trim()) {
           this.formdataV2.search_cn_keywords.push(this.newCnKeyword.trim());
