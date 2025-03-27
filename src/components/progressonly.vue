@@ -152,6 +152,7 @@
 // import webinfo from "@/components/webinfo.vue";
 import eventBus from "@/utils/eventBus";
 import { paperPack, orderDetailById } from "@/api/user";
+import { reduce_pack } from "@/api/paper";
 import { mapGetters } from "vuex";
 
 export default {
@@ -344,11 +345,28 @@ export default {
               _this.getList(data, delay, maxRetries, currentRetry);
             }, delay);
           } else {
-            // if()
-            let zipUrl = order_item_response[0].case.file_urls.word;
+            if (orderData.order_type == "REDUCE_AIGC") {
+              // 生成成功
+              let data = {
+                out_trade_no: orderData.out_trade_no,
+              };
+              reduce_pack(data).then((res) => {
+                console.log("dddd", res);
+                if (res.result.zip_url) {
+                  window.open(res.result.zip_url);
+                } else {
+                  this.$message({
+                    type: "warning",
+                    message: "下载链接为空！",
+                  });
+                }
+              });
+            } else {
+              let zipUrl = order_item_response[0].case.file_urls.word;
 
-            if (zipUrl) {
-              window.open(zipUrl);
+              if (zipUrl) {
+                window.open(zipUrl);
+              }
             }
 
             this.$store.dispatch("paper/setPollingStatus", false);

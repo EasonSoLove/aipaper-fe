@@ -960,6 +960,7 @@ export default {
     text-align: left;
     font-style: normal;
     position: relative;
+    cursor: pointer;
   }
 
   .paperClass {
@@ -967,6 +968,9 @@ export default {
   }
 
   .activeLT {
+    // height: 60px;
+    // line-height: 60px;
+    // border: 1px solid #ccc;
     span {
       position: absolute;
       bottom: -10px;
