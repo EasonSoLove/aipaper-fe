@@ -8,6 +8,9 @@
           :class="['outLeftTitle', outlineVersion == 'v1' ? 'activeLT' : '']"
         >
           万象专业版
+
+          <b style="font-size: 14px">一键生成更简单</b>
+
           <span class="underLeft"></span>
         </p>
         <!-- checkoutPaper(2) -->
