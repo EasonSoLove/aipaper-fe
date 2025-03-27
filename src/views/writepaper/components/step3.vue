@@ -41,6 +41,8 @@
           </div>
         </div>
       </div>
+      <button @click="startPolling">开始轮询</button>
+      <button @click="stopPolling">停止轮询</button>
       <iframe :src="step3PdfUrl" style="width: 100%; height: 100%"></iframe>
     </div>
     <!-- <div class="pdfBox">
@@ -70,7 +72,10 @@ import { mapGetters } from "vuex";
 // import eventBus from "@/utils/eventBus";
 import PdfViewer from "./PdfViewer.vue";
 import { paperPack } from "@/api/user";
-
+import {
+  startUniquePaperPolling,
+  stopPaperPolling,
+} from "@/utils/step3polling";
 export default {
   name: "step3",
   data() {
@@ -129,6 +134,7 @@ export default {
   mounted() {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
+    console.log("step3初始化");
   },
   created() {
     // eventBus.on("sendOutline", this.addE); // 订阅事件
@@ -138,6 +144,15 @@ export default {
   },
 
   methods: {
+    // 启动轮询
+    startPolling() {
+      const requestData = { id: 123 }; // 请求数据
+      startUniquePaperPolling(requestData);
+    },
+    // 停止轮询
+    stopPolling() {
+      stopPaperPolling();
+    },
     returnStep() {
       this.$store.dispatch("app/setActiveIndex", 0);
     },

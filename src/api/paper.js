@@ -31,7 +31,10 @@ export function references(params) {
 }
 export function reduce_pack(params) {
   return request({
-    url: baseUrl + "/api/ai-paper/paper/reduce_pack/" + params.out_trade_no,
+    url:
+      baseUrl +
+      "/api/ai-paper/paper/reduce_pack?out_trade_no=" +
+      params.out_trade_no,
     method: "get",
   });
 }
@@ -52,6 +55,12 @@ export function inviteFetch() {
 export function passOrder(params) {
   return request({
     url: baseUrl + "/api/ai-paper/pass/order/" + params.fileBackKey,
+    method: "get",
+  });
+}
+export function paper_status(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/paper_status" + params.key,
     method: "get",
   });
 }

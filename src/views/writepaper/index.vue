@@ -69,7 +69,10 @@
           </div>
           <p class="tabIntro">检查大纲 <span>生成正文</span></p>
         </div>
-        <div :class="['tabLi', activeIndex == 3 ? 'activeTab3' : '']">
+        <div
+          :class="['tabLi', activeIndex == 3 ? 'activeTab3' : '']"
+          @click="setActiveIndex3"
+        >
           <p class="tabsTitle">Step 3</p>
           <div class="tabIcon">
             <span></span>
@@ -298,6 +301,11 @@ export default {
       // this.tabsClick(0);
       // this.activeIndex = 0;
       this.$store.dispatch("app/setActiveIndex", 0);
+    },
+    setActiveIndex3() {
+      // this.tabsClick(0);
+      // this.activeIndex = 0;
+      this.$store.dispatch("app/setActiveIndex", 3);
     },
     // 点击生成大纲
     showIndex() {
