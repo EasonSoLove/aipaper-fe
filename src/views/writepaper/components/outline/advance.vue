@@ -184,7 +184,22 @@
             </div>
             <div class="g_border"></div>
 
-            <p>系统检索文献列表</p>
+            <p>
+              系统检索文献列表
+              <span
+                style="margin-left: 20px; color: #409eff"
+                v-if="
+                  reference_paper_fe_lists &&
+                  reference_paper_fe_lists.length > 0
+                "
+              >
+                <i class="el-icon-search"></i>
+                <b style="margin-left: 3px">{{
+                  reference_paper_fe_lists.length
+                }}</b>
+                篇
+              </span>
+            </p>
           </h3>
           <div class="scrollBox">
             <div
@@ -236,6 +251,17 @@
             </div>
           </div>
         </div>
+
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            color: #000;
+            font-size: 24px;
+          "
+        >
+          <i class="el-icon-d-arrow-right"></i>
+        </div>
         <div class="content-main">
           <h3
             style="
@@ -250,8 +276,18 @@
               padding-right: 50px;
             "
           >
-            <p>已选中的论文</p>
+            <p>
+              已选择的参考文献
 
+              <span style="font-size: 12px">(选择的参考文献会在正文引用)</span>
+            </p>
+            <p v-if="selectedPapers && selectedPapers.length > 0">
+              <b style="color: #409eff; margin-left: 5px">
+                <i class="el-icon-circle-check"></i>
+
+                {{ selectedPapers.length }}篇</b
+              >
+            </p>
             <el-button
               type="primary"
               size="mini"

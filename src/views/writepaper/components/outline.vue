@@ -647,6 +647,26 @@ export default {
     },
     // 用户投喂保存
     saveExtraFun(vision) {
+      console.log("已选择蚊香", this.formdataV2.reference_paper_selected_lists);
+      if (this.formdataV2.reference_paper_selected_lists.length < 10) {
+        this.$message({
+          type: "warning",
+          message: "请在论文选择区, 选择至少10篇参考文献!",
+        });
+        this.$store.dispatch("app/setProStatus", false);
+
+        return false;
+      }
+      if (this.formdataV2.reference_paper_selected_lists.length > 30) {
+        this.$message({
+          type: "warning",
+          message: "最多选择30篇参考文献,请在已选择列表删除部分参考文献!",
+        });
+        this.$store.dispatch("app/setProStatus", false);
+
+        return false;
+      }
+
       this.$confirm(
         "请仔细检查所勾选文献与您专业和论文题目的相关性，万象学术模型会进行参考文献相关性进行引用逐级生成大纲，若相关性不大，可能不会引用！ 是否继续?",
         "温馨提示",
@@ -670,6 +690,8 @@ export default {
           }
         })
         .catch(() => {
+          this.$store.dispatch("app/setProStatus", false);
+
           this.$message({
             type: "info",
             message: "已取消生成",
