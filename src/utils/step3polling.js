@@ -15,7 +15,7 @@ function createIntervalPolling(
   callback,
   delay = 2000,
   maxRetries = 5,
-  timeout = 120000
+  timeout = 1200000
 ) {
   let timer = null;
   let isCancelled = false;

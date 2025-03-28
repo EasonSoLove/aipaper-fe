@@ -58,10 +58,12 @@ export function passOrder(params) {
     method: "get",
   });
 }
-export function paper_status(params) {
+export function paper_status(data) {
   return request({
-    url: baseUrl + "/api/ai-paper/paper/paper_status" + params.key,
-    method: "get",
+    url: baseUrl + "/api/ai-paper/paper/paper_status",
+    method: "post",
+    data,
+
   });
 }
 export function down_url(params) {
