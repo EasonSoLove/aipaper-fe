@@ -66,20 +66,30 @@ function createIntervalPolling(
 /**
  * 业务轮询方法
  * @param {Object} data 请求数据
+ * @param {Function} onSuccess 成功后的回调函数，接收 res.result
  * @returns {Object} { start, stop } 控制轮询的接口
  */
-function createPaperPolling(data) {
+function createPaperPolling(data, onSuccess) {
   return createIntervalPolling(
     async (stop) => {
       const res = await paper_status(data); // 调用接口
-
-      if (res.result.status === "生成中") {
-      } else if (res.result.status === "生成失败") {
-        console.log("轮询失败，状态：", res.result.status);
+      console.log("re statusstatusstatus", res);
+      if (res.result.paper_stage == 1) {
+        if (res.result.task_info_list && res.result.task_info_list.length > 0) {
+          onSuccess(res.result); // 返回结果
+        }
+        // 继续轮询
+      } else if (res.result.paper_stage == 3) {
+        console.log("轮询失败，状态：", res);
         stop(); // 停止轮询
       } else {
-        // store.dispatch("app/setProStatus", false);
-        console.log("生成完成，结果：", res.result.outline.outline);
+        console.log("生成完成，结果：", res);
+
+        // 调用回调，将结果返回给调用方
+        if (onSuccess && typeof onSuccess === "function") {
+          onSuccess(res.result); // 返回结果
+        }
+
         stop(); // 停止轮询
       }
     },
@@ -93,15 +103,15 @@ function createPaperPolling(data) {
  * 启动唯一轮询
  * @param {Object} data 请求数据
  */
-export function startUniquePaperPolling(data) {
+export function startUniquePaperPolling(data, onSuccess) {
   // 如果已存在轮询实例，先停止它
   if (activePollingInstance) {
     activePollingInstance.stop();
     activePollingInstance = null;
   }
 
-  // 创建新的业务轮询实例
-  activePollingInstance = createPaperPolling(data);
+  // 创建新的业务轮询实例，并传入回调
+  activePollingInstance = createPaperPolling(data, onSuccess);
 
   // 启动轮询
   activePollingInstance.start();
