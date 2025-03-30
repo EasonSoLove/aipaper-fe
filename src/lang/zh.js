@@ -7,7 +7,7 @@ export default {
     integratedServices: "综合服务",
     eliteCourses: "精品课程",
     aiTools: "AI工具",
-    reduceRepetition: "降重/降AIGC",
+    reduceRepetition: "降AIGC率(知网版)",
     chat: "AI 助手",
     plagiarismCheck: "论文查重",
     documentation: "文档",

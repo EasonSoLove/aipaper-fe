@@ -992,7 +992,13 @@ export default {
 
   computed: {
     // 计算属性
-    ...mapGetters(["requestForm", "additionalList", "homeData", "device"]),
+    ...mapGetters([
+      "requestForm",
+      "additionalList",
+      "outlineVersion",
+      "homeData",
+      "device",
+    ]),
   },
   methods: {
     downLoadLine() {
@@ -1024,7 +1030,7 @@ export default {
     },
     // 重新生成大纲
     reloadOutline() {
-      eventBus.emit("reloadOutline", this.requestForm.version);
+      eventBus.emit("reloadOutline", this.outlineVersion);
     },
     // 先保存再调用AI更新
     updateParentHeight() {

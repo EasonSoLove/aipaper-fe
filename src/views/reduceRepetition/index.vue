@@ -7,23 +7,24 @@
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
-          免费版降低重复率/AIGC率
+          免费版降AIGC率(知网版)
           <span class="underLeft"></span>
         </p>
         <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
         >
-          付费版文件降重/降AIGC
+          付费版降AIGC率(知网版)
           <span class="underLeft"></span>
         </p>
         <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
-          <p style="color: #606266">
-            本站使用DeepSeek(R1) 实现降低重复率/AIGC率
-          </p>
+          <p style="color: #606266">本站使用万象大模型实现降低AIGC率</p>
           <p style="color: #606266; margin-top: 3px">
             AIGC降重工具升级为高级推理模型, 推理时间略有延长,请您耐心等待!
+          </p>
+          <p style="color: #606266; margin-top: 3px">
+            保证知网的AIGC率 <b class="red">30%</b> 以下
           </p>
         </div>
       </div>
@@ -41,7 +42,7 @@
               type="textarea"
               :rows="20"
               :placeholder="placeText[activeIndex - 1]"
-              maxlength="5000"
+              maxlength="300"
               show-word-limit
               v-model="original_paragraph"
               resize="false"
@@ -151,11 +152,11 @@ export default {
       sendStatus: false,
       activeIndex: 1,
       placeText: [
-        "请输入文章段落，待降重/降AIGC率均可，每次最多1000字",
+        "请输入文章段落，待降AIGC率均可，每次最多300字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
       ],
       reduceText: [
-        "请在左侧输入待降重复率/降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
+        "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
         "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
       ],
       original_paragraph: "",
