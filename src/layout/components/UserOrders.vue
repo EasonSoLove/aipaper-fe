@@ -505,7 +505,6 @@ export default {
       console.log("rwo", row);
       // 关闭弹窗
       // 生成一个 0 到 10 之间的随机数，然后加上 30
-      const randomNum = Math.random() * 10 + 30;
       // 使用 toFixed(2) 保留两位小数，并将结果转换为浮点数
       this.$log("ddd1111", row, row.order.out_trade_no);
       let outLineData = row.outline;
@@ -518,11 +517,13 @@ export default {
         word_count: outLineData.word_count,
       };
       this.$store.dispatch("app/setRequestForm", requestForm);
+      this.$store.dispatch("app/toggleCurrentOrder", row.order);
+      // 打开step3
+      this.$store.dispatch("app/setActiveIndex", 3);
+      // step3开始循环
       this.$nextTick(() => {
-        eventBus.emit("showEmitPaperDialog", {
-          requestKey: row.order.out_trade_no,
-          payStatus: 4,
-          paperPercent: parseFloat(randomNum.toFixed(2)),
+        eventBus.emit("startStep3Polling", {
+          out_trade_no: row.order.out_trade_no,
         });
       });
     },

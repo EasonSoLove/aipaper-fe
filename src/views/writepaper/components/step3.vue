@@ -33,7 +33,7 @@
           <div
             @click="downLoadPaper"
             v-loading="downStatus"
-            v-if="currentOrder.payment_status == 'TRADE_SUCCESS'"
+            v-if="paper_stage == '2'"
             class="pdfNavRight g_poin"
           >
             <i class="el-icon-download"></i>
@@ -41,8 +41,8 @@
           </div>
         </div>
       </div>
-      <button @click="startPolling">开始轮询</button>
-      <button @click="stopPolling">停止轮询</button>
+      <!-- <button @click="startPolling">开始轮询</button>
+      <button @click="stopPolling">停止轮询</button> -->
 
       <div v-if="paperProductStatus" style="height: 30000px">
         <iframe :src="step3PdfUrl" style="width: 100%; height: 100%"></iframe>
@@ -51,7 +51,7 @@
         <el-row style="padding: 20px" :gutter="20">
           <el-col :span="8"
             ><div class="step3Left">
-              <el-timeline>
+              <el-timeline :reverse="true">
                 <el-timeline-item
                   v-for="(activity, index) in task_info_list"
                   :key="index"
@@ -62,7 +62,22 @@
                   <el-card>
                     <h4>{{ activity.task_theme }}</h4>
                     <p>{{ activity.task_content }}</p>
-                    <p>{{ activity.task_reasoner }}</p>
+                    <p v-if="index != task_info_list.length - 1">
+                      {{ activity.task_reasoner }}
+                    </p>
+                    <p v-else style="margin-top: 15px; line-height: 24px">
+                      <i
+                        class="el-icon-loading"
+                        style="margin-right: 5px; position: relative; top: -2px"
+                      ></i>
+                      <span
+                        v-for="(char, index) in displayedChars"
+                        :key="index"
+                        class="wave-char"
+                      >
+                        {{ char }}
+                      </span>
+                    </p>
                   </el-card>
                 </el-timeline-item>
               </el-timeline>
@@ -145,7 +160,7 @@
 import { mapGetters } from "vuex";
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
-// import eventBus from "@/utils/eventBus";
+import eventBus from "@/utils/eventBus";
 import PdfViewer from "./PdfViewer.vue";
 import { paperPack } from "@/api/user";
 import {
@@ -156,6 +171,9 @@ export default {
   name: "step3",
   data() {
     return {
+      oldStr: "",
+      old_paper_info_list_length: 0,
+      newStr: "",
       paperProductStatus: false,
       // 定义变量
       dialogVisible: false,
@@ -165,7 +183,7 @@ export default {
       downStatus: false,
       out_trade_no: "",
       out_trade_no: "5135fc99-75a2-4b17-9321-d791a3817dbe",
-      paper_stage: 2,
+      paper_stage: 1,
       task_info_list: [
         {
           task_node: "init",
@@ -564,6 +582,8 @@ export default {
           ],
         },
       ],
+      displayedChars: [], // 用于逐个展示的字符列表
+      intervalId: null, // 定时器ID，用于清除定时器
     };
   },
   components: {
@@ -571,10 +591,20 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["step3PdfUrl", "currentOrder", "device"]),
+    ...mapGetters(["step3PdfUrl", "currentOrder", "activeIndex", "device"]),
   },
 
   watch: {
+    activeIndex: {
+      handler(val) {
+        this.$log("activeIndexval", val);
+        if (val !== 3) {
+          this.stopPolling();
+        }
+        // 更新首页大纲列表
+        // eventBus.emit("step0Reload", true); // 发布事件
+      },
+    },
     step3PdfUrl(newValue, oldValue) {
       this.dialogVisible = false;
 
@@ -614,17 +644,45 @@ export default {
     console.log("step3初始化");
   },
   created() {
-    // eventBus.on("sendOutline", this.addE); // 订阅事件
+    eventBus.on("startStep3Polling", this.startPolling); // 订阅事件
   },
   beforeDestroy() {
-    // eventBus.off("sendOutline", this.addE); // 移除事件监听
+    eventBus.off("startStep3Polling", this.startPolling); // 移除事件监听
+    this.stopPolling();
   },
 
   methods: {
+    startDisplay(inputString) {
+      // 清空当前展示内容
+      this.displayedChars = [];
+
+      // 确保没有遗留的定时器
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+
+      let index = 0; // 当前展示的字符索引
+
+      // 每100毫秒展示一个字符
+      this.intervalId = setInterval(() => {
+        if (index < inputString.length) {
+          this.displayedChars.push(inputString[index]); // 添加当前字符到展示列表
+          index++;
+        } else {
+          // 如果展示完成，清除定时器
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+      }, 100); // 每100毫秒添加一个字符
+    },
     // 启动轮询
-    startPolling() {
+    startPolling(data) {
+      if (!data.out_trade_no) {
+        Ming("step3没有值", data);
+        return false;
+      }
       const requestData = {
-        out_trade_no: "1cae52cb-f34e-4887-8001-dab9da3ce60e",
+        out_trade_no: data.out_trade_no,
       }; // 请求数据
 
       // 开始轮询，并传入回调处理结果
@@ -642,6 +700,21 @@ export default {
       this.task_info_list = result.task_info_list;
       this.paper_stage = result.paper_stage;
       this.paper_info_list = result.paper_info_list;
+      let lastTimeLine = this.task_info_list[this.task_info_list.length - 1];
+      console.log("处理轮询结果lastTimeLine：", lastTimeLine);
+      // 需要做渐入的
+      this.oldStr = JSON.parse(JSON.stringify(lastTimeLine.task_theme));
+      console.log("处理轮询结果this.oldStr：", this.oldStr);
+      if (this.old_paper_info_list_length == 0) {
+        this.old_paper_info_list_length = this.paper_info_list.length;
+        this.startDisplay(this.oldStr);
+      } else {
+        if (this.paper_info_list && this.paper_info_list.length > 0) {
+          if (this.old_paper_info_list_length < this.paper_info_list.length) {
+            this.startDisplay(this.oldStr);
+          }
+        }
+      }
       console.log("处理轮询结果：", result);
     },
     // 停止轮询
@@ -649,6 +722,8 @@ export default {
       stopPaperPolling();
     },
     returnStep() {
+      this.stopPolling();
+
       this.$store.dispatch("app/setActiveIndex", 0);
     },
     downLoadPaper: _.debounce(function (item) {
@@ -867,5 +942,23 @@ export default {
   // padding-top: 10px;
   padding: 10px;
   background: #f7f9fa;
+}
+
+// 跳动效果
+.wave-char {
+  display: inline-block;
+  transform-origin: bottom;
+  animation: waveJump 1s ease-in-out infinite;
+}
+
+/* 跳跃波浪效果 */
+@keyframes waveJump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px); /* 跳跃高度 */
+  }
 }
 </style>

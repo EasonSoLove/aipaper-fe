@@ -25,6 +25,7 @@ const logPlugin = {
 
     // 定义全局函数
     window.Ming = logger.log;
+    window.gao = logger.log;
     window.Warn = logger.warn;
     window.ELog = logger.error;
   },

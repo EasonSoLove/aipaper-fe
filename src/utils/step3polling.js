@@ -13,9 +13,9 @@ let activePollingInstance = null; // 存储当前活跃的轮询实例
  */
 function createIntervalPolling(
   callback,
-  delay = 2000,
+  delay = 20000,
   maxRetries = 5,
-  timeout = 1200000
+  timeout = 120000
 ) {
   let timer = null;
   let isCancelled = false;
@@ -93,9 +93,9 @@ function createPaperPolling(data, onSuccess) {
         stop(); // 停止轮询
       }
     },
-    2000, // 轮询间隔
+    3000, // 轮询间隔
     5, // 最大重试次数
-    120000 // 超时时间
+    5600000 // 超时时间
   );
 }
 
