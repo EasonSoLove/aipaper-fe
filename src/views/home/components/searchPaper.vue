@@ -6,8 +6,9 @@
     </div>
     <div class="mainBackground">
       <div class="leftMainText">
-        <p>MIXPAPER</p>
         <p>万象写作</p>
+        <p class="border_p"></p>
+        <p>MIXPAPER</p>
       </div>
 
       <!-- <div class="mainInput">
