@@ -1228,6 +1228,7 @@ export default {
     },
     updateApiGroup(data1) {
       Ming("1014---当前大纲对象123:", data1);
+      Ming("1014---this.outline:", this.outline);
       // this.saveOutline();
       let data = {
         title: this.requestForm.title,
@@ -1376,7 +1377,7 @@ export default {
           content: "",
         },
       };
-      console.log("dddddd", this.numberValidateForm);
+      console.log("dddddd", newChild);
       // 只判断了 after情况
       if (this.numberValidateForm.insertPosition == "after") {
         const targetIndex = parentNodeData.sections.findIndex(
@@ -1393,12 +1394,10 @@ export default {
           parentNodeData.sections.splice(targetIndex, 0, newChild);
         }
       }
-      console.log(
-        "this.outline123123",
-        JSON.stringify(this.outline[0].sections[1])
-      );
+
       // parentNodeData.sections.push(newChild);
-      this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
+      // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
+      this.updateApiGroup(this.outline);
       this.editStatus = false;
     },
 

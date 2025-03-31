@@ -372,7 +372,7 @@ export default {
   background-color: #f60;
   margin-left: 6px;
   position: absolute;
-  right: 5px;
+  right: 6px;
   top: 10px;
 }
 </stlyle>

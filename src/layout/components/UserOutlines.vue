@@ -179,6 +179,8 @@ export default {
       Ming("sddd", this.$route.path);
       // 关闭弹窗
       eventBus.emit("orderDialogChange", false);
+      // 切换至对应v1/v2
+      this.$store.dispatch("paper/setOutlineVersion", row.version);
 
       if (this.$route.path !== "/main/writepaper") {
         this.$router.push({ path: "/main/writepaper" }, function () {

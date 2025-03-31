@@ -84,7 +84,7 @@
     </div>
 
     <div class="stepContent">
-      <!-- <step0 ref="step0" v-if="activeIndex != 3"></step0> -->
+      <step0 ref="step0" v-if="activeIndex != 3"></step0>
 
       <step1 v-if="activeIndex == 1"></step1>
       <step2 :outlineData="outlineData" v-if="activeIndex == 2"></step2>

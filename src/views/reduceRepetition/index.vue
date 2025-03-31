@@ -364,6 +364,7 @@ export default {
     text-align: left;
     font-style: normal;
     position: relative;
+    cursor: pointer;
   }
 
   .paperClass {
