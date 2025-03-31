@@ -6,8 +6,9 @@
     </div>
     <div class="mainBackground">
       <div class="leftMainText">
-        <p>MIXPAPER</p>
         <p>万象写作</p>
+        <p class="border_p"></p>
+        <p>MIXPAPER</p>
       </div>
 
       <!-- <div class="mainInput">
@@ -33,7 +34,9 @@
         </div>
       </div> -->
       <div class="inputDesc g_poin" @click="$jumpUrl('/main/writepaper')">
-        <p>让天下没有难做的学术</p>
+        <p>
+          万象写作是由浅思科技自主研发的AI论文辅助写作系统，荣获300w美金的融资，由清华博士，斯坦福博士等基于人工智能、大模型等前沿技术，打造的一站式学术辅助写作平台。为用户提供学术创新，论文创作，润色，改写，降重，降AIGC率等服务。
+        </p>
       </div>
       <div class="inputBtn" @click="$jumpUrl('/main/writepaper')">
         <img src="@/assets/images/index/home_banner01_btn_pc.png" alt="" />

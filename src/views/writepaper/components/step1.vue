@@ -103,7 +103,7 @@ export default {
     eventBus.off("beginTime", this.addE); // 移除事件监听
   },
   computed: {
-    ...mapGetters(["requestForm"]),
+    ...mapGetters(["requestForm", "outlineVersion"]),
     // 计算属性
     outlineStatusText() {
       return this.textArr[this.currentIndex];
@@ -111,7 +111,10 @@ export default {
   },
   methods: {
     reloadOutline() {
-      eventBus.emit("reloadOutline", 3);
+      eventBus.emit(
+        "reloadOutline",
+        this.outlineVersion ? this.outlineVersion : "v1"
+      );
     },
     errLine() {
       clearInterval(this.intervalId); // 达到目标数字时清除定时器

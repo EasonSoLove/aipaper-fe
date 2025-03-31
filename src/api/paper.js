@@ -29,6 +29,15 @@ export function references(params) {
     params,
   });
 }
+export function reduce_pack(params) {
+  return request({
+    url:
+      baseUrl +
+      "/api/ai-paper/paper/reduce_pack?out_trade_no=" +
+      params.out_trade_no,
+    method: "get",
+  });
+}
 // 我的推广获取订单列表
 export function order_info(params) {
   return request({
@@ -47,6 +56,14 @@ export function passOrder(params) {
   return request({
     url: baseUrl + "/api/ai-paper/pass/order/" + params.fileBackKey,
     method: "get",
+  });
+}
+export function paper_status(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/paper/paper_status",
+    method: "post",
+    data,
+
   });
 }
 export function down_url(params) {

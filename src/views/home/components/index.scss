@@ -1,9 +1,12 @@
 .mainBackground {
-  padding-top: 78px;
+  padding-top: 48px;
 
   width: 100%;
   .leftMainText {
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     max-width: 1100px;
     margin: 0 auto;
     font-family: AlimamaShuHeiTi;
@@ -12,6 +15,12 @@
     line-height: 50px;
     font-weight: bold;
     font-style: normal;
+  }
+  .border_p {
+    margin-left: 20px;
+    margin-right: 20px;
+    border-left: 3px solid #000;
+    height: 30px;
   }
 }
 .mainInput {
@@ -97,17 +106,20 @@
   margin: 0 auto;
   margin-top: 20px;
   // height: 48px;
-  white-space: nowrap; /* 防止文字换行 */
+  display: flex;
+  justify-content: center;
+  // white-space: nowrap; /* 防止文字换行 */
 
   & > p {
-    height: 25px;
-    opacity: 0.5;
-    font-family: PingFangSC-Regular;
-    font-weight: 400;
-    font-size: 18px;
-    color: #212121;
+    width: 600px;
+    display: block;
+    font-family: MicrosoftYaHei;
+    font-size: 20px;
+    color: #000000;
     letter-spacing: 0;
-    text-align: center;
+    font-weight: 400;
+    margin-bottom: 10px;
+    text-align: left;
   }
 }
 // 六大优势

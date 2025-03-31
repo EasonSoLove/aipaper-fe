@@ -992,7 +992,13 @@ export default {
 
   computed: {
     // 计算属性
-    ...mapGetters(["requestForm", "additionalList", "homeData", "device"]),
+    ...mapGetters([
+      "requestForm",
+      "additionalList",
+      "outlineVersion",
+      "homeData",
+      "device",
+    ]),
   },
   methods: {
     downLoadLine() {
@@ -1024,7 +1030,7 @@ export default {
     },
     // 重新生成大纲
     reloadOutline() {
-      eventBus.emit("reloadOutline", 3);
+      eventBus.emit("reloadOutline", this.outlineVersion);
     },
     // 先保存再调用AI更新
     updateParentHeight() {
@@ -1086,6 +1092,9 @@ export default {
         //   type: "success",
         //   message: "保存大纲成功!",
         // });
+        // 保存成功清除弹窗内容
+        // this.$refs.numberValidateForm.resetFields();
+
         // 进入轮询方法,
         if (status == "aitype") {
           let _this = this;
@@ -1217,10 +1226,31 @@ export default {
       }
       // return draggingNode.data.apiGroupName.indexOf('三级 3-2-2') === -1
     },
-    updateApiGroup(data) {
-      Ming("1014---当前大纲对象:", data);
-      this.saveOutline();
-      this.generateIndexes(this.outline);
+    updateApiGroup(data1) {
+      Ming("1014---当前大纲对象123:", data1);
+      // this.saveOutline();
+      let data = {
+        title: this.requestForm.title,
+        key1: this.requestForm.key || this.requestForm.key1,
+        outline: {
+          outline: data1,
+        },
+        aitype: false,
+      };
+      editLine(data).then((res) => {
+        // this.$message({
+        //   type: "success",
+        //   message: "保存大纲成功!",
+        // });
+        let _this = this;
+        setTimeout(() => {
+          _this.reloadSave();
+        }, 500);
+        // 保存成功清除弹窗内容
+        // this.$refs.numberValidateForm.resetFields();
+        // 进入轮询方法,
+        // 刷新大纲
+      });
     },
     appendShow(node, data) {
       this.editData = data;
@@ -1346,7 +1376,8 @@ export default {
           content: "",
         },
       };
-
+      console.log("dddddd", this.numberValidateForm);
+      // 只判断了 after情况
       if (this.numberValidateForm.insertPosition == "after") {
         const targetIndex = parentNodeData.sections.findIndex(
           (item) => item.index === data.index
@@ -1362,9 +1393,12 @@ export default {
           parentNodeData.sections.splice(targetIndex, 0, newChild);
         }
       }
+      console.log(
+        "this.outline123123",
+        JSON.stringify(this.outline[0].sections[1])
+      );
       // parentNodeData.sections.push(newChild);
-      this.updateApiGroup(this.outline);
-      this.$refs.numberValidateForm.resetFields();
+      this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
       this.editStatus = false;
     },
 

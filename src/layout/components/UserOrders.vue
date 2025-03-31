@@ -253,7 +253,7 @@
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import { getList } from "@/api/table";
-import { re_reduce } from "@/api/paper";
+import { re_reduce, reduce_pack } from "@/api/paper";
 import OrderType from "@/utils/orderTypes.js";
 import {
   getOrderList,
@@ -535,9 +535,20 @@ export default {
       this.downStatus = true;
       console.log("item", item);
       if (item.order.order_type == "REDUCE_AIGC") {
-        let zipUrl = item.order_item_response[0].case.file_urls.word;
-        window.open(zipUrl);
-        this.downStatus = false;
+        let data = {
+          out_trade_no: item.order.out_trade_no,
+        };
+        reduce_pack(data).then((res) => {
+          console.log("dddd", res);
+          if (res.result.zip_url) {
+            window.open(res.result.zip_url);
+          } else {
+            this.$message({
+              type: "warning",
+              message: "下载链接为空！",
+            });
+          }
+        });
 
         return false;
       }
