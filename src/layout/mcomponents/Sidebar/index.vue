@@ -9,8 +9,8 @@
           <img :src="logoMax" alt="" title="logo" />
         </div> -->
         <div class="logoL">
-          <!-- <p>万象学术</p> -->
-          <img :src="logo" alt="" title="logo" />
+          <p>万象写作</p>
+          <!-- <img :src="logo" alt="" title="logo" /> -->
         </div>
       </div>
     </div>
@@ -318,8 +318,8 @@ export default {
   height: 40px;
   font-family: DOUYINSANSBOLD, DOUYINSANSBOLD;
   font-weight: normal;
-  font-size: 24px;
-  color: #3355ff;
+  font-size: 26px;
+  color: rgba(0, 0, 0, 0.85);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -336,7 +336,7 @@ export default {
       "宋体", 宋体, Tahoma, Arial, Helvetica, STHeiti;
     text-align: center;
     font-weight: 600;
-    transform: rotateX(45deg) scaleX(1.2);
+    // transform: rotateX(45deg) scaleX(1.2);
   }
 }
 .mSiderBar {
