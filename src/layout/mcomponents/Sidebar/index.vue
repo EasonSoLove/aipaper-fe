@@ -61,6 +61,11 @@
                 <i :class="route.meta.icon"></i>
               </span>
               {{ generateTitle(route.meta.title) }}
+              <span
+                v-show="route.meta.title == 'reduceRepetition'"
+                class="title-content-mark"
+                >新</span
+              >
             </div>
             <span class="right imgIcon"></span>
           </div>
@@ -186,7 +191,7 @@ export default {
     .mSliderItem {
       border-radius: 24px;
       line-height: 24px;
-      padding-left: 24px;
+      padding-left: 15px;
       padding-right: 15px;
       padding-bottom: 6px;
       padding-top: 6px;
@@ -194,7 +199,7 @@ export default {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-
+      position: relative;
       .left {
         display: flex;
         flex-direction: row;
@@ -341,5 +346,33 @@ export default {
 }
 .mSiderBar {
   padding-top: 10px;
+}
+
+.title-content-mark {
+  --totl-primary-background: rgba(255, 255, 255, 0.8);
+  --totl-primary-font-color: #000;
+  --totl-primate-font-descolor: #565656;
+  --bubble-width: 500px;
+  --bubble-padding-left: 500px;
+  font-family: Arial, sans-serif;
+  list-style: none;
+  white-space: nowrap;
+  display: inline-block;
+  padding: 0 2px;
+  text-align: center;
+  vertical-align: middle;
+  font-style: normal;
+  color: #fff;
+  overflow: hidden;
+  line-height: 16px;
+  height: 16px;
+  font-size: 12px;
+  border-radius: 4px;
+  font-weight: 200;
+  background-color: #f60;
+  margin-left: 6px;
+  position: absolute;
+  right: 5px;
+  top: 10px;
 }
 </stlyle>
