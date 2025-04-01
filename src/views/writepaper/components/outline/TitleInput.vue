@@ -129,7 +129,7 @@ export default {
       Ming(this.requestForm);
       let data = {
         language: this.requestForm.language,
-        field: this.requestForm.field[0],
+        field: this.requestForm.field[1],
         type: this.requestForm.type,
         user_idea: this.requestForm.title,
       };
