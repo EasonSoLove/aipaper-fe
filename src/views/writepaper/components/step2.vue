@@ -1031,6 +1031,7 @@ export default {
     // 重新生成大纲
     reloadOutline() {
       eventBus.emit("reloadOutline", this.outlineVersion);
+      eventBus.emit("reloadOutline", this.outlineVersion);
     },
     // 先保存再调用AI更新
     updateParentHeight() {
@@ -1377,6 +1378,7 @@ export default {
         },
       };
       console.log("dddddd", this.numberValidateForm);
+      // 只判断了 after情况      console.log("dddddd", newChild);
       // 只判断了 after情况
       if (this.numberValidateForm.insertPosition == "after") {
         const targetIndex = parentNodeData.sections.findIndex(
@@ -1398,7 +1400,8 @@ export default {
         JSON.stringify(this.outline[0].sections[1])
       );
       // parentNodeData.sections.push(newChild);
-      this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
+      // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
+      this.updateApiGroup(this.outline);
       this.editStatus = false;
     },
 

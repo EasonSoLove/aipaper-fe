@@ -320,7 +320,7 @@ export default {
   },
   methods: {
     sendReLoad(obj) {
-      console.log("obj", obj);
+      Ming("obj", obj);
       if (obj.order.order_type == "REDUCE_AIGC") {
         let data = {
           reduce_key: obj.order.key1,
@@ -475,7 +475,7 @@ export default {
     }, 300),
     pushStep3: _.debounce(function (row) {
       zhuge.track(`查看论文进度`, {});
-      console.log("reow", row);
+      Ming("reow", row);
       if (row.order.order_type == "REDUCE_AIGC") {
         return false;
       }
@@ -502,7 +502,7 @@ export default {
     }, 300),
     pushFinish(row) {
       eventBus.emit("orderDialogChange", false);
-      console.log("rwo", row);
+      Ming("rwo", row);
       // 关闭弹窗
       // 生成一个 0 到 10 之间的随机数，然后加上 30
       // 使用 toFixed(2) 保留两位小数，并将结果转换为浮点数
@@ -528,6 +528,34 @@ export default {
       });
     },
     downLoadPaper: _.debounce(function (item) {
+      this.downStatus = true;
+      if (item.order.order_type == "REDUCE_AIGC") {
+        zhuge.track(`下载降重压缩包`);
+        let data = {
+          out_trade_no: item.order.out_trade_no,
+        };
+        reduce_pack(data)
+          .then((res) => {
+            Ming("dddd", res);
+            if (res.result.zip_url) {
+              window.open(res.result.zip_url);
+              this.downStatus = false;
+            } else {
+              this.downStatus = false;
+
+              this.$message({
+                type: "warning",
+                message: "下载链接为空！",
+              });
+            }
+          })
+          .catch(() => {
+            this.downStatus = false;
+          });
+
+        return false;
+      }
+
       zhuge.track(`下载论文`, {
         订单价格: item.order.total_price,
         订单题目: item.outline.title,

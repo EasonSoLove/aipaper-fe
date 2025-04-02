@@ -243,7 +243,7 @@ export default {
         this.payTitleStatus == "TRADE_SUCCESS" ||
         this.payTitleStatus == "TRADE_DEPOSIT_SUCCESS"
       ) {
-        this.$confirm("关闭弹窗,不影响论文生成进度")
+        this.$confirm("关闭弹窗,不影响论文降AIGC进度")
           .then((_) => {
             done();
             this.$store.dispatch("app/setActiveIndex", 0);
@@ -262,7 +262,7 @@ export default {
         this.payTitleStatus == "TRADE_SUCCESS" ||
         this.payTitleStatus == "TRADE_DEPOSIT_SUCCESS"
       ) {
-        this.$confirm("关闭弹窗,不影响论文生成进度")
+        this.$confirm("关闭弹窗,不影响论文降AIGC的进度")
           .then((_) => {
             // done();
             this.ownPayStatus = false;

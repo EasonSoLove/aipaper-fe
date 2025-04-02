@@ -248,10 +248,16 @@ export default {
 <style lang="scss" scoped>
 /* 整体容器 */
 .container {
-  background-color: #fff;
   margin-top: -20px;
   padding: 20px;
   padding-bottom: 50px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #00bfff33 50%,
+    #6236ff33 82%,
+    #b620e033 100%
+  ) !important;
 }
 
 /* 布局样式 */

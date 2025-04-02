@@ -150,7 +150,7 @@ export default {
       direction: "rtl", //抽屉方向
       textareaOut: "",
       sendStatus: false,
-      activeIndex: 1,
+      activeIndex: 2,
       placeText: [
         "请输入文章段落，待降AIGC率均可，每次最多300字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
@@ -364,6 +364,7 @@ export default {
     text-align: left;
     font-style: normal;
     position: relative;
+    cursor: pointer;
   }
 
   .paperClass {
@@ -372,6 +373,7 @@ export default {
 
   .activeLT {
     font-weight: 600;
+    @include center-content(22px);
 
     span {
       position: absolute;

@@ -179,21 +179,24 @@ export default {
       Ming("sddd", this.$route.path);
       // 关闭弹窗
       eventBus.emit("orderDialogChange", false);
+      // 切换至对应v1/v2
+      this.$store.dispatch("paper/setOutlineVersion", row.version);
 
       if (this.$route.path !== "/main/writepaper") {
         this.$router.push({ path: "/main/writepaper" }, function () {
-          this.$nextTick(() => {
-            console.log("点击展示大纲弹窗");
-            // 展示大纲弹窗
+          console.log("点击展示大纲弹窗");
+          // 展示大纲弹窗
+          setTimeout(() => {
             eventBus.emit("outlineGen", row);
-          });
+          }, 1000);
         });
       } else {
         this.$nextTick(() => {
           // 展示大纲弹窗
           console.log("点击展示大纲弹窗2222233");
-
-          eventBus.emit("outlineGen", row);
+          setTimeout(() => {
+            eventBus.emit("outlineGen", row);
+          }, 300);
         });
       }
     },
