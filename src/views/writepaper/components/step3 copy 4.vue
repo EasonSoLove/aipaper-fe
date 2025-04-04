@@ -74,7 +74,7 @@
               </el-timeline-item>
               <el-timeline-item
                 v-if="JSON.stringify(steamStr) !== '{}'"
-                :timestamp="oldStr.task_time"
+                :timestamp="steamStr.task_time"
                 placement="top"
               >
                 <el-card>
@@ -129,7 +129,6 @@ export default {
   data() {
     return {
       oldStr: {
-        task_time: "",
         task_theme: "",
         task_reasoner: "",
         task_content: "",
@@ -262,7 +261,7 @@ export default {
         const currentStr = this.oldStr[currentProperty];
 
         if (index < currentStr.length) {
-          // console.log(currentStr[index]);
+          console.log(currentStr[index]);
           this.steamStr[currentProperty] += currentStr[index];
           index++;
         } else {
@@ -305,13 +304,10 @@ export default {
     handlePollingResult(result) {
       // 处理轮询结果的逻辑
       this.paper_stage = result.paper_stage;
-
       this.task_info_list = result.task_info_list
         ? result.task_info_list.slice(0, -1)
         : [];
-      let lastTimeLine =
-        result.task_info_list[result.task_info_list.length - 1];
-      // 需要做渐入的
+      let lastTimeLine = result.task_info_list[result.task_info_list.length];
       // 需要做渐入的
       this.oldStr = JSON.parse(JSON.stringify(lastTimeLine));
       console.log("处理轮询结果this.oldStr：", this.oldStr);

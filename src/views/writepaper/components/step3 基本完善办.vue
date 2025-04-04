@@ -60,41 +60,72 @@
               >
                 <el-card>
                   <p class="gp0">{{ activity.task_theme }}</p>
-                  <p class="gp2">
-                    <vue-markdown>
-                      {{ activity.task_reasoner }}
-                    </vue-markdown>
-                  </p>
                   <p class="gp1">
                     <vue-markdown>
                       {{ activity.task_content }}
                     </vue-markdown>
                   </p>
-                </el-card>
-              </el-timeline-item>
-              <el-timeline-item
-                v-if="JSON.stringify(steamStr) !== '{}'"
-                :timestamp="oldStr.task_time"
-                placement="top"
-              >
-                <el-card>
-                  <p class="gp0">{{ steamStr.task_theme }}</p>
-                  <p v-html="markdownReasoner" class="gp2"></p>
-                  <p v-html="markdownContent" class="gp1"></p>
-
-                  <!-- <p class="gp1">
+                  <p class="gp2">
                     <vue-markdown>
-                      {{ steamStr.task_content }}
+                      {{ activity.task_reasoner }}
                     </vue-markdown>
-                  </p> -->
+                  </p>
                 </el-card>
               </el-timeline-item>
             </el-timeline>
-            <div id="step3Bottom"></div>
           </div>
+          <!-- <el-col :span="16">
+            <div class="step3Right">
+              <div class="paperListBox">
+                <div
+                  v-for="(paper, index) in paper_info_list"
+                  :key="index + 'paper'"
+                >
+                  <div class="paperItem">
+                    <p class="itemTitle">
+                      {{ paper.chapter_num }}
+                      <span>
+                        {{ paper.title }}
+                      </span>
+                    </p>
+
+                    <template
+                      v-if="paper.sections && paper.sections.length > 0"
+                    >
+                      <div
+                        class="contentItem"
+                        v-for="(section, index) in paper.sections"
+                        :key="index + 'content'"
+                      >
+                        <div
+                          v-show="
+                            section.section_title_num || section.section_title
+                          "
+                          class="sectionTitle"
+                        >
+                          <span>
+                            {{ section.section_title_num }}
+                          </span>
+                          <span>
+                            {{ section.section_title }}
+                          </span>
+                        </div>
+                        <div class="sectionContent">
+                          {{ section.content }}
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col> -->
         </el-row>
       </div>
     </div>
+    <!-- <div class="pdfBox">
+      <PdfViewer :pdfUrl="step3PdfUrl" ref="pdfViewer" />
+    </div> -->
     <el-dialog
       title="温馨提示"
       :visible.sync="dialogVisible"
@@ -104,6 +135,7 @@
         注意：此为预览版，只展示全文的50%。若满意请支付尾款，解锁全文并支持下载，下载有更多的惊喜哟~
       </p>
       <span slot="footer" class="dialog-footer">
+        <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
         <el-button type="primary" @click="dialogVisible = false"
           >确 定</el-button
         >
@@ -117,7 +149,6 @@ import { mapGetters } from "vuex";
 // import webinfo from "@/components/webinfo.vue";
 import eventBus from "@/utils/eventBus";
 import VueMarkdown from "vue-markdown";
-import { marked } from "marked";
 import PdfViewer from "./PdfViewer.vue";
 import { paperPack } from "@/api/user";
 import {
@@ -128,17 +159,7 @@ export default {
   name: "step3",
   data() {
     return {
-      oldStr: {
-        task_time: "",
-        task_theme: "",
-        task_reasoner: "",
-        task_content: "",
-      },
-      steamStr: {
-        task_theme: "",
-        task_reasoner: "",
-        task_content: "",
-      },
+      oldStr: "",
       old_paper_info_list_length: 0,
       newStr: "",
       paperProductStatus: false,
@@ -164,14 +185,6 @@ export default {
   computed: {
     // 计算属性
     ...mapGetters(["step3PdfUrl", "currentOrder", "activeIndex", "device"]),
-    markdownContent() {
-      // 使用Markdown解析器处理内容
-      return marked(this.steamStr.task_content);
-    },
-    markdownReasoner() {
-      // 使用Markdown解析器处理内容
-      return marked(this.steamStr.task_reasoner);
-    },
   },
 
   watch: {
@@ -205,7 +218,6 @@ export default {
         });
       }
     },
-
     pdfUrl: {
       handler(newVal, oldVal) {
         this.pdfUrl = newVal;
@@ -231,55 +243,31 @@ export default {
   beforeDestroy() {
     eventBus.off("startStep3Polling", this.startPolling); // 移除事件监听
     this.stopPolling();
-    // 清除定时器以避免组件销毁后仍然运行
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
   },
 
   methods: {
-    streamOut() {
+    startDisplay(inputString) {
       // 清空当前展示内容
-      this.steamStr = {
-        task_theme: "",
-        task_reasoner: "",
-        task_content: "",
-      };
+      this.displayedChars = [];
 
       // 确保没有遗留的定时器
       if (this.intervalId) {
         clearInterval(this.intervalId);
       }
 
-      const properties = ["task_theme", "task_reasoner", "task_content"];
-      let currentPropertyIndex = 0;
       let index = 0; // 当前展示的字符索引
 
-      // 定义一个函数用于更新当前处理的属性
-      const updateDisplay = () => {
-        const currentProperty = properties[currentPropertyIndex];
-        const currentStr = this.oldStr[currentProperty];
-
-        if (index < currentStr.length) {
-          // console.log(currentStr[index]);
-          this.steamStr[currentProperty] += currentStr[index];
+      // 每100毫秒展示一个字符
+      this.intervalId = setInterval(() => {
+        if (index < inputString.length) {
+          this.displayedChars.push(inputString[index]); // 添加当前字符到展示列表
           index++;
         } else {
-          // 当前属性完成，切换到下一个属性
-          currentPropertyIndex++;
-          if (currentPropertyIndex < properties.length) {
-            index = 0; // 重置索引以处理下一个属性
-          } else {
-            // 如果所有属性都展示完成，清除定时器
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-          }
+          // 如果展示完成，清除定时器
+          clearInterval(this.intervalId);
+          this.intervalId = null;
         }
-      };
-
-      // 每100毫秒展示一个字符
-      this.intervalId = setInterval(updateDisplay, 50);
+      }, 100); // 每100毫秒添加一个字符
     },
     // 启动轮询
     startPolling(data) {
@@ -304,26 +292,25 @@ export default {
 
     handlePollingResult(result) {
       // 处理轮询结果的逻辑
+      this.task_info_list = result.task_info_list;
       this.paper_stage = result.paper_stage;
-
-      this.task_info_list = result.task_info_list
-        ? result.task_info_list.slice(0, -1)
-        : [];
-      let lastTimeLine =
-        result.task_info_list[result.task_info_list.length - 1];
+      this.paper_info_list = result.paper_info_list;
+      let lastTimeLine = this.task_info_list[this.task_info_list.length - 1];
+      console.log("处理轮询结果lastTimeLine：", lastTimeLine);
       // 需要做渐入的
-      // 需要做渐入的
-      this.oldStr = JSON.parse(JSON.stringify(lastTimeLine));
+      this.oldStr = JSON.parse(JSON.stringify(lastTimeLine.task_theme));
       console.log("处理轮询结果this.oldStr：", this.oldStr);
+      if (this.old_paper_info_list_length == 0) {
+        this.old_paper_info_list_length = this.paper_info_list.length;
+        this.startDisplay(this.oldStr);
+      } else {
+        if (this.paper_info_list && this.paper_info_list.length > 0) {
+          if (this.old_paper_info_list_length < this.paper_info_list.length) {
+            this.startDisplay(this.oldStr);
+          }
+        }
+      }
       console.log("处理轮询结果：", result);
-      let _this = this;
-      setTimeout(() => {
-        _this.scrollBottom();
-        _this.streamOut();
-      }, 1000);
-    },
-    scrollBottom() {
-      this.$scrollTo("#step3Bottom", 500, { offset: -150 });
     },
     // 停止轮询
     stopPolling() {
@@ -399,15 +386,6 @@ export default {
   blockquote {
     line-height: 40px;
   }
-}
-::v-deep(.step3Left code) {
-  display: block;
-  padding: 10px;
-  border: 1px solid #ddd;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  background: #f6f6f6;
-  margin: 20px 0;
 }
 // 引入scss
 // @import "@/styles/variables.scss";
