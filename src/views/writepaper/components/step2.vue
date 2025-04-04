@@ -1230,6 +1230,7 @@ export default {
       Ming("1014---当前大纲对象123:", data1);
       Ming("1014---this.outline:", this.outline);
       // this.saveOutline();
+
       let data = {
         title: this.requestForm.title,
         key1: this.requestForm.key || this.requestForm.key1,
@@ -1397,8 +1398,12 @@ export default {
 
       // parentNodeData.sections.push(newChild);
       // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
-      this.updateApiGroup(this.outline);
-      this.editStatus = false;
+      this.generateIndexes(this.outline);
+      let _this = this;
+      setTimeout(() => {
+        _this.updateApiGroup(this.outline);
+        _this.editStatus = false;
+      }, 100);
     },
 
     remove(node, data) {
