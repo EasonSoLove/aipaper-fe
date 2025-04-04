@@ -999,6 +999,13 @@ export default {
       "homeData",
       "device",
     ]),
+    ...mapGetters([
+      "requestForm",
+      "additionalList",
+      "outlineVersion",
+      "homeData",
+      "device",
+    ]),
   },
   methods: {
     downLoadLine() {
@@ -1229,7 +1236,9 @@ export default {
     },
     updateApiGroup(data1) {
       Ming("1014---当前大纲对象123:", data1);
+      Ming("1014---this.outline:", this.outline);
       // this.saveOutline();
+
       let data = {
         title: this.requestForm.title,
         key1: this.requestForm.key || this.requestForm.key1,
@@ -1377,8 +1386,7 @@ export default {
           content: "",
         },
       };
-      console.log("dddddd", this.numberValidateForm);
-      // 只判断了 after情况      console.log("dddddd", newChild);
+      console.log("dddddd", newChild);
       // 只判断了 after情况
       if (this.numberValidateForm.insertPosition == "after") {
         const targetIndex = parentNodeData.sections.findIndex(
@@ -1403,6 +1411,13 @@ export default {
       // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
       this.updateApiGroup(this.outline);
       this.editStatus = false;
+      // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
+      this.generateIndexes(this.outline);
+      let _this = this;
+      setTimeout(() => {
+        _this.updateApiGroup(this.outline);
+        _this.editStatus = false;
+      }, 100);
     },
 
     remove(node, data) {

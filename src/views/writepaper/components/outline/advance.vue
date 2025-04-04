@@ -388,19 +388,30 @@
                   <p style="font-size: 12px"></p>
                 </div>
                 <div class="el-upload__tip" slot="tip">
-                  Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。
-                  <p style="margin-top: 5px; font-size: 12px">
-                    文献来源-文献作者-发表年份-文献标题.pdf，例如
-                    <em style="color: #409eff">
-                      XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf
-                    </em>
+                  <p style="margin-top: 8px; font-size: 14px">
+                    Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。
                   </p>
-                  <p style="margin-top: 5px; font-size: 12px">
+                  <div style="margin-top: 8px; font-size: 14px">
+                    文献来源-文献作者-发表年份-文献标题.pdf，
+                    <p style="margin-top: 8px; font-size: 14px">
+                      例如:
+                      <em style="color: #409eff">
+                        XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf
+                      </em>
+                    </p>
+                  </div>
+                  <p style="margin-top: 8px; font-size: 14px">
                     多作者格式: 如
                     <em style="color: #409eff">
                       XX期刊-王某某&李某某&张某某-2018-H5在游戏开发领域的应用研究.pdf
                     </em>
                   </p>
+                  <P style="margin-top: 8px; font-size: 14px">
+                    论文生成生成时,需引入您上传的论文作为参考文献, 如您论文
+                    <em style="color: #f56c6c"
+                      >命名格式不符合上述要求, 无法上传!</em
+                    >
+                  </P>
                 </div>
               </el-upload>
             </div>
@@ -553,34 +564,54 @@ export default {
         this.$message.error("上传文件只能是 PDF 格式!");
         return false;
       }
+
+      // 定义正则表达式
+      const regex = /^[^\s-]+-[^\s-]+(?:&[^\s-]+)*-\d{4}-[^\s-]+\.pdf$/;
+      if (!this.formdataV2.key1 && !this.formdataV2.key) {
+        this.$message({
+          type: "warning",
+          message: "上传文件需先点击 Step1 生成检索关键字!",
+        });
+        return false;
+      }
+      if (this.reference_paper_fe_lists.length <= 0) {
+        this.$message({
+          type: "warning",
+          message: "上传文件, 需先点击 Step2 检索文献!",
+        });
+        return false;
+      }
+      // 检查文件名是否符合正则表达式
+      if (!regex.test(file.name)) {
+        this.$message.error("文件命名格式不正确，请检查后重新上传！");
+        return false; // 阻止文件上传
+      }
+
       if (!isLt10M) {
         this.$message.error("上传文件大小不能超过 10MB!");
         return false;
       }
 
-      if (!this.formdataV2.key1 && !this.formdataV2.key) {
-        this.$message({
-          type: "warning",
-          message: "上传文件需先生成检索关键字!",
-        });
-        return false;
-      }
       this.uploading = true;
       let data = new FormData();
       Ming("file", file);
       data.append("files", file);
       data.append("key", this.formdataV2.key1 || this.formdataV2.key);
 
-      upload_papers(data).then((res) => {
-        Ming("ssd", res);
-        this.uploading = false;
+      upload_papers(data)
+        .then((res) => {
+          Ming("ssd", res);
+          this.uploading = false;
 
-        this.dealSelectList(res.result);
-        this.$message({
-          type: "success", // 将类型改为 success
-          message: "上传文件成功!",
+          this.dealSelectList(res.result);
+          this.$message({
+            type: "success", // 将类型改为 success
+            message: "上传文件成功!",
+          });
+        })
+        .catch(() => {
+          this.uploading = false;
         });
-      });
 
       return false;
     },

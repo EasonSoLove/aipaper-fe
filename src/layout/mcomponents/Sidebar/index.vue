@@ -11,6 +11,8 @@
         <div class="logoL">
           <p>万象写作</p>
           <!-- <img :src="logo" alt="" title="logo" /> -->
+          <p>万象写作</p>
+          <!-- <img :src="logo" alt="" title="logo" /> -->
         </div>
       </div>
     </div>
