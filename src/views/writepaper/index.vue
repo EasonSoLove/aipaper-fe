@@ -309,6 +309,7 @@ export default {
       this.$store.dispatch("app/setActiveIndex", 0);
     },
     setActiveIndex3() {
+      return false;
       // this.tabsClick(0);
       // this.activeIndex = 0;
       this.$store.dispatch("app/setActiveIndex", 3);
