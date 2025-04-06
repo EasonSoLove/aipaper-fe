@@ -648,12 +648,23 @@ export default {
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
 
-      eventBus.emit("showEmitPaperDialog", {
-        requestKey: this.currentOrder.out_trade_no,
-        payStatus: 2,
-        paperPercent: 0,
-      });
+      // eventBus.emit("showEmitPaperDialog", {
+      //   requestKey: this.currentOrder.out_trade_no,
+      //   payStatus: 2,
+      //   paperPercent: 0,
+      // });
       this.popupStatus = false;
+      // 打开step3
+      this.$store.dispatch("app/setActiveIndex", 3);
+      // step3开始循环
+      let _this = this;
+      setTimeout(() => {
+        _this.$nextTick(() => {
+          eventBus.emit("startStep3Polling", {
+            out_trade_no: this.currentOrder.out_trade_no,
+          });
+        });
+      }, 100);
     },
     getDetail() {
       this.$log("d1111", this.orderId);

@@ -2,6 +2,8 @@
   <div>
     <!-- 页面名称 -->
     <div class="pdfShowBox">
+      <div id="step3Top"></div>
+
       <div class="stickyBox">
         <div class="pdfNavbar">
           <div class="pdfNavLeft">
@@ -119,11 +121,12 @@ import eventBus from "@/utils/eventBus";
 import VueMarkdown from "vue-markdown";
 import { marked } from "marked";
 import PdfViewer from "./PdfViewer.vue";
-import { paperPack } from "@/api/user";
+import { paperPack, orderDetailById } from "@/api/user";
 import {
   startUniquePaperPolling,
   stopPaperPolling,
 } from "@/utils/step3polling";
+
 export default {
   name: "step3",
   data() {
@@ -149,9 +152,11 @@ export default {
       pdfUrl: "",
       downStatus: false,
       out_trade_no: "",
-      out_trade_no: "5135fc99-75a2-4b17-9321-d791a3817dbe",
       paper_stage: 1,
       task_info_list: [],
+      firstTag: 0,
+      oldLength: 0,
+      newLength: 0,
       paper_info_list: [],
       displayedChars: [], // 用于逐个展示的字符列表
       intervalId: null, // 定时器ID，用于清除定时器
@@ -187,7 +192,10 @@ export default {
     },
     step3PdfUrl(newValue, oldValue) {
       this.dialogVisible = false;
-
+      if (newValue) {
+        this.$scrollTo("#step3Top", 500, { offset: -150 });
+        this.paperProductStatus = true;
+      }
       // 在这里执行你需要的逻辑
       if (this.currentOrder.payment_status == "TRADE_DEPOSIT_SUCCESS") {
         let _this = this;
@@ -222,7 +230,7 @@ export default {
   mounted() {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
-    this.startPolling();
+    // this.startPolling();
     console.log("step3初始化");
   },
   created() {
@@ -240,6 +248,7 @@ export default {
 
   methods: {
     streamOut() {
+      this.stopPolling();
       // 清空当前展示内容
       this.steamStr = {
         task_theme: "",
@@ -274,6 +283,17 @@ export default {
             // 如果所有属性都展示完成，清除定时器
             clearInterval(this.intervalId);
             this.intervalId = null;
+            // 生成成功, 停止循环
+            if (this.paper_stage != 2) {
+              if (this.newLength > 0) {
+                this.oldLength = this.newLength;
+              }
+              console.log("this.oldLength", this.oldLength);
+              let _this = this;
+              setTimeout(() => {
+                _this.startPolling();
+              }, 1000);
+            }
           }
         }
       };
@@ -283,15 +303,15 @@ export default {
     },
     // 启动轮询
     startPolling(data) {
-      // if (!data.out_trade_no) {
-      //   Ming("step3没有值", data);
-      //   return false;
-      // }
       const requestData = {
-        // out_trade_no: data.out_trade_no,
-        out_trade_no: "ccec202e-9454-4f0c-abc6-cdf12d3542ad",
+        out_trade_no: "",
+        // out_trade_no: "ccec202e-9454-4f0c-abc6-cdf12d3542ad",
       }; // 请求数据
-
+      if (data && data.out_trade_no) {
+        requestData.out_trade_no = data.out_trade_no;
+      } else {
+        requestData.out_trade_no = this.currentOrder.out_trade_no;
+      }
       // 开始轮询，并传入回调处理结果
       startUniquePaperPolling(requestData, (result) => {
         console.log("轮询完成，接收到结果：", result);
@@ -305,21 +325,50 @@ export default {
     handlePollingResult(result) {
       // 处理轮询结果的逻辑
       this.paper_stage = result.paper_stage;
+      // 如果生成成功展示pdf, 获取下载链接
+      if (this.paper_stage == 2) {
+        let data = { key: this.currentOrder.out_trade_no };
+        orderDetailById(data).then((res) => {
+          console.log(res, res, res);
+          console.log(res.result.order_item_response[0].case.file_urls.pdf);
+          this.$store.dispatch(
+            "app/togglePDFUrl",
+            res.result.order_item_response[0].case.file_urls.pdf
+          );
+        });
+        this.paperProductStatus = true;
 
+        return false;
+      }
       this.task_info_list = result.task_info_list
         ? result.task_info_list.slice(0, -1)
         : [];
       let lastTimeLine =
         result.task_info_list[result.task_info_list.length - 1];
       // 需要做渐入的
-      // 需要做渐入的
       this.oldStr = JSON.parse(JSON.stringify(lastTimeLine));
+
+      // 判断是不是第一次进入, 记录当前节点长度
+      if (this.firstTag == 0) {
+        this.oldLength = result.task_info_list.length;
+      } else {
+        this.newLength = result.task_info_list.length;
+      }
       console.log("处理轮询结果this.oldStr：", this.oldStr);
       console.log("处理轮询结果：", result);
+      console.log("轮询结果页", this.oldLength, this.newLength);
       let _this = this;
       setTimeout(() => {
         _this.scrollBottom();
-        _this.streamOut();
+        if (_this.firstTag == 0) {
+          _this.streamOut();
+          _this.firstTag = 1;
+        } else {
+          if (this.newLength > this.oldLength) {
+            _this.streamOut();
+            _this.firstTag = 1;
+          }
+        }
       }, 1000);
     },
     scrollBottom() {

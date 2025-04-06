@@ -11,6 +11,7 @@ import {
   ordersRepay,
   balance_pay,
 } from "@/api/user";
+import { setTimeout } from "core-js";
 
 const GlobalMethodsPlugin = {
   install(Vue) {
@@ -42,11 +43,14 @@ const GlobalMethodsPlugin = {
         订单题目: row.outline.title,
         订单Out_trade_no: row.order.out_trade_no,
       });
+
       const processResponse = (res, currentOrder, status) => {
         this.$log("去支付 res", res);
+        // 关闭弹窗
+        eventBus.emit("orderDialogChange", false);
 
-        let outLineData = row.outline;
-        let requestForm = {
+        const outLineData = row.outline;
+        const requestForm = {
           title: outLineData.title,
           language: outLineData.language,
           type: outLineData.type,
@@ -57,7 +61,7 @@ const GlobalMethodsPlugin = {
         };
         store.dispatch("app/setRequestForm", requestForm);
 
-        let order = {
+        const order = {
           out_trade_no: res.result.out_trade_no,
           pay_amount: res.result.pay_amount,
           pay_link: res.result.pay_link,
@@ -69,8 +73,8 @@ const GlobalMethodsPlugin = {
           order_type: res.result.order_type,
           word_count: res.result.word_count,
           product: outLineData.product,
-          discounted_price: res.result.discounted_price, // 优惠金额
-          is_discount: res.result.is_discount, // 优惠金额
+          discounted_price: res.result.discounted_price,
+          is_discount: res.result.is_discount,
         };
         store.dispatch("app/toggleCurrentOrder", order);
 
@@ -83,21 +87,49 @@ const GlobalMethodsPlugin = {
         });
       };
 
-      const data = {
-        out_trade_no: row.order.out_trade_no,
-        payment_method: row.order.payment_method,
+      const payFun = async () => {
+        const data = {
+          out_trade_no: row.order.out_trade_no,
+          payment_method: row.order.payment_method,
+        };
+
+        const paymentMethod = status === "付尾款" ? balance_pay : ordersRepay;
+
+        try {
+          const res = await paymentMethod(data);
+          processResponse(res, row.order, status);
+        } catch (error) {
+          this.$message({
+            type: "warning",
+            message: `接口超时,请稍后重试! 错误: ${error.message || error}`,
+          });
+        }
       };
 
-      const paymentMethod = status === "付尾款" ? balance_pay : ordersRepay;
+      const targetPath = "/main/writepaper";
+      const currentPath = this.$route.path;
+      console.log("currenetPath", currentPath);
 
-      paymentMethod(data).then((res) => {
-        processResponse(res, row.order, status);
-      }).catch(() => {
-        this.$message({
-          type: 'warning',
-          message: '接口超时,请稍后重试!'
-        })
-      });
+      if (currentPath !== targetPath) {
+        this.$router.push(
+          {
+            path: targetPath,
+            query: {
+              timeData: new Date().getTime(),
+            },
+          },
+          () => {
+            let _this = this;
+            setTimeout(() => {
+              _this.$nextTick(() => {
+                payFun();
+              });
+            }, 1000);
+          }
+        );
+      } else {
+        payFun();
+      }
     };
 
     // 定义全局跳转方法

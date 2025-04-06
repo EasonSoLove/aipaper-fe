@@ -237,7 +237,13 @@ export default {
   },
   computed: {
     // 计算属性
-    ...mapGetters(["activeIndex", "device", "requestForm", "formdataV2"]),
+    ...mapGetters([
+      "activeIndex",
+      "device",
+      "requestForm",
+      "formdataV2",
+      "currentOrder",
+    ]),
   },
   methods: {
     fetchDataBasedOnRoute(to) {
