@@ -346,6 +346,9 @@
         font-size: 14px;
       }
     }
+    .inputBtn {
+      margin-top: 80px;
+    }
   }
   .adBox {
     padding: 0 10px;
@@ -618,5 +621,17 @@
     flex: auto !important;
     margin-left: 0px !important;
     margin-top: 10px !important;
+  }
+  .keywordBox {
+    flex-wrap: wrap;
+  }
+
+  .keyLeft,
+  .keyRight {
+    flex: auto !important;
+    width: 100% !important;
+  }
+  .keyRight {
+    margin-top: 10px;
   }
 }
