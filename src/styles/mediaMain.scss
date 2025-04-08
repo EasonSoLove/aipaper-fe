@@ -596,7 +596,10 @@
 
   // 降重页面
   .outlineTab {
-    height: 200px !important;
+    height: auto !important;
+  }
+  #outlineTop .outlineTab {
+    height: 60px !important;
   }
   .outlineTab .outLeft {
     flex-wrap: wrap;
