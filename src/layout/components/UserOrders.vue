@@ -1,8 +1,20 @@
 <template>
   <div class="ordersList">
     <div class="btns">
-      <el-button type="primary" round @click="delList">删除订单</el-button>
-      <el-button type="primary" round @click="refresh">刷新订单</el-button>
+      <el-button
+        :size="device == 'mobile' ? 'mini' : 'medium'"
+        type="primary"
+        round
+        @click="delList"
+        >删除订单</el-button
+      >
+      <el-button
+        :size="device == 'mobile' ? 'mini' : 'medium'"
+        type="primary"
+        round
+        @click="refresh"
+        >刷新订单</el-button
+      >
     </div>
     <!-- 订单列表 -->
     <el-checkbox-group v-model="checkList" @change="handleCheckAllChange">
@@ -249,7 +261,7 @@
   </div>
 </template>
 <script>
-// import { mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import { getList } from "@/api/table";
@@ -316,6 +328,7 @@ export default {
   },
 
   computed: {
+    ...mapGetters(["device"]),
     // 计算属性
   },
   methods: {

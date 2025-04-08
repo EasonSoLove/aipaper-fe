@@ -92,7 +92,7 @@
   }
   .outlineBox {
     .outlineTab {
-      padding: 0 20px !important;
+      padding: 0 10px !important;
 
       p {
         font-size: 15px !important;
@@ -153,6 +153,7 @@
   }
   .uesrInputBox {
     padding-bottom: 20px !important;
+    padding-right: 20px !important;
     .formItem {
       margin-top: 20px !important;
       padding-left: 20px !important;
@@ -226,6 +227,7 @@
   }
   .oulineTitlePaper {
     margin-top: 10px !important;
+    padding: 10px 20px;
   }
   // 大纲
   .iconRight {
@@ -375,8 +377,12 @@
 
     padding-left: 0px !important;
     padding-right: 10px !important;
-    width: 150px !important;
+    width: 140px !important;
     padding: 0 5px !important;
+  }
+
+  .logoL p {
+    font-size: 20px;
   }
 }
 // 活动弹窗
@@ -503,6 +509,13 @@
     font-size: 10px !important;
     height: 25px !important;
     line-height: 25px !important;
+    padding: 0px !important;
+  }
+  .outLeftTitle > b {
+    display: none;
+  }
+  .outLeftTitle {
+    margin-right: 10px !important;
   }
   .shareBtn {
     font-size: 16px !important;
@@ -543,5 +556,64 @@
   }
   .langBox {
     padding-right: 16px !important;
+  }
+
+  // 写作也安眠
+  .buttonStep1 {
+    width: 100% !important;
+  }
+  .button-group button {
+    width: 100% !important;
+  }
+  .container {
+    padding-left: 20px !important;
+  }
+  .leftArrow {
+    display: none !important;
+  }
+  .Mcontent {
+    flex-wrap: wrap;
+    max-height: inherit !important;
+  }
+  .Mcontent .sidebar {
+    width: 100%;
+    flex: auto !important;
+    padding: 0px;
+  }
+  .formItemLabel span {
+    font-size: 10px !important;
+  }
+
+  .madBox .card {
+    width: 100% !important;
+  }
+  .madBox {
+    padding: 0 !important;
+  }
+  .Excontainer {
+    padding-right: 20px !important;
+  }
+
+  // 降重页面
+  .outlineTab {
+    height: 200px !important;
+  }
+  .outlineTab .outLeft {
+    flex-wrap: wrap;
+  }
+  .outLeft > div {
+    margin-top: 15px;
+  }
+  .outLeft > p {
+    margin-top: 10px;
+  }
+  .layout {
+    flex-wrap: wrap !important;
+  }
+  .file-list-card {
+    width: 100% !important;
+    flex: auto !important;
+    margin-left: 0px !important;
+    margin-top: 10px !important;
   }
 }
