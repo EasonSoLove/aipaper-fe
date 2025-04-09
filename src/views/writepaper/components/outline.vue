@@ -24,6 +24,25 @@
           ]"
         >
           万象定制版 <b style="font-size: 14px">让你的论文更懂你</b>
+          <!-- <svg
+            xmlns="http://www.w3.org/2000/svg"
+            style="height: 73px"
+            version="1.1"
+          >
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color: #00d5ff" />
+                <stop offset="29%" style="stop-color: #0091ff" />
+                <stop offset="62%" style="stop-color: #6236ff" />
+                <stop offset="100%" style="stop-color: #b620e0" />
+              </linearGradient>
+            </defs>
+            <text x="0" y="30" font-size="22" fill="url(#gradient)">
+              万象定制版
+              <tspan font-size="14" dy="5">让你的论文更懂你</tspan>
+            </text>
+          </svg> -->
+
           <span class="underLeft"></span>
         </div>
       </div>
