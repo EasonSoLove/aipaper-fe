@@ -5,12 +5,12 @@
       <p>尊敬的用户，您好！</p>
       <!-- <p>网站被攻击,程序猿紧急修复中，预计维护时间为 10 小时。</p> -->
       <p>
-        网站被<span class="red">攻击</span> (ಥ_ಥ) ,程序猿
-        <span class="red">紧急修复</span> 中
+        因近期用户量过大<span class="red">网站带宽升级,</span> (ಥ_ಥ) ,程序猿
+        <span class="red">紧急加班</span> 中
       </p>
       <p>
         预计维护时间为
-        <b class="red"> 1 </b>
+        <b class="red"> 5 </b>
         小时。
       </p>
       <!-- <p>爆肝修复中, 请稍等,或联系客服</p> -->
@@ -47,7 +47,7 @@ export default {
   name: "App",
   data() {
     return {
-      isMaintenance: false, // 设置为 true 表示网站正在维护
+      isMaintenance: true, // 设置为 true 表示网站正在维护
     };
   },
   components: {
