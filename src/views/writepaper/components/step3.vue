@@ -248,6 +248,7 @@ export default {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
     this.startPolling();
+    this.$scrollTo("#step3Top", 500, { offset: -150 });
     console.log("step3初始化");
   },
   created() {
