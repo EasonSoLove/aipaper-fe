@@ -999,13 +999,6 @@ export default {
       "homeData",
       "device",
     ]),
-    ...mapGetters([
-      "requestForm",
-      "additionalList",
-      "outlineVersion",
-      "homeData",
-      "device",
-    ]),
   },
   methods: {
     downLoadLine() {
@@ -1037,7 +1030,6 @@ export default {
     },
     // 重新生成大纲
     reloadOutline() {
-      eventBus.emit("reloadOutline", this.outlineVersion);
       eventBus.emit("reloadOutline", this.outlineVersion);
     },
     // 先保存再调用AI更新
@@ -1407,10 +1399,8 @@ export default {
         "this.outline123123",
         JSON.stringify(this.outline[0].sections[1])
       );
+
       // parentNodeData.sections.push(newChild);
-      // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
-      this.updateApiGroup(this.outline);
-      this.editStatus = false;
       // this.updateApiGroup(JSON.parse(JSON.stringify(this.outline)));
       this.generateIndexes(this.outline);
       let _this = this;

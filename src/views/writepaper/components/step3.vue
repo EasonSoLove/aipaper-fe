@@ -52,7 +52,7 @@
       <div v-else>
         <el-row style="padding: 40px" :gutter="20">
           <div class="step3Left">
-            <el-timeline>
+            <el-timeline v-show="task_info_list && task_info_list.length > 0">
               <el-timeline-item
                 v-for="(activity, index) in task_info_list"
                 :key="index"
@@ -89,6 +89,14 @@
                       {{ steamStr.task_content }}
                     </vue-markdown>
                   </p> -->
+                </el-card>
+              </el-timeline-item>
+            </el-timeline>
+
+            <el-timeline v-show="!task_info_list">
+              <el-timeline-item timestamp="" placement="top">
+                <el-card>
+                  <p>订单排队中请稍等...</p>
                 </el-card>
               </el-timeline-item>
             </el-timeline>

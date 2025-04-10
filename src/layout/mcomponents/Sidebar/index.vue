@@ -9,6 +9,7 @@
           <img :src="logoMax" alt="" title="logo" />
         </div> -->
         <div class="logoL">
+          <!-- <img :src="logo" alt="" title="logo" /> -->
           <p>万象写作</p>
           <!-- <img :src="logo" alt="" title="logo" /> -->
         </div>
@@ -372,7 +373,7 @@ export default {
   background-color: #f60;
   margin-left: 6px;
   position: absolute;
-  right: 5px;
+  right: 6px;
   top: 10px;
 }
 </stlyle>

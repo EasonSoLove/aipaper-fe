@@ -35,20 +35,33 @@ $colorWarning: #ea4f3d;
   font-family: PingFangSC, PingFang SC;
   font-weight: 600;
   font-size: $fontSize;
-  color: #212121;
   line-height: 28px;
   text-align: left;
   font-style: normal;
-  background: linear-gradient(
-    45.000000000000014deg,
-    #00d5ff 0%,
+
+  // Fallback color for unsupported browsers
+  color: #212121;
+  background: -webkit-linear-gradient(
+    45deg,
+    #00d5ff,
     #0091ff 29%,
     #6236ff 62%,
-    #b620e0 100%
-  ) !important;
-  color: transparent !important;
-  background-clip: text !important;
+    #b620e0
+  );
+
+  // Gradient text for supported browsers
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  // IE and older Edge fallback
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    background: none;
+    color: #212121; // Fallback color for older Edge
+  }
 }
+
 .paperColor {
 }
 

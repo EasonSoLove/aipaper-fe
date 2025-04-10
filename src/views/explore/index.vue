@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container Excontainer">
     <div class="swiperListTitle" style="margin-top: 50px">
       <p>
         <span> 论文宝典下载</span>
@@ -8,7 +8,7 @@
         </span>
       </p>
     </div>
-    <div class="adBox">
+    <div class="adBox madBox">
       <div
         class="card"
         v-for="(card, index) in references"

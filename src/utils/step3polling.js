@@ -74,7 +74,7 @@ function createPaperPolling(data, onSuccess) {
     async (stop) => {
       const res = await paper_status(data); // 调用接口
       console.log("re statusstatusstatus", res);
-      if (res.result.paper_stage == 1) {
+      if (res.result.paper_stage == 1 || res.result.paper_stage == 0) {
         if (res.result.task_info_list && res.result.task_info_list.length > 0) {
           onSuccess(res.result); // 返回结果
         }
@@ -93,7 +93,7 @@ function createPaperPolling(data, onSuccess) {
         stop(); // 停止轮询
       }
     },
-    3000, // 轮询间隔
+    30000, // 轮询间隔
     5, // 最大重试次数
     5600000 // 超时时间
   );
