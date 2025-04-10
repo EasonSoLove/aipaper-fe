@@ -3,7 +3,6 @@
     <!-- 页面名称 -->
     <div class="pdfShowBox">
       <div id="step3Top"></div>
-
       <div class="stickyBox">
         <div class="pdfNavbar">
           <div class="pdfNavLeft">
@@ -52,7 +51,7 @@
       <div v-else>
         <el-row style="padding: 40px" :gutter="20">
           <div class="step3Left">
-            <el-timeline v-show="task_info_list && task_info_list.length > 0">
+            <el-timeline v-if="task_info_list && task_info_list.length > 0">
               <el-timeline-item
                 v-for="(activity, index) in task_info_list"
                 :key="index"
@@ -92,17 +91,26 @@
                 </el-card>
               </el-timeline-item>
             </el-timeline>
-
-            <el-timeline v-show="!task_info_list">
-              <el-timeline-item timestamp="" placement="top">
+            <el-timeline v-else>
+              <el-timeline-item :timestamp="nowTime" placement="top">
                 <el-card>
-                  <p>订单排队中请稍等...</p>
+                  <p>您当前订单排队中, 请稍等...</p>
                 </el-card>
               </el-timeline-item>
             </el-timeline>
             <div id="step3Bottom"></div>
           </div>
         </el-row>
+      </div>
+
+      <div ref="gzhRef" class="gzhDialog">
+        <div class="imgProgressImg">
+          <img src="@/assets/images/outline/gongzonghao.jpg" alt="" />
+        </div>
+        <p style="padding: 0 10px">关注微信公众号</p>
+        <p style="margin-top: 5px; padding: 0 10px; padding-bottom: 10px">
+          获取大纲及论文实时生成进度！
+        </p>
       </div>
     </div>
     <el-dialog
@@ -145,6 +153,7 @@ export default {
         task_reasoner: "",
         task_content: "",
       },
+      nowTime: "",
       steamStr: {
         task_theme: "",
         task_reasoner: "",
@@ -238,7 +247,7 @@ export default {
   mounted() {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
-    // this.startPolling();
+    this.startPolling();
     console.log("step3初始化");
   },
   created() {
@@ -255,6 +264,17 @@ export default {
   },
 
   methods: {
+    getCurrentTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, "0"); // 月份从0开始，需要加1
+      const day = now.getDate().toString().padStart(2, "0");
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      const seconds = now.getSeconds().toString().padStart(2, "0");
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    },
     streamOut() {
       this.stopPolling();
       // 清空当前展示内容
@@ -323,7 +343,7 @@ export default {
       // 开始轮询，并传入回调处理结果
       startUniquePaperPolling(requestData, (result) => {
         console.log("轮询完成，接收到结果：", result);
-
+        this.nowTime = this.getCurrentTime();
         // 处理接收到的结果
         // 比如更新组件数据或触发其他逻辑
         this.handlePollingResult(result);
@@ -338,11 +358,73 @@ export default {
         let data = { key: this.currentOrder.out_trade_no };
         orderDetailById(data).then((res) => {
           console.log(res, res, res);
-          console.log(res.result.order_item_response[0].case.file_urls.pdf);
-          this.$store.dispatch(
-            "app/togglePDFUrl",
-            res.result.order_item_response[0].case.file_urls.pdf
-          );
+          let paperTitle = res.result.outline.title;
+          // 如果是附件就下载
+          let wordTypeList = [
+            "EXTRA_PROPOSAL",
+            "EXTRA_TASK_ASSIGNMENT",
+            "EXTRA_JOURNAL_REVIEWED",
+          ];
+          if (wordTypeList.includes(res.result.order.order_type)) {
+            // word
+            // 提示用户下载
+            this.$confirm("文件已生成, 是否下载?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                // 下载word
+                paperPack({ out_trade_no: res.result.order.out_trade_no }).then(
+                  (res) => {
+                    // window.open(res.result.zip_url, "_blank");
+                    // Create a temporary link element
+                    const link = document.createElement("a");
+                    link.href = res.result.zip_url;
+
+                    // Set the download attribute to suggest a filename
+                    // let title = this.requestForm.title ? this.requestForm.title : 'outline'
+                    link.download = paperTitle + ".zip"; // Change 'filename.zip' to the desired file name
+
+                    // Append the link to the body
+                    document.body.appendChild(link);
+
+                    // Programmatically click the link to trigger the download
+                    link.click();
+
+                    // Remove the link from the document
+                    document.body.removeChild(link);
+                    // let _this = this;
+                    // setTimeout(() => {
+                    //   _this.$message({
+                    //     type: "success",
+                    //     message: "已开始下载文件!",
+                    //   });
+                    //   _this.$store.dispatch("app/setActiveIndex", 0);
+                    //   eventBus.emit("outlineGen", this.requestForm);
+                    // }, 1000);
+                    this.$message({
+                      type: "success",
+                      message: "您的文件已开始下载!",
+                    });
+                    this.returnStep();
+                  }
+                );
+                // 结束
+              })
+              .catch(() => {
+                this.$message({
+                  type: "info",
+                  message: "我的订单可下载已生成文件!",
+                });
+              });
+          } else {
+            // 如果是正文, 就展示
+            this.$store.dispatch(
+              "app/togglePDFUrl",
+              res.result.order_item_response[0].case.file_urls.pdf
+            );
+          }
         });
         this.paperProductStatus = true;
 
@@ -367,12 +449,15 @@ export default {
       console.log("轮询结果页", this.oldLength, this.newLength);
       let _this = this;
       setTimeout(() => {
-        _this.scrollBottom();
         if (_this.firstTag == 0) {
+          _this.scrollBottom();
+
           _this.streamOut();
           _this.firstTag = 1;
         } else {
           if (this.newLength > this.oldLength) {
+            _this.scrollBottom();
+
             _this.streamOut();
             _this.firstTag = 1;
           }
@@ -477,6 +562,7 @@ export default {
 }
 .pdfShowBox {
   background-color: #fff;
+  position: relative;
 }
 .iframe-container {
   position: relative;
@@ -642,7 +728,29 @@ export default {
   transform-origin: bottom;
   animation: waveJump 1s ease-in-out infinite;
 }
+.gzhDialog {
+  position: absolute;
+  bottom: 50px;
+  right: -190px;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+.imgProgressImg {
+  padding-top: 20px;
+  width: 150px;
+  height: 170px;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
 /* 跳跃波浪效果 */
 @keyframes waveJump {
   0%,
