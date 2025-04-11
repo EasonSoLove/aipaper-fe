@@ -92,6 +92,16 @@
                 </el-card>
               </el-timeline-item>
             </el-timeline>
+
+            <div
+              v-if="lastStepStatus && paper_stage != 2"
+              style="text-align: center"
+            >
+              <p>
+                <i class="el-icon-loading"></i>
+                下一步正在生成中, 请稍等....
+              </p>
+            </div>
             <div id="step3Bottom"></div>
           </div>
         </el-row>
@@ -153,6 +163,7 @@ export default {
       downStatus: false,
       out_trade_no: "",
       paper_stage: 1,
+      lastStepStatus: true,
       task_info_list: [],
       firstTag: 0,
       oldLength: 0,
@@ -303,6 +314,8 @@ export default {
     },
     // 启动轮询
     startPolling(data) {
+      this.lastStepStatus = true;
+
       const requestData = {
         out_trade_no: "",
         // out_trade_no: "ccec202e-9454-4f0c-abc6-cdf12d3542ad",
@@ -376,6 +389,7 @@ export default {
     },
     // 停止轮询
     stopPolling() {
+      this.lastStepStatus = false;
       stopPaperPolling();
     },
     returnStep() {
