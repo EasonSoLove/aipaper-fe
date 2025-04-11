@@ -2,15 +2,16 @@
   <div v-loading="loading" class="container">
     <header class="header footer">
       <el-button
+        class="buttonStep1"
         type="primary"
         :disabled="!!formdataV2.key1"
         @click="getkeyWords"
         round
         style="width: 50%"
       >
-        <span style="margin-right: 10px">Step 1</span>
-        生成检索论文的关键词</el-button
-      >
+        <span class="stepSpan" style="margin-right: 10px">Step 1</span>
+        生成检索论文的关键词
+      </el-button>
     </header>
     <div class="keywordBox">
       <div class="keyLeft">
@@ -122,11 +123,11 @@
           round
           style="width: 50%"
         >
-          <span style="margin-right: 10px">Step 2</span>
+          <span class="stepSpan" style="margin-right: 10px">Step 2</span>
           检索文献（可自定义挑选）
         </el-button>
       </div>
-      <div v-loading="selectListLoading" class="content">
+      <div v-loading="selectListLoading" class="content Mcontent">
         <div class="sidebar" style="position: relative; padding-top: 10px">
           <!-- <h3>用户上传文献列表</h3>
           <div
@@ -258,6 +259,7 @@
         </div>
 
         <div
+          class="leftArrow"
           style="
             display: flex;
             align-items: center;

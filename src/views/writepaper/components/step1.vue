@@ -25,42 +25,54 @@
       <span style="margin-left: 50px">类型: </span>
       {{ requestForm.type ? requestForm.type : "暂无" }}
     </p>
+    <div class="newProgressBox">
+      <div class="ProGressLEft">
+        <!-- 页面名称 -->
 
-    <!-- 页面名称 -->
-
-    <div v-if="errLineStatus" class="progressBox">
-      <div class="pgBoxEl">
-        <el-progress
-          :text-inside="true"
-          :percentage="currentNumber"
-          type="circle"
-          :width="150"
-        ></el-progress>
-        <div class="progressText">
-          <p>{{ outlineStatusText }}<i class="el-icon-loading"></i></p>
-          <p class="progressNumber">{{ currentNumber }}%</p>
+        <div v-if="errLineStatus" class="progressBox">
+          <div class="pgBoxEl">
+            <el-progress
+              :text-inside="true"
+              :percentage="currentNumber"
+              type="circle"
+              :width="150"
+            ></el-progress>
+            <div class="progressText">
+              <p>{{ outlineStatusText }}<i class="el-icon-loading"></i></p>
+              <p class="progressNumber">{{ currentNumber }}%</p>
+            </div>
+            <p
+              style="
+                position: absolute;
+                bottom: -30px;
+                left: -50px;
+                width: 260px;
+                font-size: 14px;
+                color: #5c6166;
+              "
+            >
+              深度求索，慢但质量高，预计5分钟完成
+            </p>
+          </div>
         </div>
-        <p
-          style="
-            position: absolute;
-            bottom: -30px;
-            left: -50px;
-            width: 260px;
-            font-size: 14px;
-            color: #5c6166;
-          "
-        >
-          深度求索，慢但质量高，预计5分钟完成
+        <div v-else class="errText outlineTitleDesc">
+          <el-link
+            @click="reloadOutline"
+            style="font-size: 16px"
+            icon="el-icon-refresh"
+            >大纲生成失败, 请点击重试...</el-link
+          >
+        </div>
+      </div>
+      <div class="newProgressRight">
+        <div class="imgProgressImg">
+          <img src="@/assets/images/outline/gongzonghao.jpg" alt="" />
+        </div>
+        <p style="padding: 0 10px">关注微信公众号</p>
+        <p style="margin-top: 5px; padding: 0 10px; padding-bottom: 10px">
+          获取大纲及论文实时生成进度！
         </p>
       </div>
-    </div>
-    <div v-else class="errText outlineTitleDesc">
-      <el-link
-        @click="reloadOutline"
-        style="font-size: 16px"
-        icon="el-icon-refresh"
-        >大纲生成失败, 请点击重试...</el-link
-      >
     </div>
   </div>
 </template>
@@ -258,5 +270,33 @@ export default {
 }
 .errText {
   margin-top: 40px;
+}
+
+.newProgressBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.newProgressRight {
+  margin-left: 130px;
+  margin-right: -50px;
+  position: relative;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.imgProgressImg {
+  padding-top: 20px;
+  width: 150px;
+  height: 170px;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
