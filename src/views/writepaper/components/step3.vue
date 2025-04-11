@@ -51,7 +51,7 @@
       <div v-else>
         <el-row style="padding: 40px" :gutter="20">
           <div class="step3Left">
-            <el-timeline v-if="task_info_list && task_info_list.length > 0">
+            <el-timeline v-if="oldStr">
               <el-timeline-item
                 v-for="(activity, index) in task_info_list"
                 :key="index"
@@ -113,6 +113,13 @@
         </el-row>
       </div>
 
+      <div ref="gzhRef" class="gzhDialog1">
+        <p style="margin-top: 5px; padding: 10px; line-height: 18px">
+          <span style="font-size: 14px"> Tips: </span>
+          此页面可以放心关闭,生成结束可以在
+          <b style="color: #409eff">我的订单</b>查看
+        </p>
+      </div>
       <div ref="gzhRef" class="gzhDialog">
         <div class="imgProgressImg">
           <img src="@/assets/images/outline/gongzonghao.jpg" alt="" />
@@ -344,10 +351,11 @@ export default {
     // 启动轮询
     startPolling(data) {
       this.lastStepStatus = true;
-
+      console.log("this.oldStr", this.oldStr);
       const requestData = {
         out_trade_no: "",
-        // out_trade_no: "ccec202e-9454-4f0c-abc6-cdf12d3542ad",
+        task_node: this.oldStr.task_node,
+        // out_trade_no: "9d4eebbf-3d87-432b-bb88-d53475a2df00",
       }; // 请求数据
       if (data && data.out_trade_no) {
         requestData.out_trade_no = data.out_trade_no;
@@ -444,11 +452,16 @@ export default {
 
         return false;
       }
+
+      // 没有成功 走一下判断 流式输出
       this.task_info_list = result.task_info_list
         ? result.task_info_list.slice(0, -1)
         : [];
+      // console.log(this.task_info_list, "task_info_list");
       let lastTimeLine =
         result.task_info_list[result.task_info_list.length - 1];
+      // console.log(lastTimeLine, "lastTimeLine");
+
       // 需要做渐入的
       this.oldStr = JSON.parse(JSON.stringify(lastTimeLine));
 
@@ -460,7 +473,7 @@ export default {
       }
       console.log("处理轮询结果this.oldStr：", this.oldStr);
       console.log("处理轮询结果：", result);
-      console.log("轮询结果页", this.oldLength, this.newLength);
+      console.log("轮询结果页", this.newLength, this.oldLength);
       let _this = this;
       setTimeout(() => {
         if (_this.firstTag == 0) {
@@ -742,6 +755,19 @@ export default {
   display: inline-block;
   transform-origin: bottom;
   animation: waveJump 1s ease-in-out infinite;
+}
+.gzhDialog1 {
+  position: absolute;
+  bottom: 270px;
+  right: -193px;
+  width: 187px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 .gzhDialog {
   position: absolute;
