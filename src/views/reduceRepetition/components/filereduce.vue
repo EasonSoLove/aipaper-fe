@@ -79,7 +79,7 @@
         type="primary"
         style="width: 100%"
       >
-        去支付
+        一键降AIGC
       </el-button>
     </div>
   </div>

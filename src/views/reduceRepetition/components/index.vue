@@ -974,7 +974,7 @@ export default {
 }
 
 .markBox img {
-  width: 200px;
+  width: 180px;
   height: auto;
 }
 
