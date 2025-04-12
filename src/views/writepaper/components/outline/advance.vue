@@ -401,6 +401,13 @@
                         XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf
                       </em>
                     </p>
+                    <p style="margin-top: 8px; font-size: 14px">
+                      英文文献:
+                      <em style="color: #409eff">
+                        Journal-Author&CoAuthor-2020-Research in Game
+                        Development.pdf
+                      </em>
+                    </p>
                   </div>
                   <p style="margin-top: 8px; font-size: 14px">
                     多作者格式: 如
@@ -568,7 +575,10 @@ export default {
       }
 
       // 定义正则表达式
-      const regex = /^[^\s-]+-[^\s-]+(?:&[^\s-]+)*-\d{4}-[^\s-]+\.pdf$/;
+      // const regex = /^[^\s-]+-[^\s-]+(?:&[^\s-]+)*-\d{4}-[^\s-]+\.pdf$/;
+      const regex =
+        /^[^\s-]+-[^\s-]+(?:&[^\s-]+)*-\d{4}-[^\s-]+(?:\s[^\s-]+)*\.pdf$/;
+
       if (!this.formdataV2.key1 && !this.formdataV2.key) {
         this.$message({
           type: "warning",
