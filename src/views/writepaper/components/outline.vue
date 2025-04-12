@@ -309,7 +309,12 @@
           "
           class="selectLang formItem firstItem"
         >
-          <p class="formItemLabel">论文字数</p>
+          <p class="formItemLabel">
+            论文字数
+            <span class="introSpanOutline">
+              字数仅供参考,这种误差范围可能是几百字到几千字，属于正常现象。不会影响文案的整体质量和核心表达。
+            </span>
+          </p>
           <div class="formItemCon wordItem">
             <el-slider
               v-model="requestForm.word_count"
@@ -1256,5 +1261,12 @@ label.el-radio.is-checked {
 ::v-deep .el-slider__marks-text {
   top: -40px !important;
   color: #000;
+}
+.introSpanOutline {
+  font-size: 12px;
+  position: relative;
+  top: 3px;
+  margin-left: 8px;
+  color: rgb(96, 98, 102);
 }
 </style>

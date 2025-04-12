@@ -31,14 +31,6 @@
         </p> -->
 
         <div class="payCodeBox" style="justify-content: center">
-          <div style="margin-right: 50px">
-            <div class="reduceCard">
-              <p>文件查重付款</p>
-              <div class="cardChildList">
-                <p>总字数: {{ currentOrder.word_count }}</p>
-              </div>
-            </div>
-          </div>
           <div class="payLeftCode">
             <p class="plTitle">支付信息</p>
             <div class="newLeftBox">
@@ -121,6 +113,36 @@
               </div>
             </div>
             <!-- left code -->
+          </div>
+          <div
+            style="margin-right: 50px; padding-left: 50px; padding-top: 20px"
+          >
+            <div class="reduceCard">
+              <p style="margin-bottom: 20px">降AIGC付款:</p>
+
+              <p style="color: #606266">
+                千字单价:
+                <span style="color: #409eff; text-decoration: line-through"
+                  >10元/1000字</span
+                >
+              </p>
+              <p style="margin: 10px 0; color: #606266">
+                限时优惠:
+                <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
+                  >3元/1000字(不满千字按千字计算)</span
+                >
+              </p>
+
+              <div class="cardChildList">
+                <p>总字数: {{ currentOrder.word_count }}</p>
+              </div>
+              <div style="margin-top: 50px">
+                <p>
+                  郑重承诺:
+                  <span> 保证降低至30%以内，超出必定退款!!! </span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <!-- 二维码展示 -->
@@ -777,17 +799,17 @@ export default {
 }
 .cardChildList {
   display: flex;
-  margin-top: 10px;
+  margin: 20px 0;
   p {
-    height: 24px;
-    line-height: 22px;
+    height: 34px;
+    line-height: 34px;
     background: #fff7e8;
     border: 1px solid #ff7d00;
     border-radius: 2px;
     padding: 0px 8px;
     color: #ff7d00;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 16px;
     margin-right: 10px;
   }
 }

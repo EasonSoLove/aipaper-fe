@@ -7,14 +7,14 @@
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
-          免费版降AIGC率(知网版)
+          普通版-降AIGC率(知网版)
           <span class="underLeft"></span>
         </p>
         <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
         >
-          付费版降AIGC率(知网版)
+          万象版-降AIGC率(知网版)
           <span class="underLeft"></span>
         </p>
         <div style="position: relative; top: 10px">
