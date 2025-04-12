@@ -312,7 +312,7 @@
           <p class="formItemLabel">
             论文字数
             <span class="introSpanOutline">
-              字数仅供参考,这种误差范围可能是几百字到几千字，属于正常现象。不会影响文案的整体质量和核心表达。
+              字数供参考，可能存在误差，属于正常情况。
             </span>
           </p>
           <div class="formItemCon wordItem">

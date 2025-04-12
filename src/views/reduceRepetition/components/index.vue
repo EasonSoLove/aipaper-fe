@@ -136,11 +136,18 @@
               <div class="cardChildList">
                 <p>总字数: {{ currentOrder.word_count }}</p>
               </div>
-              <div style="margin-top: 50px">
-                <p>
+              <div style="margin-top: 230px; position: relative">
+                <p
+                  style="font-size: 16px; line-height: 1.5; text-align: center"
+                >
                   郑重承诺:
-                  <span> 保证降低至30%以内，超出必定退款!!! </span>
+                  <span style="font-weight: bold; color: red">
+                    保证降低至30%以内，超出必定退款!!!
+                  </span>
                 </p>
+                <div class="markBox">
+                  <img src="@/assets/images/mark.png" alt="" />
+                </div>
               </div>
             </div>
           </div>
@@ -886,6 +893,7 @@ export default {
     }
   }
 }
+
 .payCodeTitle {
   text-align: left;
   width: 100%;
@@ -955,5 +963,22 @@ export default {
 ::v-deep .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
   background: #409eff !important;
   color: #fff !important;
+}
+
+.markBox {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+  transition: transform 0.3s;
+}
+
+.markBox img {
+  width: 200px;
+  height: auto;
+}
+
+.markBox:hover {
+  transform: translateX(-50%) rotate(0deg);
 }
 </style>
