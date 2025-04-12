@@ -967,7 +967,7 @@ export default {
 
 .markBox {
   position: absolute;
-  bottom: 30px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%) rotate(0deg);
   transition: transform 0.3s;
