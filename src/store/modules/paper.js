@@ -10,6 +10,7 @@ const state = {
   selector_item: {},
   formdataV2: {},
   outlineVersion: "v2",
+  is_reduce_aigc: true,
 };
 
 const mutations = {
@@ -21,6 +22,9 @@ const mutations = {
   },
   TOGGLE_OUTLINE: (state, outlineVersion) => {
     state.outlineVersion = outlineVersion;
+  },
+  TOGGLE_AIGC: (state, is_reduce_aigc) => {
+    state.is_reduce_aigc = is_reduce_aigc;
   },
   SAVE_VID: (state, bdVid) => {
     state.bdVid = bdVid;
@@ -48,6 +52,9 @@ const actions = {
   },
   setOutlineVersion({ commit }, outlineVersion) {
     commit("TOGGLE_OUTLINE", outlineVersion);
+  },
+  setAigc({ commit }, is_reduce_aigc) {
+    commit("TOGGLE_AIGC", is_reduce_aigc);
   },
   setFormdataV2({ commit }, formdataV2) {
     commit("SAVE_FORMV2", formdataV2);
