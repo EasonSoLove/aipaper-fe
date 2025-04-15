@@ -22,7 +22,11 @@ import i18n from "./lang"; // internationalization
 import VueClipboard from "vue-clipboard2";
 // import globalModal from "./components/GlobalModal.vue";
 import globalDialog from "./components/globalDialog.vue";
-import progressonly from './components/progressonly.vue'
+import progressonly from "./components/progressonly.vue";
+
+import MingBtn from "./components/MingBtn.vue";
+// 注册全局组件
+Vue.component("MingBtn", MingBtn);
 
 Vue.component("global-modal", globalDialog);
 Vue.component("progressonly", progressonly);

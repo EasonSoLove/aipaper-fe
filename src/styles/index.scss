@@ -330,3 +330,21 @@ li {
 .info {
   color: #909399;
 }
+.aigcBox {
+  display: inline-block;
+  width: auto;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+// .aigcBox {
+//   ::v-deep .el-checkbox.is-bordered.is-checked {
+//     border-color: red;
+//   }
+// }
+// ::v-deep .el-checkbox.is-bordered.is-checked {
+//   border-color: red;
+// }
+
+// ::v-deep .el-checkbox.is-bordered.el-checkbox--medium {
+//   height: 60px;
+// }

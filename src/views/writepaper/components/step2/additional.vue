@@ -89,8 +89,13 @@
               requestForm.product ==
                 '结课论文                                                       '
             "
+            class="aigcBox"
           >
-            <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
+            <el-checkbox
+              :value="is_reduce_aigc"
+              @change="handleCheckboxChange"
+              border
+            >
               论文是否开启降AIGC
             </el-checkbox>
           </div>
@@ -164,10 +169,18 @@
               文件综述不支持预览
             </p>
           </div>
-          <div>
-            <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
+          <div class="aigcBox">
+            <el-checkbox
+              :value="is_reduce_aigc"
+              @change="handleCheckboxChange"
+              border
+            >
               论文是否开启降AIGC
             </el-checkbox>
+
+            <!-- <MingBtn :value="is_reduce_aigc" @change="handleCheckboxChange">
+              论文是否开启降AIGC
+            </MingBtn> -->
           </div>
         </div>
       </div>
@@ -400,6 +413,7 @@ export default {
   },
   methods: {
     handleCheckboxChange(newValue) {
+      console.log(newValue);
       this.$store.dispatch("paper/setAigc", newValue);
     },
     selectCard(card) {
