@@ -91,13 +91,9 @@
             "
             @click.stop="handleCheckboxClick"
           >
-            <el-checkbox
-              :value="is_reduce_aigc"
-              @change="handleCheckboxChange"
-              border
-            >
+            <MingBtn :value="is_reduce_aigc" @change="handleCheckboxChange">
               论文是否开启降AIGC
-            </el-checkbox>
+            </MingBtn>
           </div>
           <div class="cardPress">
             <img src="@/assets/images/step/icon_24_bz@2x.png" alt="" />
@@ -173,13 +169,9 @@
             </p>
           </div>
           <div class="aigcBox" @click.stop="handleCheckboxClick">
-            <el-checkbox
-              :value="is_reduce_aigc"
-              @change="handleCheckboxChange"
-              border
-            >
+            <MingBtn :value="is_reduce_aigc" @change="handleCheckboxChange">
               论文是否开启降AIGC
-            </el-checkbox>
+            </MingBtn>
           </div>
         </div>
       </div>
