@@ -79,6 +79,20 @@
               />论文正文(Word版)
             </p>
           </div>
+          <div
+            v-show="
+              currentOrder.order_type == 'PAPER_VOCATIONAL' ||
+              currentOrder.order_type == 'PAPER_VOCATIONAL_STAGES' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE_STAGES' ||
+              currentOrder.order_type == 'PAPER_MASTER' ||
+              currentOrder.order_type == 'PAPER_MASTER_STAGES'
+            "
+          >
+            <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
+              论文是否开启降AIGC
+            </el-checkbox>
+          </div>
           <div class="cardPress">
             <img src="@/assets/images/step/icon_24_bz@2x.png" alt="" />
             <p>承诺知网维普查重率低于20%，超过退款！</p>
@@ -151,6 +165,11 @@
 
               文件综述不支持预览
             </p>
+          </div>
+          <div>
+            <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
+              论文是否开启降AIGC
+            </el-checkbox>
           </div>
         </div>
       </div>
@@ -391,7 +410,13 @@ export default {
         this.$emit("input", newValue);
       },
     },
-    ...mapGetters(["requestForm", "currentOrder", "homeData", "formdataV2"]),
+    ...mapGetters([
+      "requestForm",
+      "currentOrder",
+      "homeData",
+      "is_reduce_aigc",
+      "formdataV2",
+    ]),
     wordShow() {
       return (
         this.requestForm.product == "毕业论文" ||
@@ -400,6 +425,14 @@ export default {
     },
   },
   methods: {
+    handleCheckboxChange(newValue) {
+      this.$message({
+        type: "warning",
+        message: "订单暂不支持修改降AIGC功能!",
+      });
+      return false;
+      // this.$store.dispatch("paper/setAigc", newValue);
+    },
     selectCard(card) {
       if (this.orderPayDisabled) {
         this.$message({

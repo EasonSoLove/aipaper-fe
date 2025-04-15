@@ -444,10 +444,12 @@ export default {
       this.coupon_code = "";
     },
     handleClick(tab, event) {
+      console.log(tab, "sttabbb", tab, event);
       this.loading = true;
       this.startCountdown();
       // 停止上一次循环
       this.$store.dispatch("paper/setPollingStatus", false);
+
       // 重新生成订单
       let data = {
         payment_method: "alipay", // 支付方式

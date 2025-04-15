@@ -90,9 +90,9 @@
                 '结课论文                                                       '
             "
           >
-            <el-checkbox v-model="is_reduce_aigc"
-              >论文是否开启降AIGC</el-checkbox
-            >
+            <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
+              论文是否开启降AIGC
+            </el-checkbox>
           </div>
           <div class="cardPress">
             <img src="@/assets/images/step/icon_24_bz@2x.png" alt="" />
