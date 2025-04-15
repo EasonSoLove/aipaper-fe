@@ -88,6 +88,7 @@
               currentOrder.order_type == 'PAPER_MASTER' ||
               currentOrder.order_type == 'PAPER_MASTER_STAGES'
             "
+            @click.stop="handleCheckboxClick"
           >
             <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
               论文是否开启降AIGC
@@ -166,7 +167,7 @@
               文件综述不支持预览
             </p>
           </div>
-          <div>
+          <div @click.stop="handleCheckboxClick">
             <el-checkbox :value="is_reduce_aigc" @change="handleCheckboxChange">
               论文是否开启降AIGC
             </el-checkbox>
@@ -425,6 +426,9 @@ export default {
     },
   },
   methods: {
+    handleCheckboxClick() {
+      console.log("Checkbox clicked");
+    },
     handleCheckboxChange(newValue) {
       this.$message({
         type: "warning",

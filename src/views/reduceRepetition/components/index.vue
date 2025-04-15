@@ -389,6 +389,9 @@ export default {
           this.resetForm();
 
           this.$store.dispatch("app/toggleCurrentOrder", order);
+          // 复现aigc选项
+          console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
+          this.$store.dispatch("paper/setAigc", res.result.is_reduce_aigc);
           let _this = this;
           setTimeout(() => {
             _this.loading = false;

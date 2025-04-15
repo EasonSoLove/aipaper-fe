@@ -235,6 +235,7 @@ export default {
           this.loading = false;
           // 记录大纲状态
           this.$store.dispatch("paper/setOutlineVersion", res.result.version);
+          this.$store.dispatch("paper/setAigc", true);
 
           this.jumpSelfOutline(res.result);
         })
@@ -321,6 +322,7 @@ export default {
               word_count: row.word_count,
             };
             this.$store.dispatch("app/setRequestForm", requestForm);
+            this.$store.dispatch("paper/setAigc", true);
 
             eventBus.emit("setFormData", requestForm, 1); // 发布事件
             eventBus.emit("orderDialogChange", false);
