@@ -10,7 +10,7 @@
       </p>
       <p>
         预计维护时间为
-        <b class="red"> 5 </b>
+        <b class="red"> 1 </b>
         小时。
       </p>
       <!-- <p>爆肝修复中, 请稍等,或联系客服</p> -->
@@ -47,7 +47,7 @@ export default {
   name: "App",
   data() {
     return {
-      isMaintenance: false, // 设置为 true 表示网站正在维护
+      isMaintenance: true, // 设置为 true 表示网站正在维护
     };
   },
   components: {
