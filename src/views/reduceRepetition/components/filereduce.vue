@@ -2,38 +2,6 @@
   <div class="container">
     <!-- 左右布局 -->
     <div v-loading="loading" class="layout">
-      <!-- 右侧上传区域 -->
-      <el-card class="upload-section">
-        <div slot="header" class="file-list-header">
-          <span>文件上传与解析</span>
-        </div>
-        <el-upload
-          ref="upload"
-          class="upload-demo"
-          drag
-          action=""
-          :show-file-list="false"
-          :http-request="handleUpload"
-          :before-upload="beforeUpload"
-          multiple
-        >
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">
-            <span style="font-weight: bold; font-size: 14px"> 温馨提示: </span>
-          </div>
-          <div class="el-upload__tip" slot="tip">可上传多个文件</div>
-          <div class="el-upload__tip" slot="tip">
-            限制降重总数:
-            <i style="color: #0066ff; font-weight: bold">30000</i> 字
-          </div>
-          <div class="el-upload__tip" slot="tip">
-            仅支持上传
-            <i style="color: #0066ff; font-weight: bold">.docx</i>
-            文件
-          </div>
-        </el-upload>
-      </el-card>
       <!-- 左侧文件列表 -->
       <el-card class="box-card file-list-card">
         <div slot="header" class="file-list-header">
@@ -68,6 +36,39 @@
         <div class="file-summary">
           <p>总字符数: {{ totalChars }}</p>
         </div>
+      </el-card>
+      <!-- 右侧上传区域 -->
+      <el-card class="upload-section">
+        <div slot="header" class="file-list-header">
+          <span>文件上传与解析</span>
+        </div>
+        <el-upload
+          ref="upload"
+          class="upload-demo"
+          drag
+          action=""
+          :show-file-list="true"
+          :limit="1"
+          :http-request="handleUpload"
+          :before-upload="beforeUpload"
+          multiple
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">
+            <span style="font-weight: bold; font-size: 14px"> 温馨提示: </span>
+          </div>
+          <div class="el-upload__tip" slot="tip">可上传多个文件</div>
+          <div class="el-upload__tip" slot="tip">
+            限制降重总数:
+            <i style="color: #0066ff; font-weight: bold">30000</i> 字
+          </div>
+          <div class="el-upload__tip" slot="tip">
+            仅支持上传
+            <i style="color: #0066ff; font-weight: bold">.docx</i>
+            文件
+          </div>
+        </el-upload>
       </el-card>
     </div>
 
