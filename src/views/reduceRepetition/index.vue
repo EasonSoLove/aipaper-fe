@@ -150,7 +150,7 @@ export default {
       direction: "rtl", //抽屉方向
       textareaOut: "",
       sendStatus: false,
-      activeIndex: 2,
+      activeIndex: 1,
       placeText: [
         "请输入文章段落，待降AIGC率均可，每次最多300字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
