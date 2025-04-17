@@ -1,10 +1,14 @@
 <template>
-  <div class="ming-checkbox">
+  <div
+    :class="['ming-checkbox', { disabled: isDisabled }]"
+    @click="handleContainerClick"
+  >
     <input
       type="checkbox"
       :checked="isChecked"
       @change="handleChange"
       class="ming-checkbox-input"
+      :disabled="isDisabled"
     />
     <span class="ming-checkbox-label">
       <slot></slot>
@@ -20,6 +24,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     isChecked: {
@@ -30,12 +38,22 @@ export default {
         this.$emit("input", val); // 触发 v-model 的更新
       },
     },
+    isDisabled() {
+      return this.disabled;
+    },
   },
   methods: {
     handleChange(event) {
-      const newValue = event.target.checked;
-      this.$emit("input", newValue); // 更新 v-model
-      this.$emit("change", newValue); // 发出 change 事件，传递当前状态
+      if (!this.isDisabled) {
+        const newValue = event.target.checked;
+        this.$emit("input", newValue); // 更新 v-model
+        this.$emit("change", newValue); // 发出 change 事件，传递当前状态
+      }
+    },
+    handleContainerClick() {
+      if (!this.isDisabled) {
+        this.isChecked = !this.isChecked;
+      }
     },
   },
 };
@@ -53,7 +71,12 @@ export default {
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-.ming-checkbox:hover {
+.ming-checkbox.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ming-checkbox:hover:not(.disabled) {
   background-color: rgba(255, 215, 0, 0.1); /* 金色背景渐变 */
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* 金色阴影 */
 }
