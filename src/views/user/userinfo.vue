@@ -160,7 +160,7 @@
             <span>右侧悬浮窗图片</span>
           </div>
           <div class="cardMain userUploadBox">
-            <div class="uploadLi">
+            <!-- <div class="uploadLi">
               <el-upload
                 class="imgUploader"
                 action="https://api.mixpaper.cn/api/ai-paper/user/edit"
@@ -186,7 +186,7 @@
                   @blur="saveInput(5)"
                 ></el-input>
               </p>
-            </div>
+            </div> -->
             <!-- 代理加盟 -->
             <div class="uploadLi">
               <el-upload
