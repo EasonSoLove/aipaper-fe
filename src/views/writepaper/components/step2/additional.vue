@@ -434,7 +434,7 @@ export default {
           type: this.requestForm.type,
           product: this.requestForm.product,
           word_count: this.requestForm.word_count,
-          // is_reduce_aigc: this.is_reduce_aigc,
+          is_reduce_aigc: this.is_reduce_aigc,
         };
         predict_price(data).then((res) => {
           this.defaultPrice = res.result.predict_price;
