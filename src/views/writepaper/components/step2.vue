@@ -1541,7 +1541,7 @@ export default {
         if (hasToken) {
           let data = {
             user_id: 1, // 固定传一
-            is_reduce_aigc: this.is_reduce_aigc, // 固定传一
+            // is_reduce_aigc: this.is_reduce_aigc, // 固定传一
             payment_method: "alipay", // 支付方式
             total_amount: 149.85, // 总价
             pay_type: this.selectValue == "left" ? "PAY_ALL" : "PAY_STAGES",
