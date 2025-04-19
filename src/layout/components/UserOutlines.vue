@@ -52,7 +52,10 @@
                   <template v-if="orderObj.version == 'v2'">
                     <el-button
                       @click="jumpV2Outline(orderObj)"
-                      v-if="orderObj.status == '等待中'"
+                      v-if="
+                        orderObj.status == '等待中' ||
+                        orderObj.status == '生成失败'
+                      "
                       icon="el-icon-view"
                       type="text"
                     >

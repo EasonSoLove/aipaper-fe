@@ -56,7 +56,7 @@ export default {
         // 提示用户该按钮已禁用
         this.$message({
           type: "warning",
-          message: "订单页暂不支持修改,请在大纲页生成全文前选择是否开启!",
+          message: "订单页暂不支持修改,请在大纲页点击生成全文前 选择是否开启!",
         });
         return; // 阻止后续操作
       }
