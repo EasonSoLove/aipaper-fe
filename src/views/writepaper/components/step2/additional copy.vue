@@ -228,12 +228,12 @@
         >
           担心生成后不满意?
           <span class="red" style="font-weight: bold; font-size: 20px">
-            19.9
+            38
           </span>
           元生成预览版,满意再付款
         </p>
         <p style="text-align: center; color: #606266; font-size: 12px">
-          PS: 点击生成全文,在支付页可选择正式版(全款) / 预览版(19.9元)
+          PS: 点击生成全文,在支付页可选择正式版(全款) / 预览版(38元)
         </p>
       </div>
 

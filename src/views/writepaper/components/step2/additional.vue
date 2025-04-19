@@ -121,7 +121,7 @@
           <p class="cardIntroTitle">
             {{ requestForm.title }}
           </p>
-          <p class="cardPrice">总价: <span>19.9元</span></p>
+          <p class="cardPrice">总价: <span>38元</span></p>
           <div class="cardChildList">
             <p>
               {{ requestForm.type }}
