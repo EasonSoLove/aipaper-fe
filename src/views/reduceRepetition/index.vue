@@ -10,13 +10,13 @@
           普通版-降AIGC率(知网版)
           <span class="underLeft"></span>
         </p>
-        <p
+        <!-- <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
         >
           万象版-降AIGC率(知网版)
           <span class="underLeft"></span>
-        </p>
+        </p> -->
         <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
           <p style="color: #606266">本站使用万象大模型实现降低AIGC率</p>
