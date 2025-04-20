@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="false"
     :class="['ming-checkbox', { disabled: isDisabled }]"
     @click="handleContainerClick"
   >
