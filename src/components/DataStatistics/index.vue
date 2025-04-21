@@ -26,7 +26,7 @@ export default {
       // 定义变量
       primaryNumber: 0,
       secondaryNumber: 0,
-      maxValue: 1000,
+      maxValue: 4000,
     };
   },
   components: {
