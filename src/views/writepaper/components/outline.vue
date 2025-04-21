@@ -499,7 +499,7 @@
             >
           </p>
 
-          <el-collapse accordion>
+          <el-collapse accordion style="max-height: 400px; overflow-y: scroll">
             <template
               v-for="(item, index) in formdataV2.reference_paper_selected_lists"
             >

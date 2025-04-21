@@ -158,7 +158,7 @@
             <el-button slot="reference">
               <div class="itemLi">
                 <svg class="icon svg-icon" aria-hidden="true">
-                  <use xlink:href="#icon-jiaruwomen"></use>
+                  <use xlink:href="#icon-icon-cankaowenxian"></use>
                 </svg>
                 <p>使用教程</p>
               </div>
