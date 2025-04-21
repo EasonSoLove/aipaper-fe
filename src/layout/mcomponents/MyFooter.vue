@@ -140,6 +140,31 @@
             </el-button>
           </el-popover>
         </div>
+        <div>
+          <!-- <el-button slot="reference" @click="$jumpUrl('/toPromotion')"> -->
+          <!-- <el-button slot="reference" @click="$devf">
+            <div class="itemLi">
+              <svg class="icon svg-icon" aria-hidden="true">
+                <use xlink:href="#icon-jiaruwomen"></use>
+              </svg>
+              <p>我要推广</p>
+            </div>
+          </el-button> -->
+          <el-popover placement="left" width="150" trigger="hover">
+            <div class="qywxBox">
+              <img :src="reflectService.image_url" alt="" />
+            </div>
+            <p style="margin-top: 5px">微信扫描二维码，<br />查看使用文档</p>
+            <el-button slot="reference">
+              <div class="itemLi">
+                <svg class="icon svg-icon" aria-hidden="true">
+                  <use xlink:href="#icon-jiaruwomen"></use>
+                </svg>
+                <p>使用教程</p>
+              </div>
+            </el-button>
+          </el-popover>
+        </div>
       </div>
     </div>
     <el-popover

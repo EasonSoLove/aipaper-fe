@@ -107,11 +107,11 @@
                 <el-tooltip
                   v-if="data.level >= maxLevel"
                   placement="top"
-                  content="插入图表配置"
+                  content="增删图表配置"
                 >
                   <span class="insetImgSpan" @click="showImgF(data)">
                     <i class="el-icon-edit-outline"></i>
-                    <span v-show="device !== 'mobile'">插入图表</span>
+                    <span v-show="device !== 'mobile'">增删图表</span>
                   </span>
                 </el-tooltip>
                 <!-- 新增 -->
@@ -219,7 +219,7 @@
             <textarea-autosize
               class="ownInput"
               rows="1"
-              placeholder="请输入您对应的章节内容,或点击AI帮写..."
+              placeholder="请输入您对应的章节内容，或点击AI帮写（网站暂不支持三级目录，该功能正在努力升级中...）"
               ref="myTextarea"
               @blur.native="saveSummary"
               v-model="data.summary"
@@ -358,11 +358,11 @@
         </el-button>
       </span>
     </el-dialog>
-    <!-- 插入图表 -->
+    <!-- 增删图表 -->
     <el-dialog
       :append-to-body="true"
       :lock-scroll="false"
-      title="插入图表"
+      title="增删图表"
       :visible.sync="imgExcelSetStatus"
       :width="device == 'mobile' ? '90%' : '60%'"
       label-width="130px"

@@ -615,25 +615,4 @@ export default {
     height: 24px;
   }
 }
-.introList {
-  margin-top: 20px;
-  line-height: 20px;
-  color: #1b2126;
-  font-size: 14px;
-  font-face: PingFangSC;
-  font-weight: 400;
-  text-align: left;
-}
-
-.priceIntro {
-  color: #0066ff;
-  font-size: 14px;
-  width: 120px;
-  font-weight: 400;
-  text-align: left;
-  text-decoration: underline;
-  &:hover {
-    cursor: pointer;
-  }
-}
 </style>
