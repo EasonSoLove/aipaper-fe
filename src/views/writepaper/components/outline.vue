@@ -508,6 +508,16 @@
                 :title="item.title"
                 :name="index + 'p'"
               >
+                <template slot="title">
+                  {{ item.title }}
+                  <span
+                    v-show="item.reference_parse_status === 'ERROR_PARSE'"
+                    class="delTips2 animate__animated animate__headShake infinite-bounce"
+                  >
+                    <i class="el-icon-caret-left"></i>
+                    该文献解析失败, 请在论文选择区,手动删除!
+                  </span>
+                </template>
                 <div class="firstItem">
                   <el-tag> 作者: {{ item.authors.join(",") }}</el-tag>
                   <el-tag> 类型: {{ item.database }} </el-tag>
@@ -931,7 +941,7 @@ export default {
           // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
           polling({ key: this.requestKey }, 5000)
             .then((res) => {
-              this.$log("ddddd", res);
+              this.$log("dddddaaaaaaaaaa", res);
               if (res == "生成失败") {
                 eventBus.emit("errorOutline", res); // 发布事件
               } else {
@@ -944,7 +954,7 @@ export default {
                 type: "error",
                 message: "大纲生成失败, 请稍后重试",
               });
-              eventBus.emit("errorOutline"); // 发布事件
+              // eventBus.emit("errorOutline", error); // 发布事件
               this.$emit("errorBack", "关闭index");
             });
         })
@@ -1034,7 +1044,7 @@ export default {
                     type: "error",
                     message: "大纲生成失败, 请稍后重试",
                   });
-                  eventBus.emit("errorOutline"); // 发布事件
+                  // eventBus.emit("errorOutline", error); // 发布事件
                   this.$emit("errorBack", "关闭index");
                 });
             })
@@ -1357,6 +1367,19 @@ label.el-radio.is-checked {
   align-items: flex-start;
   justify-content: flex-start;
   margin-top: 30px;
+}
+
+.delTips2 {
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  background: #fff;
+  padding: 4px;
+  line-height: 16px;
+  margin-left: 10px;
+  border-radius: 3px;
+  font-weight: bold;
+  color: #f56c6c;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .firstItem {
   display: flex;

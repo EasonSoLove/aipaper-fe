@@ -171,6 +171,11 @@
 
               文件综述不支持预览
             </p>
+            <p>
+              <img src="@/assets/images/step/icon_24_qy.png" alt="" />
+
+              <span class="red"> 预览版暂不支持退费! </span>
+            </p>
           </div>
           <div class="aigcBox" @click.stop="handleCheckboxClick">
             <MingBtn

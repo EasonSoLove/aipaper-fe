@@ -328,11 +328,31 @@
               >清空文献</el-button
             >
           </h3>
-          <div class="scrollBox">
+          <div class="scrollBox" style="padding-top: 24px">
             <div v-for="(paper, index) in selectedPapers" :key="index">
-              <div class="paper-card">
+              <div
+                :class="[
+                  'paper-card',
+                  paper.reference_parse_status === 'ERROR_PARSE'
+                    ? 'errorPaper'
+                    : '',
+                  paper.reference_parse_status === 'NO_PARSE'
+                    ? 'primaryPaper'
+                    : '',
+                  paper.reference_parse_status === 'SUCCESS_PARSE'
+                    ? 'successPaper'
+                    : '',
+                ]"
+              >
                 <div class="paper-header">
                   <h4>{{ paper.title }}</h4>
+                  <div
+                    v-show="paper.reference_parse_status === 'ERROR_PARSE'"
+                    class="delTips animate__animated animate__bounce infinite-bounce"
+                  >
+                    该文献解析失败, 请手动删除!
+                    <i class="el-icon-caret-right"></i>
+                  </div>
                   <el-button
                     type="danger"
                     size="mini"
@@ -1161,6 +1181,15 @@ hr {
   padding: 20px;
   padding-top: 0px;
 }
+.errorPaper {
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+.primaryPaper {
+  background: rgb(64, 158, 255, 0.1) !important;
+}
+.successPaper {
+  background: rgb(103, 194, 58, 0.1) !important;
+}
 .g_border {
   border-bottom: 1px solid #ccc;
   margin: 10px 0;
@@ -1222,7 +1251,7 @@ hr {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -1231,9 +1260,23 @@ hr {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   margin-bottom: 8px;
 }
+.delTips {
+  position: absolute;
+  right: 28px;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  top: 2px;
+  background: #fff;
+  padding: 4px;
+  border-radius: 3px;
+  font-weight: bold;
 
+  color: #f56c6c;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
 .paper-body {
   margin-bottom: 8px;
   color: #666;

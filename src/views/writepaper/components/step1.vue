@@ -61,6 +61,13 @@
           >
             大纲生成失败, 请点击重试...
           </el-link>
+          <p
+            style="font-size: 14px; margin-top: 10px; width: 300px; color: #333"
+          >
+            由于部分参考文献不符合规范，万象学术模型无法学习，请返回
+            <span class="red">文献列表处替换或删除</span
+            >有问题的文献后重新生成大纲！
+          </p>
         </div>
       </div>
       <div class="newProgressRight">
@@ -94,6 +101,7 @@ export default {
       descri: "1201 艺术学理论类",
       intervalId: null,
       currentIndex: 0,
+      error_message: "",
       textArr: ["分析题目", "检索文献", "AI创作", "规划章节", "生成大纲."],
     };
   },
@@ -127,7 +135,9 @@ export default {
         this.outlineVersion ? this.outlineVersion : "v1"
       );
     },
-    errLine() {
+    errLine(res) {
+      console.log("errLine11111111111", res.error_message);
+      // this.error_message = res.error_message;
       clearInterval(this.intervalId); // 达到目标数字时清除定时器
       this.errLineStatus = false;
     },

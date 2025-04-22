@@ -23,6 +23,7 @@ import VueClipboard from "vue-clipboard2";
 // import globalModal from "./components/GlobalModal.vue";
 import globalDialog from "./components/globalDialog.vue";
 import progressonly from "./components/progressonly.vue";
+import "animate.css";
 
 import MingBtn from "./components/MingBtn.vue";
 // 注册全局组件

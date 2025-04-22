@@ -162,20 +162,20 @@ export default {
     downLine,
   },
   mounted() {
-    this.$message({
-      showClose: true,
-      center: true,
-      duration: 6000,
-      type: "warning",
-      dangerouslyUseHTMLString: true,
-      message: `
-            <p style="text-align: center;">
-            近期算力紧张，用户访问骤增，大纲和正文有失败情况，请重试。
-          </p>
-    <p style="text-align: center;margin-top: 10px">如果生成大纲或者正文失败，重试不成功，请及时联系客服解决！给大家带来的不便，敬请谅解。</p>
+    // this.$message({
+    //   showClose: true,
+    //   center: true,
+    //   duration: 6000,
+    //   type: "warning",
+    //   dangerouslyUseHTMLString: true,
+    //   message: `
+    //         <p style="text-align: center;">
+    //         近期算力紧张，用户访问骤增，大纲和正文有失败情况，请重试。
+    //       </p>
+    // <p style="text-align: center;margin-top: 10px">如果生成大纲或者正文失败，重试不成功，请及时联系客服解决！给大家带来的不便，敬请谅解。</p>
 
-            `,
-    });
+    //         `,
+    // });
     //     `
     //         <p style="text-align: center;">
     //         近期算力紧张，给大家带来的不变，敬请谅解。
