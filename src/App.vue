@@ -13,7 +13,7 @@
       <p>
         预计维护时间为
         <b class="red"> 4 </b>
-        小时。
+        小时。 <b>2024-04-23 22:00 恢复网站</b>
       </p>
       <!-- <p>爆肝修复中, 请稍等,或联系客服</p> -->
       <p>给您带来的不便，我们深表歉意，感谢您的理解与支持！</p>
@@ -29,7 +29,7 @@
         <div class="contentP">
           <img
             style="width: 100%; height: 100%"
-            src="./assets/images/bg/1v1img.png"
+            src="./assets/images/bg/1v1img.jpg"
             alt=""
           />
         </div>
