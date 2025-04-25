@@ -224,7 +224,9 @@ export default {
       sms(data)
         .then((res) => {
           this.sendCodeStatus = false;
-
+          window.zhuge.track("发送验证码", {
+            phone: this.phoneNum,
+          });
           this.index++;
           this.codeTimeStatus = true;
           this.secondsLeft = 60; // 重置倒计时为60秒

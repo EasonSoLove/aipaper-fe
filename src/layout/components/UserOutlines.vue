@@ -72,7 +72,7 @@
                     </el-button>
                   </template>
                 </div>
-                <div>
+                <!-- <div >
                   <el-button
                     @click="clickShowDia(orderObj)"
                     icon="el-icon-edit"
@@ -81,7 +81,7 @@
                   >
                     根据此大纲继续生成正文,任务书等
                   </el-button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>

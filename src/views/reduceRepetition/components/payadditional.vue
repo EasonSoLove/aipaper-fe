@@ -106,7 +106,9 @@
           <p class="cardIntroTitle">
             {{ requestForm.title }}
           </p>
-          <p class="cardPrice">总价: <span>38元</span></p>
+          <p class="cardPrice">
+            总价: <span> {{ homeData.predict_price }} 元</span>
+          </p>
           <div class="cardChildList">
             <p>
               {{ requestForm.type }}
@@ -148,6 +150,11 @@
               <img src="@/assets/images/step/icon_24_qy.png" alt="" />
 
               文件综述不支持预览
+            </p>
+            <p>
+              <img src="@/assets/images/step/icon_24_qy.png" alt="" />
+
+              <span class="red"> 预览版暂不支持退费! </span>
             </p>
           </div>
         </div>
@@ -613,27 +620,6 @@ export default {
     margin-right: 8px;
     width: 24px;
     height: 24px;
-  }
-}
-.introList {
-  margin-top: 20px;
-  line-height: 20px;
-  color: #1b2126;
-  font-size: 14px;
-  font-face: PingFangSC;
-  font-weight: 400;
-  text-align: left;
-}
-
-.priceIntro {
-  color: #0066ff;
-  font-size: 14px;
-  width: 120px;
-  font-weight: 400;
-  text-align: left;
-  text-decoration: underline;
-  &:hover {
-    cursor: pointer;
   }
 }
 </style>

@@ -20,13 +20,16 @@
         </p>
         <p>
           点击
-          <span> 【<i class="el-icon-edit-outline"></i>插入图表】 </span>
+          <span> 【<i class="el-icon-edit-outline"></i>增删图表】 </span>
           可以在对应的章节中加入不同的内容，包含公式、数据表、图表、代码
         </p>
         <p>
-          请在所有的编辑都完成后，如果有不想写具体描述而留空的部分，可以点击一次
-          <span> 【<i class="el-icon-circle-plus-outline"></i>AI帮写】 </span>
-          ，注意这个会有等待时间。
+          模型在创作大纲过程中会自动为部分章节加入公式、数据表、图表、代码，如果您不需要，可以点击<span>【增删图表】</span>，<span>手动取消勾选</span>您不想要的公式、数据表、图表、代码。
+        </p>
+        <p>
+          在所有的编辑完成后，如果有章节内容留空、插图描述留空的地方，<span>务必点击</span>一次
+          <span> 【AI帮写】 ，【AI帮写】</span>
+          ，需要重写部分内容，请您耐心等待！
         </p>
       </div>
       <div class="jumpBtn">
@@ -43,6 +46,12 @@
             >【重新生成按钮<i class="el-icon-refresh"></i>】</span
           >
         </p>
+      </div>
+    </div>
+    <div class="tipBox">
+      <p class="tipTitle">Tips 3:</p>
+      <div class="tipCon">
+        <p><span>网站暂不支持三级目录</span>，该功能正在努力升级中...</p>
       </div>
     </div>
   </div>

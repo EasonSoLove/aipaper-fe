@@ -348,3 +348,24 @@ li {
 // ::v-deep .el-checkbox.is-bordered.el-checkbox--medium {
 //   height: 60px;
 // }
+.introList {
+  margin-top: 20px;
+  line-height: 20px;
+  color: #1b2126;
+  font-size: 18px;
+  font-face: PingFangSC;
+  font-weight: 400;
+  text-align: left;
+}
+.priceIntro {
+  color: #0066ff;
+  font-size: 18px !important;
+  width: 160px !important;
+  font-weight: 400;
+  text-align: left;
+  margin-top: 3px;
+  text-decoration: underline;
+  &:hover {
+    cursor: pointer;
+  }
+}

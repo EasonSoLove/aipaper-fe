@@ -63,78 +63,198 @@
     <div
       :class="['uesrInputBox', outlineVersion == 'v2' ? 'tabMainActive' : '']"
     >
-      <!-- 科目与题目 -->
-      <div class="selectLang formItem">
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="不支持无意义题目, 题目控制在60字以内"
-          placement="top"
-        >
-          <p class="formItemLabel">科目与题目</p>
-        </el-tooltip>
-        <div class="formItemCon phoneFlex">
-          <el-cascader
-            placeholder="请选择科目"
-            v-model="requestForm.field"
-            :options="homeData.subject_list"
-            :props="carProp"
-            @change="handleChange"
+      <!-- 论文基础信息 -->
+      <div class="outlineBasic">
+        <div
+          class="outlineBasicDia"
+          v-if="produceLineStatus || formdataV2.status == '生成成功'"
+          @click="showMessage"
+        ></div>
+        <!-- 科目与题目 -->
+        <div class="selectLang formItem">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="不支持无意义题目, 题目控制在60字以内"
+            placement="top"
           >
-          </el-cascader>
-          <div class="userInputCon">
-            <!-- <el-input
+            <p class="formItemLabel">科目与题目</p>
+          </el-tooltip>
+          <div class="formItemCon phoneFlex">
+            <el-cascader
+              placeholder="请选择科目"
+              v-model="requestForm.field"
+              :options="homeData.subject_list"
+              :props="carProp"
+              @change="handleChange"
+            >
+            </el-cascader>
+            <div class="userInputCon">
+              <!-- <el-input
               v-model="requestForm.title"
               maxlength="60"
               show-word-limit
               placeholder="请输入完整题目，题目越完整大纲越准确"
             ></el-input> -->
-            <TitleInput
-              v-model="requestForm.title"
-              :requestForm="requestForm"
-            ></TitleInput>
+              <TitleInput
+                v-model="requestForm.title"
+                :requestForm="requestForm"
+              ></TitleInput>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        :class="[
-          'firstItem',
-          'secondItem',
-          device == 'mobile' ? 'mobilebox' : '',
-        ]"
-      >
-        <!-- 论文语言 -->
-        <div class="selectLang formItem">
-          <p class="formItemLabel">论文语言</p>
-          <div class="formItemCon langBox">
-            <el-select v-model="requestForm.language" placeholder="请选择">
-              <el-option
-                v-for="item in homeData.language_list"
-                :key="item.value"
-                :label="item.language"
-                :value="item.value"
+        <div
+          :class="[
+            'firstItem',
+            'secondItem',
+            device == 'mobile' ? 'mobilebox' : '',
+          ]"
+        >
+          <!-- 论文语言 -->
+          <div class="selectLang formItem">
+            <p class="formItemLabel">论文语言</p>
+            <div class="formItemCon langBox">
+              <el-select v-model="requestForm.language" placeholder="请选择">
+                <el-option
+                  v-for="item in homeData.language_list"
+                  :key="item.value"
+                  :label="item.language"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+          <!-- 论文类型 -->
+          <div class="selectLang formItem leftType">
+            <p class="formItemLabel">学业类型</p>
+            <div class="formItemCon">
+              <el-radio-group
+                @change="paperTypeChange"
+                v-model="requestForm.type"
               >
-              </el-option>
-            </el-select>
+                <el-radio
+                  class="radioSmall"
+                  v-for="item in homeData.category_list"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.name"
+                >
+                  <el-tooltip class="item" effect="dark" placement="top">
+                    <template slot="content">
+                      <p style="width: 200px; line-height: 20px">
+                        {{ typeTips[item.name] }}
+                      </p>
+                    </template>
+                    <div class="labelBox">
+                      <div class="left">
+                        <img
+                          v-if="requestForm.type == item.name"
+                          class="home-icon"
+                          src="@/assets/images/index/icon_24_xylx_selected@2x.png"
+                          alt=""
+                        />
+                        <img
+                          v-else
+                          class="home-icon"
+                          src="@/assets/images/bank-dark.png"
+                          alt=""
+                        />
+                        {{ item.name }}
+                        <span v-show="item.description"
+                          >({{ item.description }})</span
+                        >
+                      </div>
+                      <div class="rightIcon">
+                        <img
+                          src="@/assets/images/index/icon_option_selected@2x.png"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </el-tooltip>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </div>
+          <!-- 论文水平 -->
+          <div class="selectLang formItem leftType">
+            <p class="formItemLabel">论文水平</p>
+            <div class="formItemCon">
+              <el-radio-group v-model="requestForm.paper_level">
+                <el-radio
+                  class="radioSmall"
+                  v-for="item in paper_levelList"
+                  :key="item.name"
+                  :label="item.value"
+                  :value="item.value"
+                >
+                  <el-tooltip
+                    class="item custom-tooltip"
+                    effect="dark"
+                    placement="top"
+                  >
+                    <template slot="content">
+                      <p style="width: 200px; line-height: 20px">
+                        {{ item.description }}
+                      </p>
+                    </template>
+                    <div class="labelBox">
+                      <div class="left">
+                        <img
+                          v-if="requestForm.paper_level == item.value"
+                          class="home-icon"
+                          src="@/assets/images/index/icon_24_lwsp_selected.png"
+                          alt=""
+                        />
+                        <img
+                          v-else
+                          class="home-icon"
+                          src="@/assets/images/index/icon_24_lwsp_default@2x.png"
+                          alt=""
+                        />
+                        <span style="margin-left: 10px">
+                          {{ item.name }}
+                        </span>
+                        <!-- <span v-show="item.description"></span> -->
+                      </div>
+                      <div class="rightIcon">
+                        <img
+                          src="@/assets/images/index/icon_option_selected@2x.png"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </el-tooltip>
+                </el-radio>
+              </el-radio-group>
+            </div>
           </div>
         </div>
         <!-- 论文类型 -->
-        <div class="selectLang formItem leftType">
-          <p class="formItemLabel">学业类型</p>
-          <div class="formItemCon">
-            <el-radio-group
-              @change="paperTypeChange"
-              v-model="requestForm.type"
-            >
-              <el-radio
-                class="radioSmall"
-                v-for="item in homeData.category_list"
-                :key="item.name"
-                :label="item.name"
-                :value="item.name"
+        <div
+          :class="[
+            'firstItem',
+            'secondItem',
+            device == 'mobile' ? 'mobilebox' : '',
+          ]"
+        >
+          <div class="selectLang formItem">
+            <p class="formItemLabel">论文类型</p>
+            <div class="formItemCon">
+              <el-radio-group
+                @change="requestProductChange"
+                v-model="requestForm.product"
               >
-                <el-tooltip class="item" effect="dark" placement="top">
+                <el-radio
+                  class="onlyCyc"
+                  v-for="item in homeData.category_product_list"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.name"
+                >
+                  <!-- <el-tooltip class="item" effect="dark" placement="top"> -->
                   <template slot="content">
                     <p style="width: 200px; line-height: 20px">
                       {{ typeTips[item.name] }}
@@ -142,8 +262,12 @@
                   </template>
                   <div class="labelBox">
                     <div class="left">
+                      <!-- <svg class="icon svg-icon" aria-hidden="true">
+                    <use xlink:href="#icon-tubiaozoushitu"></use>
+                  </svg> -->
+
                       <img
-                        v-if="requestForm.type == item.name"
+                        v-if="requestForm.product == item.name"
                         class="home-icon"
                         src="@/assets/images/index/icon_24_xylx_selected@2x.png"
                         alt=""
@@ -159,171 +283,56 @@
                         >({{ item.description }})</span
                       >
                     </div>
-                    <div class="rightIcon">
-                      <img
-                        src="@/assets/images/index/icon_option_selected@2x.png"
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                </el-tooltip>
-              </el-radio>
-            </el-radio-group>
-          </div>
-        </div>
-        <!-- 论文水平 -->
-        <div class="selectLang formItem leftType">
-          <p class="formItemLabel">论文水平</p>
-          <div class="formItemCon">
-            <el-radio-group v-model="requestForm.paper_level">
-              <el-radio
-                class="radioSmall"
-                v-for="item in paper_levelList"
-                :key="item.name"
-                :label="item.value"
-                :value="item.value"
-              >
-                <el-tooltip
-                  class="item custom-tooltip"
-                  effect="dark"
-                  placement="top"
-                >
-                  <template slot="content">
-                    <p style="width: 200px; line-height: 20px">
-                      {{ item.description }}
-                    </p>
-                  </template>
-                  <div class="labelBox">
-                    <div class="left">
-                      <img
-                        v-if="requestForm.paper_level == item.value"
-                        class="home-icon"
-                        src="@/assets/images/index/icon_24_lwsp_selected.png"
-                        alt=""
-                      />
-                      <img
-                        v-else
-                        class="home-icon"
-                        src="@/assets/images/index/icon_24_lwsp_default@2x.png"
-                        alt=""
-                      />
-                      <span style="margin-left: 10px">
-                        {{ item.name }}
-                      </span>
-                      <!-- <span v-show="item.description"></span> -->
-                    </div>
-                    <div class="rightIcon">
-                      <img
-                        src="@/assets/images/index/icon_option_selected@2x.png"
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                </el-tooltip>
-              </el-radio>
-            </el-radio-group>
-          </div>
-        </div>
-      </div>
-      <!-- 论文类型 -->
-      <div
-        :class="[
-          'firstItem',
-          'secondItem',
-          device == 'mobile' ? 'mobilebox' : '',
-        ]"
-      >
-        <div class="selectLang formItem">
-          <p class="formItemLabel">论文类型</p>
-          <div class="formItemCon">
-            <el-radio-group
-              @change="requestProductChange"
-              v-model="requestForm.product"
-            >
-              <el-radio
-                class="onlyCyc"
-                v-for="item in homeData.category_product_list"
-                :key="item.name"
-                :label="item.name"
-                :value="item.name"
-              >
-                <!-- <el-tooltip class="item" effect="dark" placement="top"> -->
-                <template slot="content">
-                  <p style="width: 200px; line-height: 20px">
-                    {{ typeTips[item.name] }}
-                  </p>
-                </template>
-                <div class="labelBox">
-                  <div class="left">
-                    <!-- <svg class="icon svg-icon" aria-hidden="true">
-                    <use xlink:href="#icon-tubiaozoushitu"></use>
-                  </svg> -->
-
-                    <img
+                    <div
                       v-if="requestForm.product == item.name"
-                      class="home-icon"
-                      src="@/assets/images/index/icon_24_xylx_selected@2x.png"
-                      alt=""
-                    />
-                    <img
-                      v-else
-                      class="home-icon"
-                      src="@/assets/images/bank-dark.png"
-                      alt=""
-                    />
-                    {{ item.name }}
-                    <span v-show="item.description"
-                      >({{ item.description }})</span
+                      class="rightIcon2"
                     >
+                      <img
+                        src="@/assets/images/index/radios_checked@2x.png"
+                        alt=""
+                      />
+                    </div>
                   </div>
-                  <div
-                    v-if="requestForm.product == item.name"
-                    class="rightIcon2"
-                  >
-                    <img
-                      src="@/assets/images/index/radios_checked@2x.png"
-                      alt=""
-                    />
-                  </div>
-                </div>
-                <!-- </el-tooltip> -->
-              </el-radio>
-            </el-radio-group>
+                  <!-- </el-tooltip> -->
+                </el-radio>
+              </el-radio-group>
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        :class="[
-          'firstItem',
-          'secondItem',
-          device == 'mobile' ? 'mobilebox' : '',
-        ]"
-      >
-        <!-- 论文字数 -->
         <div
-          v-if="
-            !(
-              requestForm.product == '开题报告' ||
-              requestForm.product == '任务书'
-            )
-          "
-          class="selectLang formItem firstItem"
+          :class="[
+            'firstItem',
+            'secondItem',
+            device == 'mobile' ? 'mobilebox' : '',
+          ]"
         >
-          <p class="formItemLabel">
-            论文字数
-            <span class="introSpanOutline">
-              字数供参考，可能存在误差，属于正常情况。
-            </span>
-          </p>
-          <div class="formItemCon wordItem">
-            <el-slider
-              v-model="requestForm.word_count"
-              :min="minCount"
-              :max="maxCount"
-              :marks="marks"
-              :step="1000"
-            >
-            </el-slider>
+          <!-- 论文字数 -->
+          <div
+            v-if="
+              !(
+                requestForm.product == '开题报告' ||
+                requestForm.product == '任务书'
+              )
+            "
+            class="selectLang formItem firstItem"
+          >
+            <p class="formItemLabel">
+              论文字数
+              <span class="introSpanOutline">
+                字数供参考，可能存在误差，属于正常情况。
+              </span>
+            </p>
+            <div class="formItemCon wordItem">
+              <el-slider
+                :disabled="produceLineStatus || formdataV2.status == '生成成功'"
+                v-model="requestForm.word_count"
+                :min="minCount"
+                :max="maxCount"
+                :marks="marks"
+                :step="1000"
+              >
+              </el-slider>
+            </div>
           </div>
         </div>
       </div>
@@ -352,14 +361,17 @@
           <p class="formItemLabel">
             投喂信息
             <span style="font-size: 14px"
-              >（可以提供 开题报告， 设计思路等各种参考内容）</span
+              >（可以提供开题报告， 设计思路等参考内容）</span
             >
           </p>
           <div class="formItemCon">
             <el-input
               type="textarea"
               :autosize="{ minRows: 6, maxRows: 10 }"
-              placeholder="可投喂信息： 开题报告， 设计思路等内容"
+              placeholder="1. 可投喂开题报告、设计思路等，模型会根据您的投喂内容，在思考和推理过程中进行参考
+2. 投喂的所有内容仅在创作大纲阶段使用，暂不支持三级目录
+3. 投喂文献内容请使用“本地上传”功能上传您的参考文献，此处投喂并不会在初稿创作过程中引用
+4. 模型暂不具备联网功能，针对部分投喂无法获取最新数据，敬请谅解"
               v-model="requestForm.extra_requirements"
             >
             </el-input>
@@ -406,6 +418,124 @@
     </div>
     <advantage ref="advantageDia"></advantage>
     <example ref="exampleDia"></example>
+
+    <el-dialog
+      title="请确认您的大纲信息, 是否继续生成?"
+      :visible.sync="lineDetailStatus"
+      width="50%"
+      :before-close="handleClose"
+    >
+      <p style="margin-bottom: 10px; margin-top: -10px" class="red">
+        请确认您的科目、专业、论文类型、论文字数等信息填写无误，否则会影响大纲及初稿的创作质量！
+      </p>
+      <div style="margin-top: 0px">
+        <el-descriptions class="margin-top" :column="2" border>
+          {{ formdataV2 }}
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-user"></i>
+              科目与题目
+            </template>
+            {{ formdataV2.field }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-mobile-phone"></i>
+              论文语言
+            </template>
+            {{ formdataV2.language }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-location-outline"></i>
+              学业类型
+            </template>
+            {{ formdataV2.type }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-tickets"></i>
+              论文水平
+            </template>
+            {{ formdataV2.paper_level == 0 ? "初级" : "高级" }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-tickets"></i>
+              论文类型
+            </template>
+            {{ formdataV2.product }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-tickets"></i>
+              论文字数
+            </template>
+            {{ formdataV2.word_count }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template slot="label">
+              <i class="el-icon-office-building"></i>
+              论文题目
+            </template>
+            {{ formdataV2.title }}
+          </el-descriptions-item>
+        </el-descriptions>
+        <div>
+          <p
+            style="
+              font-size: 16px;
+              margin-top: 20px;
+              color: #222;
+              font-weight: bold;
+            "
+          >
+            您勾选的参考文献
+          </p>
+          <p style="font-size: 12px; margin-bottom: 10px; line-height: 16px">
+            请仔细检查所勾选文献与您专业和论文题目的相关性，万象学术模型会进行参考文献相关性进行引用逐级生成大纲，<span
+              class="red"
+              >若相关性不大，可能不会引用！</span
+            >
+          </p>
+
+          <el-collapse accordion style="max-height: 400px; overflow-y: scroll">
+            <template
+              v-for="(item, index) in formdataV2.reference_paper_selected_lists"
+            >
+              <el-collapse-item
+                :key="index + 'paper'"
+                :title="item.title"
+                :name="index + 'p'"
+              >
+                <template slot="title">
+                  {{ item.title }}
+                  <span
+                    v-show="item.reference_parse_status === 'ERROR_PARSE'"
+                    class="delTips2 animate__animated animate__headShake infinite-bounce"
+                  >
+                    <i class="el-icon-caret-left"></i>
+                    该文献解析失败, 请在论文选择区,手动删除!
+                  </span>
+                </template>
+                <div class="firstItem">
+                  <el-tag> 作者: {{ item.authors.join(",") }}</el-tag>
+                  <el-tag> 类型: {{ item.database }} </el-tag>
+                  <el-tag> 日期: {{ item.date }} </el-tag>
+                  <el-tag> 来源: {{ item.source }} </el-tag>
+                </div>
+                <div style="margin-top: 10px">摘要: {{ item.abstract }}</div>
+              </el-collapse-item>
+            </template>
+          </el-collapse>
+        </div>
+        <p style="margin-top: 30px; font-weight: bold"></p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeConfirm">去修改</el-button>
+        <el-button type="primary" @click="confirmSend">继 续</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -442,6 +572,7 @@ export default {
 
         word_count: 5000,
       },
+      lineDetailStatus: false,
       OrderType: OrderType,
       // outlineActiveIndex: 2,
       carProp: {
@@ -579,6 +710,21 @@ export default {
     },
   },
   methods: {
+    showMessage() {
+      if (this.produceLineStatus) {
+        this.$message({
+          type: "warning",
+          message:
+            "当前大纲“生成中”，科目等信息无法修改，如需修改请刷新页面重新生成大纲!",
+        });
+      } else {
+        this.$message({
+          type: "warning",
+          message:
+            "当前大纲“生成成功”，科目等信息无法修改，如需修改请刷新页面重新生成大纲!",
+        });
+      }
+    },
     // 如果有key值, 用户切换页面 数据复现
     returnDataToForm(data) {
       // title: "",
@@ -673,6 +819,33 @@ export default {
       // });
       this.sendOutlineForm("v2");
     },
+    closeConfirm() {
+      this.lineDetailStatus = false;
+      this.$store.dispatch("app/setProStatus", false);
+    },
+    handleClose(done) {
+      this.$store.dispatch("app/setProStatus", false);
+
+      done();
+    },
+    confirmSend() {
+      this.lineDetailStatus = false;
+      let data = {
+        key: this.formdataV2.key || this.formdataV2.key1,
+        extra_requirements: this.requestForm.extra_requirements,
+      };
+      if (this.requestForm.extra_requirements) {
+        save_extra_requirements(data)
+          .then((res) => {
+            this.sendV2Fun();
+          })
+          .catch(() => {
+            this.$store.dispatch("app/setProStatus", false);
+          });
+      } else {
+        this.sendV2Fun();
+      }
+    },
     // 用户投喂保存
     saveExtraFun(vision) {
       console.log("已选择蚊香", this.formdataV2.reference_paper_selected_lists);
@@ -702,7 +875,9 @@ export default {
 
         return false;
       }
-
+      // TODO:
+      this.lineDetailStatus = true;
+      return false;
       this.$confirm(
         "请仔细检查所勾选文献与您专业和论文题目的相关性，万象学术模型会进行参考文献相关性进行引用逐级生成大纲，若相关性不大，可能不会引用！ 是否继续?",
         "温馨提示",
@@ -712,23 +887,7 @@ export default {
           type: "warning",
         }
       )
-        .then(() => {
-          let data = {
-            key: this.formdataV2.key || this.formdataV2.key1,
-            extra_requirements: this.requestForm.extra_requirements,
-          };
-          if (this.requestForm.extra_requirements) {
-            save_extra_requirements(data)
-              .then((res) => {
-                this.sendV2Fun();
-              })
-              .catch(() => {
-                this.$store.dispatch("app/setProStatus", false);
-              });
-          } else {
-            this.sendV2Fun();
-          }
-        })
+        .then(() => {})
         .catch(() => {
           this.$store.dispatch("app/setProStatus", false);
 
@@ -782,7 +941,7 @@ export default {
           // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
           polling({ key: this.requestKey }, 5000)
             .then((res) => {
-              this.$log("ddddd", res);
+              this.$log("dddddaaaaaaaaaa", res);
               if (res == "生成失败") {
                 eventBus.emit("errorOutline", res); // 发布事件
               } else {
@@ -795,7 +954,7 @@ export default {
                 type: "error",
                 message: "大纲生成失败, 请稍后重试",
               });
-              eventBus.emit("errorOutline"); // 发布事件
+              // eventBus.emit("errorOutline", error); // 发布事件
               this.$emit("errorBack", "关闭index");
             });
         })
@@ -885,7 +1044,7 @@ export default {
                     type: "error",
                     message: "大纲生成失败, 请稍后重试",
                   });
-                  eventBus.emit("errorOutline"); // 发布事件
+                  // eventBus.emit("errorOutline", error); // 发布事件
                   this.$emit("errorBack", "关闭index");
                 });
             })
@@ -1209,6 +1368,19 @@ label.el-radio.is-checked {
   justify-content: flex-start;
   margin-top: 30px;
 }
+
+.delTips2 {
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  background: #fff;
+  padding: 4px;
+  line-height: 16px;
+  margin-left: 10px;
+  border-radius: 3px;
+  font-weight: bold;
+  color: #f56c6c;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
 .firstItem {
   display: flex;
   align-items: flex-start;
@@ -1267,5 +1439,25 @@ label.el-radio.is-checked {
   top: 3px;
   margin-left: 8px;
   color: rgb(96, 98, 102);
+}
+.firstItem {
+  span {
+    margin-right: 10px;
+  }
+}
+
+.outlineBasic {
+  position: relative;
+}
+.outlineBasicDia {
+  position: absolute;
+  top: 0;
+  border-radius: 10px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
+  background: rgb(255, 255, 255, 0.7);
+  z-index: 1000;
 }
 </style>

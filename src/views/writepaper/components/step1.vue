@@ -7,13 +7,12 @@
       <p class="introTitle">编辑大纲，生成全文</p>
       <p class="introSubtitle">
         🔔
-        大纲可直接<span>点击编辑</span>，点击<span>AI帮写</span>可智能为项目查漏补缺。点击小节右侧<span>插入图表</span>，为小节增加<span>数据(表)、图、公式、代码段</span>，支持对章节,
+        大纲可直接<span>点击编辑</span>，点击<span>AI帮写</span>可智能为项目查漏补缺。点击小节右侧<span>增删图表</span>，为小节增加<span>数据(表)、图、公式、代码段</span>，支持对章节,
         小节进行<span>增加、删减</span>
       </p>
     </div>
 
-    <!-- 论文标题
-        -->
+    <!-- 论文标题 -->
     <p class="oulineTitlePaper"><span>题目: </span>{{ requestForm.title }}</p>
     <p class="outlineTitleDesc">
       <span>科目: </span
@@ -28,7 +27,6 @@
     <div class="newProgressBox">
       <div class="ProGressLEft">
         <!-- 页面名称 -->
-
         <div v-if="errLineStatus" class="progressBox">
           <div class="pgBoxEl">
             <el-progress
@@ -60,8 +58,16 @@
             @click="reloadOutline"
             style="font-size: 16px"
             icon="el-icon-refresh"
-            >大纲生成失败, 请点击重试...</el-link
           >
+            大纲生成失败, 请点击重试...
+          </el-link>
+          <p
+            style="font-size: 14px; margin-top: 10px; width: 300px; color: #333"
+          >
+            由于部分参考文献不符合规范，万象学术模型无法学习，请返回
+            <span class="red">文献列表处替换或删除</span
+            >有问题的文献后重新生成大纲！
+          </p>
         </div>
       </div>
       <div class="newProgressRight">
@@ -95,6 +101,7 @@ export default {
       descri: "1201 艺术学理论类",
       intervalId: null,
       currentIndex: 0,
+      error_message: "",
       textArr: ["分析题目", "检索文献", "AI创作", "规划章节", "生成大纲."],
     };
   },
@@ -128,7 +135,9 @@ export default {
         this.outlineVersion ? this.outlineVersion : "v1"
       );
     },
-    errLine() {
+    errLine(res) {
+      console.log("errLine11111111111", res.error_message);
+      // this.error_message = res.error_message;
       clearInterval(this.intervalId); // 达到目标数字时清除定时器
       this.errLineStatus = false;
     },

@@ -5,7 +5,7 @@
         class="buttonStep1"
         type="primary"
         :disabled="!!formdataV2.key1"
-        @click="getkeyWords"
+        @click="beforeGetKeyWords"
         round
         style="width: 50%"
       >
@@ -296,7 +296,7 @@
           <h3
             style="
               position: absolute;
-              top: 52px;
+              top: 55px;
               left: 20px;
               background-color: #fff;
               display: flex;
@@ -309,7 +309,9 @@
             <p>
               已选择的参考文献
 
-              <span style="font-size: 12px">(选择的参考文献会在正文引用)</span>
+              <span style="font-size: 12px"
+                >(我们保证根据文献的相关性进行引用，但无法保证所有文献被100%引用，敬请谅解！)</span
+              >
             </p>
             <p v-if="selectedPapers && selectedPapers.length > 0">
               <b style="color: #409eff; margin-left: 5px">
@@ -326,11 +328,31 @@
               >清空文献</el-button
             >
           </h3>
-          <div class="scrollBox">
+          <div class="scrollBox" style="padding-top: 24px">
             <div v-for="(paper, index) in selectedPapers" :key="index">
-              <div class="paper-card">
+              <div
+                :class="[
+                  'paper-card',
+                  paper.reference_parse_status === 'ERROR_PARSE'
+                    ? 'errorPaper'
+                    : '',
+                  paper.reference_parse_status === 'NO_PARSE'
+                    ? 'primaryPaper'
+                    : '',
+                  paper.reference_parse_status === 'SUCCESS_PARSE'
+                    ? 'successPaper'
+                    : '',
+                ]"
+              >
                 <div class="paper-header">
                   <h4>{{ paper.title }}</h4>
+                  <div
+                    v-show="paper.reference_parse_status === 'ERROR_PARSE'"
+                    class="delTips animate__animated animate__bounce infinite-bounce"
+                  >
+                    该文献解析失败, 请手动删除!
+                    <i class="el-icon-caret-right"></i>
+                  </div>
                   <el-button
                     type="danger"
                     size="mini"
@@ -368,9 +390,46 @@
         </div>
       </div>
       <!-- 上传文件 -->
-      <el-dialog title="上传文件" :visible.sync="dialogVisible" width="50%">
+      <el-dialog title="上传文件" :visible.sync="dialogVisible" width="60%">
         <div>
           <div v-loading="uploading" class="upload-section">
+            <div>
+              <div class="el-upload__tip" slot="tip">
+                <p style="margin-top: 8px; font-size: 14px" class="red">
+                  Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。
+                </p>
+                <p style="margin-top: 8px; font-size: 14px">
+                  <b> 命名格式：</b>
+                  文献来源-文献作者-文献发表年份-文献标题.pdf
+                </p>
+                <div style="margin-top: 8px; font-size: 14px">
+                  <p style="margin-top: 8px; font-size: 14px">
+                    <b> 中文文献格式参考：</b>
+                    <em style="color: #409eff">
+                      XX科技大学-王天亮-2017-H5在游戏开发领域的应用研究.pdf
+                    </em>
+                  </p>
+                  <p style="margin-top: 8px; font-size: 14px">
+                    <b> 英文文献格式参考：</b>
+                    <em style="color: #409eff">
+                      Temple University-Tianliang Wang-2018-Research on the
+                      Application of H5.pdf
+                    </em>
+                  </p>
+                  <p style="margin-top: 8px; font-size: 14px">
+                    <b> 多作者格式参考：</b>
+                    <em style="color: #409eff">
+                      XX科技大学-王天亮&石磊-2017-H5在游戏开发领域的应用研究.pdf
+                    </em>
+                  </p>
+                </div>
+                <P style="margin-top: 8px; font-size: 14px">
+                  <em style="color: #f56c6c"
+                    >备注：请勿上传图片过多或页码超过100页的文献！
+                  </em>
+                </P>
+              </div>
+            </div>
             <div class="upload-box">
               <el-upload
                 class="upload-demo1"
@@ -388,39 +447,6 @@
                     只能上传 <em>PDF文件</em>，且不超过 <em>10M</em>
                   </p>
                   <p style="font-size: 12px"></p>
-                </div>
-                <div class="el-upload__tip" slot="tip">
-                  <p style="margin-top: 8px; font-size: 14px">
-                    Tips：请按照指定的格式进行命名，命名有误会影响正文中的引文格式。
-                  </p>
-                  <div style="margin-top: 8px; font-size: 14px">
-                    文献来源-文献作者-发表年份-文献标题.pdf，
-                    <p style="margin-top: 8px; font-size: 14px">
-                      例如:
-                      <em style="color: #409eff">
-                        XX科技大学-王某某-2017-H5在游戏开发领域的应用研究.pdf
-                      </em>
-                    </p>
-                    <p style="margin-top: 8px; font-size: 14px">
-                      英文文献:
-                      <em style="color: #409eff">
-                        Journal-Author&CoAuthor-2020-Research in Game
-                        Development.pdf
-                      </em>
-                    </p>
-                  </div>
-                  <p style="margin-top: 8px; font-size: 14px">
-                    多作者格式: 如
-                    <em style="color: #409eff">
-                      XX期刊-王某某&李某某&张某某-2018-H5在游戏开发领域的应用研究.pdf
-                    </em>
-                  </p>
-                  <P style="margin-top: 8px; font-size: 14px">
-                    论文生成生成时,需引入您上传的论文作为参考文献, 如您论文
-                    <em style="color: #f56c6c"
-                      >命名格式不符合上述要求, 无法上传!</em
-                    >
-                  </P>
                 </div>
               </el-upload>
             </div>
@@ -730,8 +756,7 @@ export default {
       this.$set(paper, "isExpanded", !paper.isExpanded);
       Ming(paper.isExpanded, "收齐切换2222");
     },
-
-    getkeyWords() {
+    beforeGetKeyWords() {
       if (!this.parentForm.title) {
         this.$message({
           type: "warning",
@@ -739,6 +764,27 @@ export default {
         });
         return false;
       }
+      this.$confirm(
+        "请确认您的 <span style='color: #d75300;'>科目、专业、论文类型、论文字数</span>等信息填写无误，否则会影响大纲及初稿的创作质量！ <br/>是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+          dangerouslyUseHTMLString: true, // 确保启用 HTML 支持
+        }
+      )
+        .then(() => {
+          this.getkeyWords();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "请再检查您所选的参数!",
+          });
+        });
+    },
+    getkeyWords() {
       this.loading = true;
       let data = {
         title: this.parentForm.title,
@@ -1135,6 +1181,15 @@ hr {
   padding: 20px;
   padding-top: 0px;
 }
+.errorPaper {
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+.primaryPaper {
+  background: rgb(64, 158, 255, 0.1) !important;
+}
+.successPaper {
+  background: rgb(103, 194, 58, 0.1) !important;
+}
 .g_border {
   border-bottom: 1px solid #ccc;
   margin: 10px 0;
@@ -1196,7 +1251,7 @@ hr {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -1205,9 +1260,23 @@ hr {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   margin-bottom: 8px;
 }
+.delTips {
+  position: absolute;
+  right: 28px;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+  top: 2px;
+  background: #fff;
+  padding: 4px;
+  border-radius: 3px;
+  font-weight: bold;
 
+  color: #f56c6c;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
 .paper-body {
   margin-bottom: 8px;
   color: #666;
@@ -1240,6 +1309,12 @@ hr {
   }
 }
 .dateP {
+  margin-left: 20px;
+}
+.upload-section {
+  display: flex;
+}
+.upload-box {
   margin-left: 20px;
 }
 </style>
