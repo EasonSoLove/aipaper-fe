@@ -47,11 +47,7 @@
         <p class="bottomTitle">产品服务</p>
         <ul class="bottomLink">
           <li>
-            <a
-              href="http://wepu.kelisida.cn/?Q:hclickid=f56b1cedf9728afc"
-              target="_blank"
-              >维普</a
-            >
+            <a href="http://www.cqvap.com/" target="_blank">维普</a>
           </li>
           <li>
             <a href="https://www.wanfangdata.com.cn/index.html" target="_blank"
