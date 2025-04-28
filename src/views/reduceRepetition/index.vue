@@ -28,6 +28,15 @@
           </p>
         </div>
       </div>
+      <div class="outRight">
+        <p>
+          剩余使用次数：<b>{{ remaining_nums }}</b
+          >次
+        </p>
+        <div class="getMore" @click="showBuyDialog">
+          次数不足？限时购买更优惠
+        </div>
+      </div>
     </div>
     <template v-if="activeIndex == 1">
       <div
@@ -121,6 +130,23 @@
       />
     </template>
     <reducepay :requestKey="requestKey" :payStatus="popupStatus"></reducepay>
+    <el-dialog
+      title="购买降重套餐"
+      :visible.sync="dialogVisible"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <div class="content">
+        <p>限时购买优惠套餐</p>
+        <div class="packages">
+          <div class="package"></div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitBuyInfo">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -162,6 +188,9 @@ export default {
       ],
       original_paragraph: "",
       user_content: "",
+      remaining_nums: "", // 剩余使用次数
+      dialogVisible: false,
+      reduce_aigc_packages: [], // 降重套餐
     };
   },
   computed: {},
@@ -179,7 +208,8 @@ export default {
   methods: {
     getReTimes() {
       remaining_times().then((res) => {
-        console.log("dddf", res);
+        console.log("剩余次数:", res);
+        this.remaining_nums = res.result.remaining_nums;
       });
     },
     showPaperDialog(data) {
@@ -193,6 +223,44 @@ export default {
     showPayDialog(data) {
       this.requestKey = data.requestKey;
       this.popupStatus = Date.now();
+    },
+    showBuyDialog() {
+      // 购买套餐弹窗
+      // getReduceAIGCPackages().then()
+      let reduce_aigc_packages = [
+        {
+          index: "1",
+          package_product_id: "52",
+          description: "5元10次，单次仅需0.5元",
+          price: 5,
+          original_price: 8,
+          rights_num: 10,
+          gift_rights_num: 0,
+        },
+        {
+          index: "2",
+          package_product_id: "53",
+          description: "14元30次，单次仅需0.46元",
+          price: 14,
+          original_price: 24,
+          rights_num: 30,
+          gift_rights_num: 0,
+        },
+        {
+          index: "3",
+          package_product_id: "54",
+          description: "20元50次，单次仅需0.4元",
+          price: 20,
+          original_price: 40,
+          rights_num: 50,
+          gift_rights_num: 0,
+        },
+      ];
+      console.log("套餐内容:", reduce_aigc_packages);
+      this.dialogVisible = true;
+    },
+    submitBuyInfo() {
+      console.log("提交购买套餐信息");
     },
     onCopy() {
       this.$message({
@@ -316,6 +384,7 @@ export default {
     }
   }
 }
+
 .reduceBtn {
   width: auto;
   height: 44px;
@@ -362,7 +431,48 @@ export default {
     display: flex;
     align-items: center;
   }
-
+  .outRight {
+    display: flex;
+    b {
+      font-size: 1.5em;
+      color: rgba(206, 33, 33, 0.726);
+      margin-right: 5px;
+    }
+    .getMore {
+      cursor: pointer;
+      font-size: 1.1em;
+      font-style: italic;
+      background: #833ab4;
+      background: linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+      line-height: 2em;
+      padding: 0 25px;
+      padding-right: 5px;
+      color: #fff;
+      margin: 0 15px;
+      position: relative;
+      &::before {
+        position: absolute;
+        left: -13px;
+        top: 0;
+        content: "";
+        display: inline-block;
+        width: 2em;
+        height: 2em;
+        background: #fff;
+        transform: rotate(45deg);
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -16px; /* 箭头距离右边的距离 */
+        transform: translateY(-50%); /* 垂直居中 */
+        border-top: 13px solid transparent; /* 上边透明 */
+        border-bottom: 13px solid transparent; /* 下边透明 */
+        border-left: 16px solid #fcb045; /* 左边白色形成箭头 */
+      }
+    }
+  }
   .outLeftTitle {
     font-family: PingFangSC, PingFang SC;
     font-weight: 500;
@@ -395,18 +505,23 @@ export default {
     }
   }
 }
+
 .contentTitle {
   margin-bottom: 10px;
 }
+
 .edit-1 {
   font-size: bold;
 }
+
 ::v-deep .el-loading-spinner .el-loading-text {
   font-size: 14px !important;
 }
+
 ::v-deep .el-upload {
   width: 100%;
 }
+
 ::v-deep .el-upload-dragger {
   height: 240px;
   width: 100%;
