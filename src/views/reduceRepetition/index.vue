@@ -127,6 +127,7 @@
 <script>
 import swiperOne from "@/views/writepaper/components/swiperOne.vue";
 import { editReduce } from "@/api/user";
+import { remaining_times } from "@/api/wallet";
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import eventBus from "@/utils/eventBus";
@@ -172,7 +173,15 @@ export default {
     eventBus.off("showEmitPaypopup", this.showPayDialog); // 订阅事件
     eventBus.off("showEmitReduceDialog", this.showPaperDialog); // 订阅事件
   },
+  mounted() {
+    this.getReTimes();
+  },
   methods: {
+    getReTimes() {
+      remaining_times().then((res) => {
+        console.log("dddf", res);
+      });
+    },
     showPaperDialog(data) {
       this.requestKey = data.requestKey;
       this.payStatusPro = new Date().getTime();

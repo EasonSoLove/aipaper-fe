@@ -15,6 +15,12 @@ export function find_user_balance() {
     method: "get",
   });
 }
+export function remaining_times() {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/remaining_times",
+    method: "get",
+  });
+}
 // 钱包明细列表
 export function find_recharge_details(params) {
   return request({
