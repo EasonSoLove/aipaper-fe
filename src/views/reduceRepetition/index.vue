@@ -442,35 +442,12 @@ export default {
       cursor: pointer;
       font-size: 1.1em;
       font-style: italic;
-      background: #833ab4;
-      background: linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+      background-image: url(../../assets/images/arrow_bg.png);
+      background-size: 100% 100%;
       line-height: 2em;
-      padding: 0 25px;
-      padding-right: 5px;
+      padding: 0 20px;
       color: #fff;
-      margin: 0 15px;
-      position: relative;
-      &::before {
-        position: absolute;
-        left: -13px;
-        top: 0;
-        content: "";
-        display: inline-block;
-        width: 2em;
-        height: 2em;
-        background: #fff;
-        transform: rotate(45deg);
-      }
-      &::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: -16px; /* 箭头距离右边的距离 */
-        transform: translateY(-50%); /* 垂直居中 */
-        border-top: 13px solid transparent; /* 上边透明 */
-        border-bottom: 13px solid transparent; /* 下边透明 */
-        border-left: 16px solid #fcb045; /* 左边白色形成箭头 */
-      }
+      margin: 0 10px;
     }
   }
   .outLeftTitle {
