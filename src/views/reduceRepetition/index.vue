@@ -160,7 +160,7 @@
       :payStatus="popupStatus"
     ></reducepay>
     <el-dialog
-      title="购买降重套餐"
+      title="购买套餐"
       :visible.sync="dialogVisible"
       width="600px"
       :close-on-click-modal="false"
