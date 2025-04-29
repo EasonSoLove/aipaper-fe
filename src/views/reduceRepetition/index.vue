@@ -17,7 +17,7 @@
           降AIGC率-人工版
           <span class="underLeft"></span>
         </p>
-        <div style="position: relative; top: 10px">
+        <!-- <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
           <p style="color: #606266">推荐字数: 300-400字效果最佳</p>
           <p style="color: #606266; margin-top: 3px">
@@ -26,15 +26,19 @@
           <p style="color: #606266; margin-top: 3px">
             保证降重后的AIGC率 <b class="red">20%</b> 以下
           </p>
-        </div>
+        </div> -->
       </div>
-      <div class="outRight">
-        <p>
-          剩余使用次数：<b>{{ remaining_nums }}</b
-          >次
-        </p>
-        <div class="getMore" @click="showBuyDialog">
-          次数不足？限时购买更优惠
+      <div class="card">
+        <div class="header">
+          <span>可用次数：</span>
+          <span class="count">{{ remaining_nums }}次</span>
+        </div>
+        <hr class="divider" />
+        <div class="content">
+          <p>限时优惠，千字低至 <span class="count">0.8</span>元</p>
+          <button @click="showBuyDialog" class="recharge-button">
+            点我补充次数
+          </button>
         </div>
       </div>
     </div>
@@ -50,7 +54,11 @@
             <el-input
               type="textarea"
               :rows="20"
-              :placeholder="placeText[activeIndex - 1]"
+              placeholder="1、采用独家算法 + 学术模型进行降AIGC，可通过知网、维普、格子达三家平台的AIGC检测，保证降完之后的AIGC率低于20%；
+2、单次降AIGC率输入限制500字符，为保证最好的降AIGC效果，单次推荐输入300-400字符；
+3、降AIGC可能会导致前后字符数有差异，属于正常现象；
+4、如有大量文本需要降AIGC，请联系人工客服进行处理。由于人工介入，因此收费会有所不同
+5、仅支持中文， 其他语言正在陆续支持中"
               maxlength="500"
               show-word-limit
               v-model="original_paragraph"
@@ -173,7 +181,7 @@
               :key="item.index"
               :class="[
                 'package-item',
-                { active: selectedPackage.index === item.index },
+                { active: selectedPackage.index == item.index },
               ]"
               @click="selectPackage(item)"
             >
@@ -208,6 +216,7 @@ import { remaining_times, recharge_package, reduce_aigc } from "@/api/wallet";
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import eventBus from "@/utils/eventBus";
+import { getToken, setToken } from "@/utils/auth"; // get token from cookie
 
 export default {
   name: "reduceRepetition",
@@ -244,7 +253,7 @@ export default {
       dialogVisible: false,
       reduce_aigc_packages: [], // 降重套餐
       selectedPackage: {
-        index: 1,
+        index: 3,
       },
     };
   },
@@ -259,6 +268,18 @@ export default {
   },
   mounted() {
     this.getReTimes();
+
+    // if()
+    let hasToken = getToken();
+    console.log("hasToken", hasToken);
+    if (!sessionStorage.getItem("hasSeenPopup")) {
+      // 如果没有标记，则显示弹窗
+      if (hasToken) {
+        this.showBuyDialog();
+        sessionStorage.setItem("hasSeenPopup", "true");
+      }
+      // 弹窗显示后，设置标记
+    }
   },
   methods: {
     selectPackage(item) {
@@ -325,6 +346,11 @@ export default {
       });
     },
     reduceSend() {
+      // 判断次数是否够用
+      if (this.remaining_nums < 1) {
+        this.showBuyDialog();
+        return false;
+      }
       zhuge.track(`用户点击降重按钮`, {});
       let formData = new FormData();
       formData.append("contents", this.original_paragraph);
@@ -525,25 +551,7 @@ export default {
     display: flex;
     align-items: center;
   }
-  .outRight {
-    display: flex;
-    b {
-      font-size: 1.5em;
-      color: rgba(206, 33, 33, 0.726);
-      margin-right: 5px;
-    }
-    .getMore {
-      cursor: pointer;
-      font-size: 1.1em;
-      font-style: italic;
-      background-image: url(../../assets/images/arrow_bg.png);
-      background-size: 100% 100%;
-      line-height: 2em;
-      padding: 0 20px;
-      color: #fff;
-      margin: 0 10px;
-    }
-  }
+
   .outLeftTitle {
     font-family: PingFangSC, PingFang SC;
     font-weight: 500;
@@ -597,5 +605,58 @@ export default {
   height: 240px;
   width: 100%;
   padding-top: 40px;
+}
+
+.card {
+  width: 260px;
+  height: 110px;
+  background: linear-gradient(to right, #6400ff, #00bfff);
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.count {
+  font-weight: bold;
+  font-size: 16px;
+  color: rgb(255, 236, 75);
+}
+
+.divider {
+  border: none;
+  border-top: 1px dashed white;
+  margin: 5px 0;
+}
+
+.content {
+  text-align: center;
+  font-size: 14px;
+}
+
+.recharge-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #ff6347;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.recharge-button:hover {
+  background-color: #ff4500;
 }
 </style>

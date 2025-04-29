@@ -125,7 +125,7 @@
                 >
                   郑重承诺:
                   <span style="font-weight: bold; color: red">
-                    保证降低至30%以内，超出必定退款!!!
+                    保证降低至20%以内，超出必定退款!!!
                   </span>
                 </p>
                 <div class="markBox">
