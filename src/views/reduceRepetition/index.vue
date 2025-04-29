@@ -231,7 +231,7 @@ export default {
       sendStatus: false,
       activeIndex: 1,
       placeText: [
-        "请输入文章段落，待降AIGC率均可，每次最多300字",
+        "请输入文章段落，待降AIGC率均可，每次最多500字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
       ],
       reduceText: [
@@ -333,6 +333,8 @@ export default {
         .then((res) => {
           this.sendStatus = false;
           this.textareaOut = res.result.result_contents;
+
+          this.getReTimes();
         })
         .catch((err) => {
           this.sendStatus = false;
