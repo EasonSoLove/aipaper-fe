@@ -105,6 +105,13 @@ export function balance_pay(data) {
     data,
   });
 }
+export function recharge(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/recharge",
+    method: "post",
+    data,
+  });
+}
 export function outlineCreate(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/outline/create",

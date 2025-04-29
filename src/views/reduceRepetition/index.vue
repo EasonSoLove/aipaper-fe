@@ -7,24 +7,24 @@
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
-          普通版-降AIGC率(知网版)
+          降AIGC率-万象版
           <span class="underLeft"></span>
         </p>
-        <!-- <p
+        <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
         >
-          万象版-降AIGC率(知网版)
+          降AIGC率-人工版
           <span class="underLeft"></span>
-        </p> -->
+        </p>
         <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
-          <p style="color: #606266">本站使用万象大模型实现降低AIGC率</p>
+          <p style="color: #606266">推荐字数: 300-400字效果最佳</p>
           <p style="color: #606266; margin-top: 3px">
-            AIGC降重工具升级为高级推理模型, 推理时间略有延长,请您耐心等待!
+            降重可能会导致 <b class="red">字数有差异</b>
           </p>
           <p style="color: #606266; margin-top: 3px">
-            保证知网的AIGC率 <b class="red">30%</b> 以下
+            保证降重后的AIGC率 <b class="red">20%</b> 以下
           </p>
         </div>
       </div>
@@ -51,7 +51,7 @@
               type="textarea"
               :rows="20"
               :placeholder="placeText[activeIndex - 1]"
-              maxlength="300"
+              maxlength="500"
               show-word-limit
               v-model="original_paragraph"
               resize="false"
@@ -116,20 +116,41 @@
           </el-input>
         </div> -->
       </div>
-
       <div v-loading="sendStatus" @click="reduceSend" class="reduceBtn g_poin">
         <p>开始生成</p>
       </div>
     </template>
     <template v-if="activeIndex == 2">
-      <filereduce></filereduce>
-      <progressonly
+      <div
+        style="
+          display: flex;
+          background-color: #fff;
+          flex-direction: column;
+          padding-bottom: 20px;
+          align-items: center;
+        "
+      >
+        <p style="margin-top: 20px; margin-bottom: 10px; font-size: 16px">
+          联系客服,进行人工降重
+        </p>
+        <div style="width: 400px">
+          <el-image :src="useImg"></el-image>
+        </div>
+      </div>
+
+      <!-- <filereduce></filereduce> -->
+
+      <!-- <progressonly
         :requestKey="requestKey"
         :payStatus="payStatusPro"
         :paperPercent="paperPercent"
-      />
+      /> -->
     </template>
-    <reducepay :requestKey="requestKey" :payStatus="popupStatus"></reducepay>
+    <reducepay
+      :requestKey="requestKey"
+      :selectedPackage="selectedPackage"
+      :payStatus="popupStatus"
+    ></reducepay>
     <el-dialog
       title="购买降重套餐"
       :visible.sync="dialogVisible"
@@ -137,14 +158,44 @@
       :close-on-click-modal="false"
     >
       <div class="content">
-        <p>限时购买优惠套餐</p>
         <div class="packages">
-          <div class="package"></div>
+          <p>
+            当前剩余次数: <b class="red">{{ remaining_nums }}</b
+            >次
+          </p>
+
+          <p style="margin-top: 20px">限时购买优惠套餐</p>
+
+          <!-- <div class="package"></div> -->
+          <div class="package-container">
+            <div
+              v-for="item in reduce_aigc_packages"
+              :key="item.index"
+              :class="[
+                'package-item',
+                { active: selectedPackage.index === item.index },
+              ]"
+              @click="selectPackage(item)"
+            >
+              <div class="price">¥{{ item.price }}</div>
+              <div class="original-price">¥{{ item.original_price }}</div>
+              <div class="description">
+                {{ item.description }}
+              </div>
+            </div>
+          </div>
+
+          <div class="tipspack">
+            <p style="color: rgb(46, 47, 46)">购买次数越多,价格越优惠!</p>
+            <p style="color: rgb(168, 173, 179); margin-top: 5px">
+              支付后,次数立即到账,如有权益未到账,请联系客服处理
+            </p>
+          </div>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitBuyInfo">确 定</el-button>
+        <el-button type="primary" @click="submitBuyInfo">去支付</el-button>
       </span>
     </el-dialog>
   </div>
@@ -152,8 +203,8 @@
 
 <script>
 import swiperOne from "@/views/writepaper/components/swiperOne.vue";
-import { editReduce } from "@/api/user";
-import { remaining_times } from "@/api/wallet";
+import { editReduce, recharge } from "@/api/user";
+import { remaining_times, recharge_package, reduce_aigc } from "@/api/wallet";
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import eventBus from "@/utils/eventBus";
@@ -171,6 +222,7 @@ export default {
       requestKey: "", //out_trade_no
       payStatusPro: 0,
       paperPercent: 0,
+      useImg: require("@/assets/images/bg/AIGC_kefu.png"),
 
       logo: require("@/assets/images/logo_paper.png"),
       drawer: false,
@@ -191,6 +243,9 @@ export default {
       remaining_nums: "", // 剩余使用次数
       dialogVisible: false,
       reduce_aigc_packages: [], // 降重套餐
+      selectedPackage: {
+        index: 1,
+      },
     };
   },
   computed: {},
@@ -206,6 +261,10 @@ export default {
     this.getReTimes();
   },
   methods: {
+    selectPackage(item) {
+      this.selectedPackage = item;
+      console.log("Selected package:", item);
+    },
     getReTimes() {
       remaining_times().then((res) => {
         console.log("剩余次数:", res);
@@ -213,54 +272,45 @@ export default {
       });
     },
     showPaperDialog(data) {
-      this.requestKey = data.requestKey;
-      this.payStatusPro = new Date().getTime();
-      this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
-      if (data.paperPercent && data.paperPercent > 0) {
-        this.paperPercent = data.paperPercent;
-      }
+      this.dialogVisible = false;
+      this.getReTimes();
+      // this.requestKey = data.requestKey;
+      // this.payStatusPro = new Date().getTime();
+      // this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
+      // if (data.paperPercent && data.paperPercent > 0) {
+      //   this.paperPercent = data.paperPercent;
+      // }
     },
-    showPayDialog(data) {
-      this.requestKey = data.requestKey;
-      this.popupStatus = Date.now();
+    submitBuyInfo(item) {
+      let data = {
+        index: this.selectedPackage.index,
+        payment_method: "alipay",
+      };
+      recharge(data)
+        .then((res) => {
+          let order = {
+            out_trade_no: res.result.out_trade_no,
+            pay_amount: res.result.pay_amount,
+            pay_link: res.result.pay_link,
+            original_price: res.result.original_amount,
+            order_type: res.result.order_type,
+            is_discount: res.result.is_discount,
+            discounted_price: res.result.discounted_price,
+          };
+          this.$store.dispatch("app/toggleCurrentOrder", order);
+          this.requestKey = res.result.out_trade_no;
+          this.popupStatus = Date.now();
+        })
+        .catch((error) => {});
     },
     showBuyDialog() {
       // 购买套餐弹窗
-      // getReduceAIGCPackages().then()
-      let reduce_aigc_packages = [
-        {
-          index: "1",
-          package_product_id: "52",
-          description: "5元10次，单次仅需0.5元",
-          price: 5,
-          original_price: 8,
-          rights_num: 10,
-          gift_rights_num: 0,
-        },
-        {
-          index: "2",
-          package_product_id: "53",
-          description: "14元30次，单次仅需0.46元",
-          price: 14,
-          original_price: 24,
-          rights_num: 30,
-          gift_rights_num: 0,
-        },
-        {
-          index: "3",
-          package_product_id: "54",
-          description: "20元50次，单次仅需0.4元",
-          price: 20,
-          original_price: 40,
-          rights_num: 50,
-          gift_rights_num: 0,
-        },
-      ];
-      console.log("套餐内容:", reduce_aigc_packages);
+      recharge_package().then((res) => {
+        this.reduce_aigc_packages = res.result.reduce_aigc_packages;
+        console.log("eee", res, this.reduce_aigc_packages);
+      });
+
       this.dialogVisible = true;
-    },
-    submitBuyInfo() {
-      console.log("提交购买套餐信息");
     },
     onCopy() {
       this.$message({
@@ -276,15 +326,17 @@ export default {
     },
     reduceSend() {
       zhuge.track(`用户点击降重按钮`, {});
-      let data = {
-        original_paragraph: this.original_paragraph,
-        // user_content: this.user_content,
-      };
+      let formData = new FormData();
+      formData.append("contents", this.original_paragraph);
       this.sendStatus = true;
-      editReduce(data).then((res) => {
-        this.sendStatus = false;
-        this.textareaOut = res.result.reduce_paragraph;
-      });
+      reduce_aigc(formData)
+        .then((res) => {
+          this.sendStatus = false;
+          this.textareaOut = res.result.result_contents;
+        })
+        .catch((err) => {
+          this.sendStatus = false;
+        });
     },
     checkoutPaper(val) {
       this.activeIndex = val;
@@ -295,7 +347,47 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/styles/variables.scss";
+.package-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 16px;
+}
+.tipspack {
+  background-color: rgba(243, 246, 247);
+  padding: 10px;
+  font-size: 12px;
+}
+.package-item {
+  border: 1px solid #ccc;
+  padding: 16px;
+  text-align: center;
+  width: 140px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+}
 
+.package-item.active {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5);
+}
+
+.price {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.original-price {
+  font-size: 14px;
+  text-decoration: line-through;
+  color: #888;
+}
+
+.description {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
 .reduceRepetiton {
   position: relative;
   border-top: 1px solid transparent;

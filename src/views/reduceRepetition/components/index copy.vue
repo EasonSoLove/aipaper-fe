@@ -70,7 +70,32 @@
                   <!-- <el-tab-pane label="消息中心">消息中心</el-tab-pane> -->
                 </el-tabs>
               </div>
+              <!-- 优惠卷 -->
+              <div
+                v-show="
+                  currentOrder.order_type !== 'OUTLINE_DOWNLOAD' &&
+                  currentOrder.order_type !== 'EXTRA_PROPOSAL' &&
+                  currentOrder.order_type !== 'EXTRA_TASK_ASSIGNMENT' &&
+                  currentOrder.order_type !== 'EXTRA_SURVEY' &&
+                  currentOrder.order_type !== 'EXTRA_JOURNAL_REVIEWED' &&
+                  currentOrder.order_type !== 'REDUCE_AIGC' &&
+                  currentOrder.is_discount == 1
+                "
+                class="newJuan"
+                style="margin-top: 10px; margin-bottom: 10px"
+              >
+                <!-- <span>优惠卷: </span> -->
 
+                <!-- <input
+                  type="text"
+                  placeholder="请输入优惠卷编号"
+                  v-model="coupon_code"
+                  @blur="useCoupon"
+                /> -->
+                <!-- <el-button size="mini" type="primary" plain
+                  >兑换</el-button
+                > -->
+              </div>
               <!-- 价格展示 -->
               <div class="newPriceBox">
                 <p>
@@ -96,28 +121,20 @@
               <p style="margin-bottom: 20px">降AIGC付款:</p>
 
               <p style="color: #606266">
-                套餐原价:
-                <span style="color: #409eff; text-decoration: line-through">{{
-                  this.selectedPackage.original_price
-                }}</span>
-              </p>
-              <p style="margin: 10px 0; color: #606266">
-                支付价格:
-                <span
-                  style="color: #f56c6c; font-size: 18px; font-weight: bold"
-                  >{{ this.selectedPackage.price }}</span
+                千字单价:
+                <span style="color: #409eff; text-decoration: line-through"
+                  >10元/1000字</span
                 >
               </p>
               <p style="margin: 10px 0; color: #606266">
-                获取查重次数:
-                <span
-                  style="color: #f56c6c; font-size: 18px; font-weight: bold"
-                  >{{ this.selectedPackage.rights_num }}</span
+                限时优惠:
+                <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
+                  >3元/1000字(不满千字按千字计算)</span
                 >
               </p>
 
               <div class="cardChildList">
-                <p>{{ this.selectedPackage.description }}</p>
+                <p>总字数: {{ currentOrder.word_count }}</p>
               </div>
               <div style="margin-top: 230px; position: relative">
                 <p
@@ -151,7 +168,12 @@
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
 import eventBus from "@/utils/eventBus";
-import { getOrder, orderDetailById, ordersRepay, recharge } from "@/api/user";
+import {
+  getOrder,
+  orderDetailById,
+  ordersRepay,
+  balance_pay,
+} from "@/api/user";
 import { mapGetters } from "vuex";
 import OrderType from "@/utils/orderTypes";
 
@@ -196,10 +218,6 @@ export default {
     },
     timeData: {
       type: String,
-      require: false,
-    },
-    selectedPackage: {
-      type: Object,
       require: false,
     },
   },
@@ -310,11 +328,11 @@ export default {
       // 停止上一次循环
       this.$store.dispatch("paper/setPollingStatus", false);
       let data = {
-        index: this.selectedPackage.index,
+        out_trade_no: this.currentOrder.out_trade_no,
         payment_method: "alipay",
+        coupon_code: this.coupon_code,
       };
-      console.log("弹窗内部 ", this.selectedPackage);
-      recharge(data)
+      balance_pay(data)
         .then((res) => {
           this.resetForm();
 
@@ -325,6 +343,7 @@ export default {
             pay_link: res.result.pay_link,
             original_price: res.result.original_amount,
             order_type: res.result.order_type,
+            is_discount: res.result.is_discount,
             discounted_price: res.result.discounted_price,
           };
           this.$store.dispatch("app/toggleCurrentOrder", order);
@@ -400,12 +419,25 @@ export default {
       this.$store.dispatch("paper/setPollingStatus", false);
       // 重新生成订单
       let data = {
-        index: this.selectedPackage.index,
-
         payment_method: "alipay", // 支付方式
+        pay_type: this.activeName,
+        key: this.currentOrder.key,
+        items: this.currentOrder.items,
+        coupon_code: this.coupon_code,
+        product: this.currentOrder.product, // 大纲的key
+        type: this.currentOrder.type, // 大纲的key
+        word_count: this.currentOrder.word_count, // 大纲的key
       };
-
-      recharge(data)
+      if (data.pay_type == "PAY_STAGES") {
+        data.items = [
+          {
+            product_id: "1", //正文id
+            quantity: 1, // 数量
+            price: 149.85, //价格
+          },
+        ];
+      }
+      getOrder(data)
         .then((res) => {
           this.resetForm();
           let order = {
@@ -416,6 +448,9 @@ export default {
             original_price: res.result.original_amount,
             pay_type: data.pay_type,
             payment_method: data.payment_method,
+            key: data.key,
+            items: data.items,
+            is_discount: res.result.is_discount,
             discounted_price: res.result.discounted_price,
           };
           this.$store.dispatch("app/toggleCurrentOrder", order);
@@ -577,10 +612,7 @@ export default {
         类目: "查重付费",
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
-      this.$message({
-        type: "success",
-        message: "支付成功,您的次数已到账,请查收!",
-      });
+
       eventBus.emit("showEmitReduceDialog", {
         requestKey: this.currentOrder.out_trade_no,
         payStatus: 2,

@@ -3,7 +3,14 @@ let baseUrl = process.env.VUE_APP_BASE_API;
 
 export function recharge(data) {
   return request({
-    url: baseUrl + "api/ai-paper/wallet/recharge",
+    url: baseUrl + "/api/ai-paper/wallet/recharge",
+    method: "post",
+    data,
+  });
+}
+export function reduce_aigc(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/reduce_aigc",
     method: "post",
     data,
   });
@@ -25,6 +32,13 @@ export function remaining_times() {
 export function find_recharge_details(params) {
   return request({
     url: baseUrl + "/api/ai-paper/wallet/find_recharge_details",
+    method: "get",
+    params,
+  });
+}
+export function recharge_package(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/recharge_package",
     method: "get",
     params,
   });
