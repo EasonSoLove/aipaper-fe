@@ -139,7 +139,7 @@
         "
       >
         <p style="margin-top: 20px; margin-bottom: 10px; font-size: 16px">
-          联系客服,进行人工降重
+          联系客服,进行人工降重/降AIGC
         </p>
         <div style="width: 400px">
           <el-image :src="useImg"></el-image>
@@ -165,15 +165,15 @@
       width="600px"
       :close-on-click-modal="false"
     >
-      <div class="content">
+      <div class="contentBox">
         <div class="packages">
           <p>
             当前剩余次数: <b class="red">{{ remaining_nums }}</b
             >次
           </p>
-
-          <p style="margin-top: 20px">限时购买优惠套餐</p>
-
+          <p style="margin-top: 20px; font-size: 1.5em; color: #333">
+            限时购买优惠套餐
+          </p>
           <!-- <div class="package"></div> -->
           <div class="package-container">
             <div
@@ -190,6 +190,7 @@
               <div class="description">
                 {{ item.description }}
               </div>
+              <div class="pop" v-if="item.index === '3'">巨划算~</div>
             </div>
           </div>
 
@@ -392,14 +393,31 @@ export default {
   width: 140px;
   border-radius: 5px;
   cursor: pointer;
+  border-color: rgba(255, 160, 122, 1);
+  box-shadow: 0 2px 8px rgba(255, 160, 122, 0.4);
   transition: box-shadow 0.3s;
+  position: relative;
+  .pop {
+    font-size: 12px;
+    width: 4.5em;
+    height: 2em;
+    line-height: 2em;
+    border-radius: 5px;
+    background: linear-gradient(to right, #6400ff, #004cff);
+    color: #fff;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    transform: translate(50%, -50%);
+    padding-left: 3px;
+  }
 }
 
-.package-item.active {
+.package-item.active,
+.package-item:hover {
   border-color: #007bff;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5);
 }
-
 .price {
   font-size: 20px;
   font-weight: bold;
@@ -544,6 +562,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
+  padding-right: 0px;
   margin-top: 16px;
   margin-bottom: 16px;
 
@@ -600,6 +619,9 @@ export default {
 ::v-deep .el-upload {
   width: 100%;
 }
+::v-deep .el-dialog {
+  // background: linear-gradient(to right, #fff6d9, #fff9e7);
+}
 
 ::v-deep .el-upload-dragger {
   height: 240px;
@@ -609,7 +631,6 @@ export default {
 
 .card {
   width: 260px;
-  height: 110px;
   background: linear-gradient(to right, #6400ff, #00bfff);
   border-radius: 10px;
   color: white;
@@ -617,7 +638,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 15px;
+  padding: 8px 10px;
   box-sizing: border-box;
 }
 
@@ -643,9 +664,13 @@ export default {
   text-align: center;
   font-size: 14px;
 }
-
+.contentBox {
+  text-align: center;
+  font-size: 14px;
+  margin-top: -40px;
+}
 .recharge-button {
-  margin-top: 10px;
+  margin-top: 5px;
   padding: 5px 10px;
   background-color: #ff6347;
   border: none;
