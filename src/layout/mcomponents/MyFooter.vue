@@ -47,7 +47,7 @@
         <p class="bottomTitle">产品服务</p>
         <ul class="bottomLink">
           <li>
-            <a href="http://www.cqvap.com/" target="_blank">维普</a>
+            <a href="https://www.cqvip.com/" target="_blank">维普</a>
           </li>
           <li>
             <a href="https://www.wanfangdata.com.cn/index.html" target="_blank"
