@@ -60,7 +60,7 @@
         </div>
       </div>
       <!-- 风投轮播 -->
-      <div class="carouselBox" v-if="showContent">
+      <div class="carouselBox">
         <div class="carouselCon">
           <el-carousel
             height="44px"
@@ -68,19 +68,32 @@
             indicator-position="none"
             :autoplay="true"
           >
-            <el-carousel-item v-for="item in 3" :key="item">
+            <!-- <el-carousel-item v-for="item in 3" :key="item">
               <p class="homeSwiper">
                 <img
                   src="@/assets/images/index/home_nav_banner_02.png"
                   alt=""
                 />
               </p>
+            </el-carousel-item> -->
+            <el-carousel-item v-for="item in 3" :key="item">
+              <div class="giftBox hidden-xs-only">
+                <img src="../../assets/images/bg/giftbox.png" alt="" />
+                <div style="text-align: center">
+                  <p>新功能<b>"降aigc率"</b>上线了！</p>
+                  <p>
+                    通过"降aigc率"功能，保证知网，维普，格子达的aigc率不超过<b>
+                      20% </b
+                    >，<b>超必退</b> ！
+                  </p>
+                </div>
+              </div>
             </el-carousel-item>
           </el-carousel>
         </div>
       </div>
       <!-- 礼包 -->
-      <div v-if="!showContent" class="giftBox hidden-xs-only">
+      <!-- <div v-if="!showContent" class="giftBox hidden-xs-only">
         <img src="../../assets/images/bg/giftbox.png" alt="" />
 
         <p>
@@ -88,7 +101,7 @@
             20% </b
           >，<b>超必退</b> ！
         </p>
-      </div>
+      </div> -->
 
       <!-- 礼包结束 -->
       <div :class="[showContent ? '' : 'leftNavbarPosition']">
@@ -1004,7 +1017,7 @@ export default {
   justify-content: center;
   background-color: #f7f7f7;
   .carouselCon {
-    width: 280px;
+    width: 580px;
   }
 }
 .homeSwiper {
