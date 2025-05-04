@@ -80,10 +80,15 @@
         </div>
       </div>
       <!-- 礼包 -->
-      <!-- <div v-if="!showContent" class="giftBox hidden-xs-only">
+      <div v-if="!showContent" class="giftBox hidden-xs-only">
         <img src="../../assets/images/bg/giftbox.png" alt="" />
-        <p>降AIGC率上线了! 知网AIGC率<b> 30% 以下</b>，<b>超必退</b> ！</p>
-      </div> -->
+
+        <p>
+          降AIGC率上线了! 全网效果最佳！知网，维普，格子达aigc率不超过<b>
+            20% </b
+          >，<b>超必退</b> ！
+        </p>
+      </div>
 
       <!-- 礼包结束 -->
       <div :class="[showContent ? '' : 'leftNavbarPosition']">
