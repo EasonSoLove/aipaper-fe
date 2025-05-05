@@ -160,6 +160,7 @@ export const constantRoutes = [
           inDevelopment: false,
         },
       },
+      // 论文宝典
       {
         path: "explore",
         name: "explore",
@@ -167,6 +168,22 @@ export const constantRoutes = [
         meta: {
           keepAlive: true,
           title: "searchPaper",
+          // title: "搜论文",
+          icon: "el-icon-download",
+          describe: "我的脑袋里有十亿亿篇文献",
+          id: "5-2",
+          parentId: "5",
+          inDevelopment: false,
+        },
+      },
+      // 优惠卷
+      {
+        path: "redemption",
+        name: "redemption",
+        component: () => import("@/views/wallet/redemption"),
+        meta: {
+          keepAlive: true,
+          title: "redemption",
           // title: "搜论文",
           icon: "el-icon-download",
           describe: "我的脑袋里有十亿亿篇文献",

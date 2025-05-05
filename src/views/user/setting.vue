@@ -4,24 +4,40 @@
     <template>
       <!-- 搜索栏 -->
       <el-form inline :model="searchForm" class="demo-form-inline">
-        <el-form-item label="状态">
+        <el-form-item label="优惠卷类型">
           <el-select
-            v-model="searchForm.status"
-            @change="getList"
+            @change="pageList1"
+            v-model="searchForm.coupon_type"
             clearable
             placeholder="请选择状态"
           >
-            <el-option label="未使用" value="1"></el-option>
-            <el-option label="已使用" value="2"></el-option>
-            <el-option label="已过期" value="3"></el-option>
-            <el-option label="冻结" value="4"></el-option>
-            <el-option label="作废" value="5"></el-option>
+            <el-option
+              v-for="(item, index) in coupon_type_list"
+              :key="index + 'coupon_type'"
+              :label="item.coupon_description"
+              :value="item.coupon_type"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select
+            v-model="searchForm.status"
+            @change="pageList1"
+            clearable
+            placeholder="请选择状态"
+          >
+            <el-option
+              v-for="(item, index) in coupon_status_list"
+              :key="index + 'statuscou'"
+              :label="item.status_description"
+              :value="item.status"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="渠道">
           <el-select
             v-model="searchForm.channel"
-            @change="getList"
+            @change="pageList1"
             placeholder="请选择渠道"
           >
             <el-option
@@ -73,19 +89,42 @@
           prop="coupon_code"
           label="优惠券代码"
         ></el-table-column>
+        <el-table-column prop="discount_rate" label="类型" width="120">
+          <template slot-scope="scope">
+            {{ translateStatus(scope.row.type) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="discount_rate" label="折扣" width="80">
           <template slot-scope="scope">
             {{ scope.row.discount_rate * 10 }}折
           </template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="220">
+        <el-table-column prop="create_time" label="创建时间" width="200">
           <template slot-scope="scope">
             {{ scope.row.create_time | dateFormatter }}
           </template>
         </el-table-column>
-        <el-table-column prop="expire_time" label="过期时间" width="220">
+        <el-table-column
+          prop="expire_time"
+          v-if="searchForm.coupon_type != 3"
+          label="过期时间"
+          width="200"
+        >
           <template slot-scope="scope">
             {{ scope.row.expire_time | dateFormatter }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="rights_num"
+          v-if="!searchForm.coupon_type || searchForm.coupon_type == 3"
+          label="降AIGC次数"
+          width="200"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span style="font-size: 16px; font-weight: bold">
+              {{ scope.row.rights_num }}次
+            </span>
           </template>
         </el-table-column>
         <el-table-column
@@ -145,12 +184,15 @@ export default {
         status: "",
         channel: "",
         out_trade_no: "",
+        coupon_type: "",
         key: "",
         page_num: 1,
         page_size: 10,
       },
       addCouponDialogVisible: false,
       channels: [],
+      coupon_status_list: [],
+      coupon_type_list: [],
       tableData: [
         {
           id: 1,
@@ -178,10 +220,22 @@ export default {
   created() {
     this.getList();
     channels().then((res) => {
-      this.channels = res.result;
+      this.channels = res.result.coupon_channels;
+      this.coupon_status_list = res.result.coupon_status_list;
+      this.coupon_type_list = res.result.coupon_type_list;
     });
   },
   methods: {
+    translateStatus(status) {
+      const type = this.coupon_type_list.find(
+        (item) => item.coupon_type === status
+      );
+      return type ? type.coupon_description : "未知状态";
+    },
+    pageList1() {
+      this.searchForm.page_num = 1;
+      this.getList();
+    },
     getList() {
       let data = { ...this.searchForm };
       coupon_list(data).then((res) => {

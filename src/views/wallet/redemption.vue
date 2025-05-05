@@ -11,10 +11,10 @@
     <button @click="exchangeCodeRequest">立即兑换</button>
     <div class="warning">
       <h3>温馨提示：</h3>
-      <p>有兑换码的用户可以在此兑换。兑换码可以兑换成余额、卡券等虚拟商品。</p>
+      <p>有兑换码的用户可以在此兑换，兑换码目前支持兑换为降AIGC的可用次数。</p>
       <p>
         兑换流程：输入兑换码 → 点击“立即兑换” →
-        兑换成功，刷新页面查看余额或卡券等。
+        兑换成功，前往降AIGC页面右上角查看可用次数。
       </p>
       <p>兑换码一经兑换，概不退换，请确认无误后再操作。</p>
     </div>
@@ -48,6 +48,11 @@ export default {
       };
       exchange_coupon(data).then((res) => {
         console.log("res", res);
+        this.$message({
+          type: "success",
+          message: "优惠卷兑换成功!",
+        });
+        this.exchangeCode = "";
       });
     },
   },

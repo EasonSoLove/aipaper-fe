@@ -11,7 +11,26 @@
       ref="couponForm"
       :rules="rules"
     >
-      <el-form-item label="优惠折扣" prop="discount_rate">
+      <el-form-item label="优惠卷类型">
+        <el-select
+          @change="changeType"
+          v-model="couponForm.coupon_type"
+          clearable
+          placeholder="请选择状态"
+        >
+          <el-option
+            v-for="(item, index) in coupon_type_list"
+            :key="index + 'coupon_type'"
+            :label="item.coupon_description"
+            :value="item.coupon_type"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item
+        label="优惠折扣"
+        v-if="couponForm.coupon_type == 1"
+        prop="discount_rate"
+      >
         <el-select
           v-model="couponForm.discount_rate"
           placeholder="请选择优惠折扣"
@@ -24,7 +43,11 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="过期时间" prop="expire_time">
+      <el-form-item
+        label="过期时间"
+        v-if="couponForm.coupon_type != 3"
+        prop="expire_time"
+      >
         <el-date-picker
           v-model="couponForm.expire_time"
           type="datetime"
@@ -34,11 +57,24 @@
           :picker-options="datePickerOptions"
         ></el-date-picker>
       </el-form-item>
+
       <el-form-item label="优惠券数量" prop="create_counts">
         <el-input-number
           v-model="couponForm.create_counts"
           :min="1"
           :max="100"
+        ></el-input-number>
+      </el-form-item>
+
+      <el-form-item
+        label="降AIGC次数"
+        v-if="couponForm.coupon_type == 3"
+        prop="rights_num"
+      >
+        <el-input-number
+          v-model="couponForm.rights_num"
+          :min="1"
+          :max="1000"
         ></el-input-number>
       </el-form-item>
       <el-form-item label="渠道" prop="channel">
@@ -85,6 +121,8 @@ export default {
         expire_time: "",
         create_counts: 1,
         channel: "",
+        coupon_type: 1,
+        rights_num: "",
       },
       discountRates: [
         { label: "免费", value: 0 },
@@ -98,15 +136,8 @@ export default {
         { label: "八折", value: 0.8 },
         { label: "九折", value: 0.9 },
       ],
-      channels: [
-        { display_name: "淘宝", channel: "tb" },
-        { display_name: "B站", channel: "bili" },
-        { display_name: "抖音", channel: "dy" },
-        { display_name: "小红书", channel: "xhs" },
-        { display_name: "微商", channel: "wx1" },
-        { display_name: "微信视频号", channel: "wx2" },
-        { display_name: "其他", channel: "other" },
-      ],
+      channels: [],
+      coupon_type_list: [],
       rules: {
         discount_rate: [
           { required: true, message: "请选择优惠折扣", trigger: "change" },
@@ -131,10 +162,23 @@ export default {
     this.getList();
   },
   methods: {
+    changeType() {
+      if (this.couponForm.coupon_type == 3) {
+        this.couponForm.expire_time = "2099-12-31 23:59:59";
+      } else {
+        this.couponForm.expire_time = "";
+      }
+      if (this.couponForm.coupon_type == 1) {
+        this.couponForm.discount_rate = 0.9;
+      }
+
+      this.codeList = "";
+    },
     getList() {
       channels().then((res) => {
         Ming("res", res);
-        this.channels = res.result;
+        this.channels = res.result.coupon_channels;
+        this.coupon_type_list = res.result.coupon_type_list;
       });
     },
     handleClose() {
@@ -147,7 +191,7 @@ export default {
           batch_create(this.couponForm).then((res) => {
             this.$message.success("优惠券添加成功");
             Ming("优惠券添加成功", res.result);
-            this.codeList = res.result.join(",");
+            this.codeList = res.result;
             this.$emit("add-coupon");
           });
         } else {

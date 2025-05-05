@@ -46,7 +46,7 @@ export function recharge_package(params) {
 // 兑换码
 export function exchange_coupon(params) {
   return request({
-    url: baseUrl + "/api/ai-paper/wallet/exchange_coupon",
+    url: baseUrl + "/api/ai-paper/coupon/exchange_coupon",
     method: "get",
     params,
   });

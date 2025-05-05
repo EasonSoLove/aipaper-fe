@@ -10,6 +10,7 @@ export default {
     aiTools: "AiTools",
     chat: "AI Assistant",
     plagiarismCheck: "PlagiarismCheck",
+    redemption: "redemption",
     reduceRepetition: "ReduceRepetition",
     dashboard: "Dashboard",
     documentation: "Documentation",

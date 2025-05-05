@@ -1017,7 +1017,7 @@ export default {
   justify-content: center;
   background-color: #f7f7f7;
   .carouselCon {
-    width: 580px;
+    width: 550px;
   }
 }
 .homeSwiper {
