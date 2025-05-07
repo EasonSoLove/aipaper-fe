@@ -7,12 +7,26 @@
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
-          降AIGC率-万象版
+          降AIGC率-维普
           <span class="underLeft"></span>
         </p>
         <p
           @click="checkoutPaper(2)"
           :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
+        >
+          降AIGC率-知网
+          <span class="underLeft"></span>
+        </p>
+        <p
+          @click="checkoutPaper(3)"
+          :class="['outLeftTitle', activeIndex == 3 ? 'activeLT' : '']"
+        >
+          降AIGC率-格子达
+          <span class="underLeft"></span>
+        </p>
+        <p
+          @click="checkoutPaper(4)"
+          :class="['outLeftTitle', activeIndex == 4 ? 'activeLT' : '']"
         >
           降AIGC率-人工版
           <span class="underLeft"></span>
@@ -42,7 +56,7 @@
         </div>
       </div>
     </div>
-    <template v-if="activeIndex == 1">
+    <template v-if="activeIndex != 4">
       <div
         v-loading="sendStatus"
         element-loading-text="使用高级推理AI, 润色中..."
@@ -58,7 +72,8 @@
 2、单次降AIGC率输入限制500字符，为保证最好的降AIGC效果，单次推荐输入300-400字符；
 3、降AIGC可能会导致前后字符数有差异，属于正常现象；
 4、如有大量文本需要降AIGC，请联系人工客服进行处理。由于人工介入，因此收费会有所不同
-5、仅支持中文， 其他语言正在陆续支持中"
+5、仅支持中文， 其他语言正在陆续支持中
+6、下列两个按钮均可使用,无任何区别,如有失败,请尝试使用另一个按钮进行降重"
               maxlength="500"
               show-word-limit
               v-model="original_paragraph"
@@ -67,28 +82,12 @@
             >
             </el-input>
           </div>
-          <!-- <div class="edit-2 flex align-center">
-        <el-button type="primary" round>降低重复率
-          <span class="edTwoIcon">
-            <svg class="icon svg-icon" aria-hidden="true">
-              <use xlink:href="#icon-a-icondanxiangjiantou1"></use>
-            </svg>
-          </span>
-        </el-button>
-        <el-button type="primary" round>降低AIGC率
-          <span class="edTwoIcon">
-            <svg class="icon svg-icon" aria-hidden="true">
-              <use xlink:href="#icon-a-icondanxiangjiantou1"></use>
-            </svg>
-          </span>
-        </el-button>
-      </div> -->
           <div class="edit-3">
             <el-input
               type="textarea"
               :rows="20"
               readonly
-              :placeholder="reduceText[activeIndex - 1]"
+              placeholder="请在左侧输入待降AIGC率的文章段落，点击“降AIGC”按钮，稍等片刻，成品会显示在这里"
               maxlength="5000"
               show-word-limit
               v-model="textareaOut"
@@ -124,11 +123,41 @@
           </el-input>
         </div> -->
       </div>
-      <div v-loading="sendStatus" @click="reduceSend" class="reduceBtn g_poin">
-        <p>开始生成</p>
+      <div v-if="activeIndex == 1" class="reduceBottom">
+        <div
+          v-for="btnItem in weipu_version"
+          :key="btnItem.version + 'btn1'"
+          v-loading="sendStatus"
+          @click="reduceSend(btnItem)"
+          class="reduceBtn g_poin"
+        >
+          <p>{{ btnItem.version_description }}</p>
+        </div>
+      </div>
+      <div v-if="activeIndex == 2" class="reduceBottom">
+        <div
+          v-for="btnItem in kns_version"
+          :key="btnItem.version + 'btn2'"
+          v-loading="sendStatus"
+          @click="reduceSend(btnItem)"
+          class="reduceBtn g_poin"
+        >
+          <p>{{ btnItem.version_description }}</p>
+        </div>
+      </div>
+      <div v-if="activeIndex == 3" class="reduceBottom">
+        <div
+          v-for="btnItem in gezida_version"
+          :key="btnItem.version + 'btn3'"
+          v-loading="sendStatus"
+          @click="reduceSend(btnItem)"
+          class="reduceBtn g_poin"
+        >
+          <p>{{ btnItem.version_description }}</p>
+        </div>
       </div>
     </template>
-    <template v-if="activeIndex == 2">
+    <template v-if="activeIndex == 4">
       <div
         style="
           display: flex;
@@ -187,9 +216,13 @@
             >
               <div class="price">¥{{ item.price }}</div>
               <div class="original-price">¥{{ item.original_price }}</div>
-              <div class="description">
+              <!-- <div  class="description">
                 {{ item.description }}
-              </div>
+              </div> -->
+              <div
+                v-html="formatDescription(item.description)"
+                class="description"
+              ></div>
               <div class="pop" v-if="item.index === '3'">巨划算~</div>
             </div>
           </div>
@@ -213,7 +246,12 @@
 <script>
 import swiperOne from "@/views/writepaper/components/swiperOne.vue";
 import { editReduce, recharge } from "@/api/user";
-import { remaining_times, recharge_package, reduce_aigc } from "@/api/wallet";
+import {
+  remaining_times,
+  recharge_package,
+  reduce_aigc,
+  third_aigc_version,
+} from "@/api/wallet";
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import eventBus from "@/utils/eventBus";
@@ -245,7 +283,7 @@ export default {
         "请输入文章段落，待降AIGC率，每次最多1000字",
       ],
       reduceText: [
-        "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
+        "请在左侧输入待降AIGC率的文章段落，点击“降AIGC”按钮，稍等片刻，成品会显示在这里",
         "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
       ],
       original_paragraph: "",
@@ -256,6 +294,9 @@ export default {
       selectedPackage: {
         index: 3,
       },
+      gezida_version: [],
+      kns_version: [],
+      weipu_version: [],
     };
   },
   computed: {},
@@ -269,10 +310,9 @@ export default {
   },
   mounted() {
     this.getReTimes();
-
+    this.getVersion();
     // if()
     let hasToken = getToken();
-    console.log("hasToken", hasToken);
     if (!sessionStorage.getItem("hasSeenPopup")) {
       // 如果没有标记，则显示弹窗
       if (hasToken) {
@@ -283,6 +323,32 @@ export default {
     }
   },
   methods: {
+    formatDescription(description) {
+      if (!description || description.length < 5) {
+        return description; // 字符串长度不足时，直接返回原字符串
+      }
+
+      // 对第3、4、5个字符加粗并标红
+      const formatted = description
+        .split("")
+        .map((char, index) => {
+          if (index <= 5) {
+            return `<span style="color: red; font-weight: bold;">${char}</span>`;
+          }
+          return char;
+        })
+        .join("");
+
+      return formatted;
+    },
+    getVersion() {
+      third_aigc_version().then((res) => {
+        console.log("ddd", res);
+        this.gezida_version = res.result.gezida_version;
+        this.kns_version = res.result.kns_version;
+        this.weipu_version = res.result.weipu_version;
+      });
+    },
     selectPackage(item) {
       this.selectedPackage = item;
       console.log("Selected package:", item);
@@ -346,7 +412,8 @@ export default {
         message: "复制失败！",
       });
     },
-    reduceSend() {
+    reduceSend(btnItem) {
+      console.log(btnItem, "btnItem");
       // 判断次数是否够用
       if (this.remaining_nums < 1) {
         this.showBuyDialog();
@@ -355,6 +422,7 @@ export default {
       zhuge.track(`用户点击降重按钮`, {});
       let formData = new FormData();
       formData.append("contents", this.original_paragraph);
+      formData.append("version", btnItem.version);
       this.sendStatus = true;
       reduce_aigc(formData)
         .then((res) => {
@@ -369,6 +437,7 @@ export default {
     },
     checkoutPaper(val) {
       this.activeIndex = val;
+      this.textareaOut = "";
     },
   },
 };
@@ -524,7 +593,7 @@ export default {
 }
 
 .reduceBtn {
-  width: auto;
+  width: 49%;
   height: 44px;
   background: #3355ff;
   border-radius: 24px;
@@ -552,7 +621,11 @@ export default {
   background: #ffffff;
   border-radius: 0px 0px 12px 12px;
 }
-
+.reduceBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .outlineTab {
   width: 100%;
   height: 96px;
@@ -574,7 +647,7 @@ export default {
   .outLeftTitle {
     font-family: PingFangSC, PingFang SC;
     font-weight: 500;
-    margin-right: 40px;
+    margin-right: 30px;
     font-size: 22px;
     color: #000000;
     line-height: 30px;

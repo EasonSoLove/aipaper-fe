@@ -22,6 +22,13 @@ export function find_user_balance() {
     method: "get",
   });
 }
+// 获取小发猫API版本号
+export function third_aigc_version() {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/version",
+    method: "get",
+  });
+}
 export function remaining_times() {
   return request({
     url: baseUrl + "/api/ai-paper/third_aigc/remaining_times",
