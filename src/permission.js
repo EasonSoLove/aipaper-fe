@@ -126,6 +126,10 @@ router.beforeEach(async (to, from, next) => {
   } else {
     // 如果没有 token 且不在白名单，需要登录
     // next(`/login?redirect=${to.path}`);
+    if (to.path == "/home/redemption") {
+      next(`/login`);
+    }
+
     eventBus.emit("showLogin"); // 发布事件
 
     NProgress.done();
