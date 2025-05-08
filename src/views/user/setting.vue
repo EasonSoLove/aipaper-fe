@@ -134,11 +134,7 @@
         ></el-table-column>
         <el-table-column prop="status" label="状态" width="120">
           <template slot-scope="scope">
-            <span v-if="scope.row.status === 1">未使用</span>
-            <span v-else-if="scope.row.status === 2">已使用</span>
-            <span v-else-if="scope.row.status === 3">已过期</span>
-            <span v-else-if="scope.row.status === 4">冻结</span>
-            <span v-else-if="scope.row.status === 5">作废</span>
+            <span>{{ getStatusDescription(scope.row.status) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="order_id" label="订单ID"></el-table-column>
@@ -194,21 +190,6 @@ export default {
       coupon_status_list: [],
       coupon_type_list: [],
       tableData: [
-        {
-          id: 1,
-          type: 1,
-          rule_id: -1,
-          create_user_id: 2422,
-          exchange_user_id: -1,
-          coupon_code: "xhs_04889f94-3c17-4d9c-a6f7-3cfa2c4fc73c",
-          discount_rate: 0.5,
-          create_time: "2024-12-23T17:17:05+08:00",
-          used_time: null,
-          expire_time: "2024-12-30T12:00:00+08:00",
-          channel: "xhs",
-          status: 1,
-          order_id: -1,
-        },
         // 其他模拟数据...
       ],
       total: 2000, // 总条数
@@ -226,6 +207,12 @@ export default {
     });
   },
   methods: {
+    getStatusDescription(status) {
+      const statusItem = this.coupon_status_list.find(
+        (item) => item.status === String(status)
+      );
+      return statusItem ? statusItem.status_description : "未知状态";
+    },
     translateStatus(status) {
       const type = this.coupon_type_list.find(
         (item) => item.coupon_type === status

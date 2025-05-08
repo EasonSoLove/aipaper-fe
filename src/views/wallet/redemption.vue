@@ -1,22 +1,34 @@
 <template>
-  <div class="exchange-component">
-    <div class="header"></div>
-    <input
-      v-model="exchangeCode"
-      placeholder="请输入充值卡的兑换码"
-      @focus="isInputFocused = true"
-      @blur="isInputFocused = false"
-      :class="{ focused: isInputFocused }"
-    />
-    <button @click="exchangeCodeRequest">立即兑换</button>
-    <div class="warning">
-      <h3>温馨提示：</h3>
-      <p>有兑换码的用户可以在此兑换，兑换码目前支持兑换为降AIGC的可用次数。</p>
-      <p>
-        兑换流程：输入兑换码 → 点击“立即兑换” →
-        兑换成功，前往降AIGC页面右上角查看可用次数。
-      </p>
-      <p>兑换码一经兑换，概不退换，请确认无误后再操作。</p>
+  <div style="width: 100%; background-color: #fff">
+    <div class="exchange-component">
+      <div class="header"></div>
+      <el-input
+        v-model="exchangeCode"
+        placeholder="请输入充值卡的兑换码"
+        clearable
+        prefix-icon="el-icon-goods"
+      />
+      <el-button
+        type="success"
+        style="margin-top: 20px; width: 50%"
+        @click="exchangeCodeRequest"
+      >
+        立即兑换
+      </el-button>
+      <div class="warning">
+        <h3>温馨提示：</h3>
+        <p>
+          有兑换码的用户可以在此兑换，兑换码目前支持兑换为降AIGC的可用次数。
+        </p>
+        <p>
+          兑换流程：输入兑换码 → 点击“立即兑换” → 兑换成功，前往
+          <el-link type="primary" @click="$jumpUrl('/main/reduceRepetition')"
+            >降AIGC页面</el-link
+          >
+          右上角查看可用次数。
+        </p>
+        <p>兑换码一经兑换，概不退换，请确认无误后再操作。</p>
+      </div>
     </div>
   </div>
 </template>
@@ -50,7 +62,7 @@ export default {
         console.log("res", res);
         this.$message({
           type: "success",
-          message: "优惠卷兑换成功!",
+          message: "优惠卷兑换成功,请前往对应页面查看兑换内容!",
         });
         this.exchangeCode = "";
       });
@@ -69,7 +81,6 @@ export default {
 
 .header {
   height: 80px;
-  background-color: #f5f5f5; /* 顶部背景颜色 */
   margin-bottom: 20px;
 }
 
@@ -82,26 +93,6 @@ input {
   transition: border-color 0.3s;
   font-size: 16px; /* 字体大小 */
   color: #666; /* 字体颜色 */
-}
-
-input.focused {
-  border-color: #4caf50; /* 选中时的边框颜色 */
-}
-
-button {
-  width: 50%;
-  padding: 10px;
-  background-color: #4caf50; /* 按钮背景色 */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 16px; /* 字体大小 */
-}
-
-button:hover {
-  background-color: #45a049; /* 按钮悬停时的颜色 */
 }
 
 .warning {

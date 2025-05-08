@@ -176,22 +176,7 @@ export const constantRoutes = [
           inDevelopment: false,
         },
       },
-      // 优惠卷
-      {
-        path: "redemption",
-        name: "redemption",
-        component: () => import("@/views/wallet/redemption"),
-        meta: {
-          keepAlive: true,
-          title: "redemption",
-          // title: "搜论文",
-          icon: "el-icon-download",
-          describe: "我的脑袋里有十亿亿篇文献",
-          id: "5-2",
-          parentId: "5",
-          inDevelopment: false,
-        },
-      },
+
       // 读论文
       // {
       //   path: "readpaper",
@@ -376,6 +361,22 @@ export const constantRoutes = [
           icon: "dashboard",
           inDevelopment: false,
           describe: "你对我的强大一无所知",
+        },
+      },
+      // 优惠卷
+      {
+        path: "redemption",
+        name: "redemption",
+        component: () => import("@/views/wallet/redemption"),
+        meta: {
+          keepAlive: true,
+          title: "redemption",
+          // title: "搜论文",
+          icon: "el-icon-download",
+          describe: "我的脑袋里有十亿亿篇文献",
+          id: "5-2",
+          parentId: "5",
+          inDevelopment: false,
         },
       },
     ],
