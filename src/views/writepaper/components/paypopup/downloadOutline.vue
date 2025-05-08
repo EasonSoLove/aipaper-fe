@@ -206,9 +206,9 @@ export default {
     },
     handleClose(done) {
       if (this.payTitleStatus == "TRADE_SUCCESS") {
-        zhuge.track(`用户成功支付`, {});
+        zhuge.track(`下载大纲-用户成功支付`, {});
       } else {
-        zhuge.track(`用户取消支付`, {});
+        zhuge.track(`下载大纲-用户取消支付`, {});
       }
       // 刷新列表
       eventBus.emit("step0Reload", true); // 发布事件
