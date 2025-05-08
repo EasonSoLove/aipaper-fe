@@ -292,7 +292,7 @@ export default {
       dialogVisible: false,
       reduce_aigc_packages: [], // 降重套餐
       selectedPackage: {
-        index: 3,
+        index: "3",
       },
       gezida_version: [],
       kns_version: [],
