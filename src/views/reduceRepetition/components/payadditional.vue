@@ -600,7 +600,7 @@ export default {
     margin-right: 8px;
   }
   p {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
   }
@@ -612,7 +612,7 @@ export default {
   color: #00b42a;
   letter-spacing: 0;
   line-height: 18px;
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   font-weight: bold;

@@ -15,7 +15,14 @@
         <div class="order">
           <div class="orderNum rowBetween">
             <!-- <div class="left">大纲号：{{ orderObj.order.out_trade_no }}</div> -->
-            <div class="left"></div>
+            <div
+              class="left"
+              style="color: #f56c6c; font-weight: bold; font-size: 13px"
+            >
+              <p v-show="orderObj.free_num > 0">
+                本大纲可免费生成正文 <b>{{ orderObj.free_num }}</b> 次
+              </p>
+            </div>
             <div class="right">
               时间：
               {{ orderObj.updated_at | dateFormatter }}
@@ -217,6 +224,8 @@ export default {
       eventBus.emit("orderDialogChange", false);
     },
     jumpV2Outline(row) {
+      this.$store.dispatch("paper/setAdditionList", []);
+
       zhuge.track(`用户编辑定制版大纲`, {
         大纲标题: row.title,
         大纲key: row.key1,
@@ -299,10 +308,9 @@ export default {
         大纲标题: row.title,
         大纲key: row.key1,
       });
-
+      this.$store.dispatch("paper/setAdditionList", []);
       this.$store.dispatch("paper/setOutlineVersion", row.version);
 
-      // row.key1
       this.$router.push(
         {
           path: "/main/writepaper",

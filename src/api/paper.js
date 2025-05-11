@@ -14,6 +14,7 @@ export function product() {
     method: "get",
   });
 }
+
 // 我的推广获取用户列表
 export function user_info(params) {
   return request({
@@ -63,7 +64,6 @@ export function paper_status(data) {
     url: baseUrl + "/api/ai-paper/paper/paper_status",
     method: "post",
     data,
-
   });
 }
 export function down_url(params) {

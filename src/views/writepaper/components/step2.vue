@@ -1494,12 +1494,31 @@ export default {
       };
       let ownProduct = this.requestForm.product;
       if (ownProduct == "毕业论文" || ownProduct == "结课论文") {
+        let arr2 = [];
+        if (this.additionalList.length > 0) {
+          this.homeData.additional_service.forEach((item) => {
+            this.additionalList.forEach((id) => {
+              if (item.id == id) {
+                let itemFilter = {
+                  product_id: item.id,
+                  quantity: 1,
+                  price: item.price,
+                };
+                arr2.push(itemFilter);
+              }
+            });
+          });
+        } else {
+          arr2 = [];
+        }
+
         ownItem = [
           {
             product_id: "1", //正文id
             quantity: 1, // 数量
             price: 149.85, //价格
           },
+          ...arr2,
         ];
       }
       if (ownProduct == "开题报告") {
