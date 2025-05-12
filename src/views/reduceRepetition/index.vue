@@ -397,7 +397,7 @@ export default {
         this.reduce_aigc_packages = res.result.reduce_aigc_packages;
         this.selectedPackage =
           this.reduce_aigc_packages[this.reduce_aigc_packages.length - 1];
-        console.log("eee", res, this.reduce_aigc_packages);
+        // console.log("eee", res, this.reduce_aigc_packages);
       });
 
       this.dialogVisible = true;

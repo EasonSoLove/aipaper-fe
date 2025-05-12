@@ -313,7 +313,7 @@ export default {
         index: this.selectedPackage.index,
         payment_method: "alipay",
       };
-      console.log("弹窗内部 ", this.selectedPackage);
+      // console.log("弹窗内部 ", this.selectedPackage);
       recharge(data)
         .then((res) => {
           this.resetForm();
@@ -371,7 +371,7 @@ export default {
 
           this.$store.dispatch("app/toggleCurrentOrder", order);
           // 复现aigc选项
-          console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
+          // console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
           this.$store.dispatch("paper/setAigc", res.result.is_reduce_aigc);
           let _this = this;
           setTimeout(() => {
