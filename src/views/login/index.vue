@@ -102,18 +102,35 @@
               </el-button>
               <div class="agreement lanhuText">
                 <div data-v-688ca5dc="" class="checkBox" @click="canClick">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    v-show="!agreeStatus"
+                  >
+                    <rect
+                      x="5"
+                      y="5"
+                      width="14"
+                      height="14"
+                      rx="3"
+                      stroke="#666"
+                      stroke-width="1.2"
+                    />
+                  </svg>
                   <img
                     data-v-688ca5dc=""
                     src="https://sso-cdn.lanhuapp.com/ssoweb/img/checked.eb4ff298.svg"
                     alt=""
                     v-show="agreeStatus"
                   />
-                  <img
-                    v-show="!agreeStatus"
+                  <!-- <img
                     data-v-688ca5dc=""
                     src="https://sso-cdn.lanhuapp.com/ssoweb/img/uncheck.b1534115.svg"
                     alt=""
-                  />
+                  /> -->
                 </div>
                 <span class="lanhuParent">
                   <span class="canClick">我已阅读并同意</span>

@@ -135,6 +135,13 @@
           <div
             v-if="avatar"
             class="navOrderBtn g_hover"
+            @click="navClickOrder(3)"
+          >
+            <span> 降AIGC卷 </span>
+          </div>
+          <div
+            v-if="avatar"
+            class="navOrderBtn g_hover"
             @click="navClickOrder(1)"
           >
             <span> 我的订单 </span>
@@ -481,7 +488,11 @@ export default {
       location.reload();
     },
     navClickOrder(status) {
-      eventBus.emit("showOrderList", status);
+      if (status == 3) {
+        this.$jumpUrl("/home/redemption");
+      } else {
+        eventBus.emit("showOrderList", status);
+      }
     },
   },
   created() {
