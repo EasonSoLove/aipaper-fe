@@ -66,6 +66,13 @@ export function paper_status(data) {
     data,
   });
 }
+export function free_pay(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/orders/free_pay",
+    method: "post",
+    data,
+  });
+}
 export function down_url(params) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/outline/down_url/" + params.key1,

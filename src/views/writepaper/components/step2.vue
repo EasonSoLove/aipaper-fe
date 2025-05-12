@@ -255,7 +255,26 @@
       </el-checkbox>
     </div>
     <div class="warningP generateSpan">
-      <!-- <span class="g_poin" @click="showSlider">生成全文</span> -->
+      <div
+        style="margin-bottom: 10px"
+        v-if="requestForm.free_num && requestForm.free_num > 0"
+      >
+        <p class="toastTips">
+          当前大纲,您有一次免费生成正文的机会,点击 <b>免费生成 </b>可生成全文
+        </p>
+        <p class="toastTips">
+          免费生成大纲 <b>默认生成正式版,勾选礼包无效 </b>
+        </p>
+        <p class="toastTips">
+          如您要购买礼包或生成预览版, 请点击 <b>生成全文</b>
+        </p>
+      </div>
+      <span
+        class="g_poin greenBtn"
+        v-if="requestForm.free_num && requestForm.free_num > 0"
+        @click="reloadSave('free')"
+        >免费生成</span
+      >
       <!-- <span class="g_poin" @click="saveOutline('reduce')">生成全文</span> -->
       <span class="g_poin" @click="reloadSave('reduce')">生成全文</span>
       <!-- <span class="g_poin" @click="textF">生成全文</span> -->
@@ -566,7 +585,7 @@ import { getOrder, editLine } from "@/api/user";
 import additional from "./step2/additional.vue";
 import eventBus from "@/utils/eventBus";
 import { outlineStatus } from "@/api/user";
-import { down_url } from "@/api/paper";
+import { free_pay } from "@/api/paper";
 
 import polling from "@/utils/get-order-detail.js";
 import tips from "./step2/tips";
@@ -887,6 +906,7 @@ export default {
         "31分钟前 论文《南宁圣**********》生成成功",
       ],
       parentHeight: 0,
+      freeOrPayStatus: "",
       marks: {
         5000: "5000字",
         8000: "8000字",
@@ -1029,6 +1049,30 @@ export default {
       this.paper_words = 1000;
       // 生成正文
     },
+    sendFreePay() {
+      let data = {
+        pay_type: "PAY_ALL",
+        key: this.requestForm.key1,
+        product: this.requestForm.product,
+        type: this.requestForm.type,
+        word_count: this.requestForm.word_count,
+      };
+      console.log("free_pay data", data);
+      free_pay(data).then((res) => {
+        console.log(res, "res");
+        // 打开step3
+        this.$store.dispatch("app/setActiveIndex", 3);
+        // step3开始循环
+        let _this = this;
+        setTimeout(() => {
+          _this.$nextTick(() => {
+            eventBus.emit("startStep3Polling", {
+              out_trade_no: res.result.out_trade_no,
+            });
+          });
+        }, 100);
+      });
+    },
     // 重新生成大纲
     reloadOutline() {
       eventBus.emit("reloadOutline", this.outlineVersion);
@@ -1133,6 +1177,7 @@ export default {
     },
 
     reloadSave(status) {
+      this.freeOrPayStatus = status;
       let data = {
         key: this.requestForm.key || this.requestForm.key1,
       };
@@ -1152,6 +1197,17 @@ export default {
             // return false;
           }
           this.generateForm();
+        }
+        if (status == "free") {
+          if (this.device === "mobile") {
+            this.$message({
+              type: "warning",
+              // message: "手机端暂不支持生成正文!",
+              message: "推荐您使用电脑生成全文！",
+            });
+            // return false;
+          }
+          this.generateForm("free");
         }
       });
     },
@@ -1542,7 +1598,7 @@ export default {
       return ownItem;
     },
     // 生成全文
-    generateForm() {
+    generateForm(free) {
       window.zhuge.track("生成正文", {
         // title: this.requestForm.title,
         语言: this.requestForm.language,
@@ -1558,6 +1614,12 @@ export default {
         // 判断item2传参
         let ownItem = this.getItems();
         if (hasToken) {
+          // 免费生层
+          if (free == "free") {
+            this.sendFreePay();
+            return false;
+          }
+          // 生成全文
           let data = {
             user_id: 1, // 固定传一
             is_reduce_aigc: this.is_reduce_aigc, // 固定传一
@@ -1640,7 +1702,7 @@ export default {
       this.statementDialogVisible = false;
       // 勾选"我已阅读并同意...."
       this.checked = true;
-      this.reloadSave("reduce");
+      this.reloadSave(this.freeOrPayStatus);
       // 接下来弹出付款二维码,走付款流程
     },
     handleDragStart(node, ev) {
@@ -1776,5 +1838,17 @@ export default {
   border-radius: 20px;
   color: #fff;
   font-weight: bold;
+}
+.toastTips {
+  color: #909399;
+  font-weight: bold;
+  margin-bottom: 5px;
+  b {
+    color: #f56c6c;
+  }
+}
+.greenBtn {
+  background: #67c23a !important;
+  margin-right: 10px;
 }
 </style>
