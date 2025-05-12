@@ -109,7 +109,7 @@
                 >
               </p>
               <p style="margin: 10px 0; color: #606266">
-                获取查重次数:
+                获取降AIGC次数:
                 <span
                   style="color: #f56c6c; font-size: 18px; font-weight: bold"
                   >{{ this.selectedPackage.rights_num }}</span

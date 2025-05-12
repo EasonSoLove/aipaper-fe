@@ -49,7 +49,7 @@
         </div>
         <hr class="divider" />
         <div class="content">
-          <p>限时优惠，千字低至 <span class="count">0.8</span>元</p>
+          <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
           <button @click="showBuyDialog" class="recharge-button">
             点我补充次数
           </button>
@@ -395,6 +395,8 @@ export default {
       // 购买套餐弹窗
       recharge_package().then((res) => {
         this.reduce_aigc_packages = res.result.reduce_aigc_packages;
+        this.selectedPackage =
+          this.reduce_aigc_packages[this.reduce_aigc_packages.length - 1];
         console.log("eee", res, this.reduce_aigc_packages);
       });
 
