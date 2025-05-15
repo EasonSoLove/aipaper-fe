@@ -69,6 +69,14 @@
                 </svg>
                 运营配置
               </div>
+              <div
+                v-if="userInfo.permission == 'SUPER_ADMIN'"
+                class="menuItem"
+                @click="jumpDetail('/user/refund')"
+              >
+                <i class="el-icon-heavy-rain"></i>
+                退款管理
+              </div>
               <div class="menuItem gray" @click="$devf">
                 <svg class="icon svg-icon" aria-hidden="true">
                   <use xlink:href="#icon-updatelog"></use>

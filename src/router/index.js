@@ -298,6 +298,15 @@ export const constantRoutes = [
         },
       },
       {
+        path: "refund",
+        name: "refund",
+        component: () => import("@/views/user/refund.vue"),
+        meta: {
+          title: "退款管理",
+          icon: "dashboard",
+        },
+      },
+      {
         path: "userInfo",
         name: "userInfo",
         component: () => import("@/views/user/userinfo"),

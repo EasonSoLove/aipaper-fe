@@ -154,9 +154,25 @@ export function editReduce(data) {
     data,
   });
 }
+export function apply(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/refund/apply",
+    method: "post",
+    data,
+  });
+}
 export function outlineStatus(params) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/outline/status/" + params.key,
+    method: "get",
+  });
+}
+export function pending_order(params) {
+  return request({
+    url:
+      baseUrl +
+      "/api/ai-paper/refund/pending_order?out_trade_no=" +
+      params.out_trade_no,
     method: "get",
   });
 }
