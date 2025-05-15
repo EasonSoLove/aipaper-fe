@@ -1070,7 +1070,7 @@ export default {
               out_trade_no: res.result.out_trade_no,
             });
           });
-        }, 100);
+        }, 1500);
       });
     },
     // 重新生成大纲
