@@ -139,7 +139,7 @@ export default {
   data() {
     return {
       searchForm: {
-        out_trade_no: "38815239-16af-4b8e-988a-b1b36850722d",
+        out_trade_no: "",
         page_num: 1,
         page_size: 10,
       },
