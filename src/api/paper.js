@@ -59,9 +59,23 @@ export function passOrder(params) {
     method: "get",
   });
 }
+export function apply_list(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/refund/apply_list",
+    method: "get",
+    params: params,
+  });
+}
 export function paper_status(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/paper_status",
+    method: "post",
+    data,
+  });
+}
+export function confirm_apply(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/refund/confirm_apply",
     method: "post",
     data,
   });

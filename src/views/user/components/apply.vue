@@ -100,7 +100,7 @@
 </template>
 
 <script>
-// import { getRefundApplications, confirmRefundApply } from "@/api/refund";
+import { apply_list, confirm_apply } from "@/api/paper";
 
 export default {
   data() {
@@ -121,7 +121,7 @@ export default {
   },
   methods: {
     getRefundList() {
-      getRefundApplications(this.searchForm).then((res) => {
+      apply_list(this.searchForm).then((res) => {
         if (res.code === 200) {
           this.refundTableData = res.result.refund_apply_list;
           this.refundTotal = res.result.total;
@@ -152,6 +152,7 @@ export default {
       this.currentAuditRow = row;
       this.currentAuditOpt = opt;
       if (opt === "REJECT") {
+        this.remark = "";
         this.remarkDialogVisible = true;
       } else {
         this.submitAudit();
@@ -163,7 +164,7 @@ export default {
         opt: this.currentAuditOpt,
         remark: this.currentAuditOpt === "REJECT" ? this.remark : undefined,
       };
-      confirmRefundApply(payload).then((res) => {
+      confirm_apply(payload).then((res) => {
         if (res.code === 200) {
           this.$message.success(res.message);
           this.remarkDialogVisible = false;
