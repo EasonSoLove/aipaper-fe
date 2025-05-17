@@ -19,6 +19,7 @@ const state = {
   currentOrder: {},
   produceLineStatus: false, // 生成大纲状态, true:生成中 false: 未生成
   activeIndex: 0, // 写论文页面 step 激活index
+  globalCode: [],
 };
 
 const mutations = {
@@ -42,6 +43,9 @@ const mutations = {
   },
   TOGGLE_DEVICE: (state, device) => {
     state.device = device;
+  },
+  TOGGLE_CODE: (state, globalCode) => {
+    state.globalCode = globalCode;
   },
   TOGGLE_PDF: (state, step3PdfUrl) => {
     state.step3PdfUrl = step3PdfUrl;
@@ -69,6 +73,9 @@ const mutations = {
 const actions = {
   setActiveIndex({ commit }, activeIndex) {
     commit("TOGGLE_ACTIVE", activeIndex);
+  },
+  setGlobalCode({ commit }, globalCode) {
+    commit("TOGGLE_CODE", globalCode);
   },
   setLanguage({ commit }, language) {
     commit("SET_LANGUAGE", language);

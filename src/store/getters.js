@@ -17,6 +17,7 @@ const getters = {
   currentOrder: (state) => state.app.currentOrder,
   produceLineStatus: (state) => state.app.produceLineStatus,
   activeIndex: (state) => state.app.activeIndex,
+  globalCode: (state) => state.app.globalCode,
   pollingStatus: (state) => state.paper.pollingStatus,
   additionalList: (state) => state.paper.additionalList,
   preViewId: (state) => state.paper.preViewId,

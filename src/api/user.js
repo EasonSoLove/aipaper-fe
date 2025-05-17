@@ -15,6 +15,12 @@ export function getHomeInfo(params) {
     params,
   });
 }
+export function global_code(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/home/global_code",
+    method: "get",
+  });
+}
 export function gpt_search(params) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/gpt_search?",

@@ -5,6 +5,7 @@
       <el-form inline :model="searchForm" class="demo-form-inline">
         <el-form-item label="订单编号">
           <el-input
+            style="width: 400px"
             v-model="searchForm.out_trade_no"
             placeholder="请输入订单编号"
           ></el-input>
@@ -24,24 +25,35 @@
           label="商家订单号"
         ></el-table-column>
         <el-table-column prop="trade_no" label="支付宝订单号"></el-table-column>
-        <el-table-column
-          prop="payment_status"
-          label="交易状态"
-        ></el-table-column>
+        <el-table-column prop="payment_status" label="交易状态">
+          <template slot-scope="scope">
+            {{ formatOrderTypeStatus2(scope.row.payment_status) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="total_price" label="订单金额"></el-table-column>
         <el-table-column prop="pay_amount" label="实付金额"></el-table-column>
-        <el-table-column
-          prop="created_at"
-          label="订单创建时间"
-        ></el-table-column>
-        <el-table-column
-          prop="updated_at"
-          label="订单更新时间"
-        ></el-table-column>
-        <el-table-column prop="order_type" label="订单类型"></el-table-column>
+        <el-table-column prop="created_at" label="订单创建时间">
+          <template slot-scope="scope">
+            {{ scope.row.created_at | dateFormatter }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="updated_at" label="订单更新时间">
+          <template slot-scope="scope">
+            {{ scope.row.updated_at | dateFormatter }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="order_type" label="订单类型">
+          <template slot-scope="scope">
+            {{ formatOrderTypeStatus(scope.row.order_type) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right" width="120">
           <template slot-scope="scope">
-            <el-button @click="handleRefund(scope.row)" type="text" size="small"
+            <el-button
+              @click="handleRefund(scope.row)"
+              type="primary"
+              plain
+              size="mini"
               >退款</el-button
             >
           </template>
@@ -117,6 +129,7 @@
 
 <script>
 import applyDiv from "./components/apply.vue";
+import { mapGetters } from "vuex";
 
 import { pending_order, apply } from "@/api/user";
 export default {
@@ -167,6 +180,9 @@ export default {
       total: 0,
     };
   },
+  computed: {
+    ...mapGetters(["globalCode"]),
+  },
   methods: {
     getList() {
       pending_order(this.searchForm).then((res) => {
@@ -180,6 +196,27 @@ export default {
     handlePageChange(page) {
       this.searchForm.page_num = page;
       this.getList();
+    },
+    formatOrderTypeStatus2(status) {
+      const statusMap = this.globalCode.payment_status_code;
+      let name = "";
+      statusMap.forEach((item) => {
+        if (item.code == status) {
+          name = item.description;
+        }
+      });
+      return name || "未知状态";
+    },
+    formatOrderTypeStatus(status) {
+      const statusMap = this.globalCode.order_type_code;
+
+      let name = "";
+      statusMap.forEach((item) => {
+        if (item.code == status) {
+          name = item.description;
+        }
+      });
+      return name || "未知状态";
     },
     handleRefund(row) {
       this.refundForm = {

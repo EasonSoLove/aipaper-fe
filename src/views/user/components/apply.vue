@@ -1,71 +1,115 @@
 <template>
-  <div class="setContainer">
-    <template>
-      <!-- 搜索栏 -->
-      <el-form inline :model="searchForm" class="demo-form-inline">
-        <el-form-item label="订单编号">
-          <el-input
-            v-model="searchForm.out_trade_no"
-            placeholder="请输入订单编号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="getRefundList">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </template>
+  <div>
+    <div class="setContainer">
+      <template>
+        <!-- 搜索栏 -->
+        <el-form inline :model="searchForm" class="demo-form-inline">
+          <el-form-item label="订单编号">
+            <el-input
+              v-model="searchForm.out_trade_no"
+              placeholder="请输入订单编号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="退款状态">
+            <el-select
+              v-model="searchForm.refund_status"
+              placeholder="请选择退款状态"
+            >
+              <el-option
+                v-for="status in globalCode.refund_status_code"
+                :key="status.code"
+                :label="status.description"
+                :value="status.code"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="getRefundList">查询</el-button>
+            <el-button @click="handleReset">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </template>
 
-    <div class="demo-form-inline">
       <!-- 表格 -->
       <el-table :data="refundTableData" border style="width: 100%">
         <el-table-column
           prop="out_trade_no"
           label="退款订单号"
+          align="center"
         ></el-table-column>
-        <el-table-column
-          prop="refund_status"
-          label="退款状态"
-          :formatter="formatRefundStatus"
-        ></el-table-column>
+        <el-table-column prop="refund_status" label="退款状态" align="center">
+          <template slot-scope="scope">
+            {{ formatRefundStatus(scope.row.refund_status) }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="refund_amount"
           label="申请退款金额"
+          align="center"
         ></el-table-column>
         <el-table-column
           prop="refund_reason"
           label="退款原因"
+          align="center"
         ></el-table-column>
-        <el-table-column
-          label="补充说明"
-          width="120"
-          scopedSlots="{ default: scope => <el-button type='text' @click='viewImage(scope.row.refund_photo)'>查看</el-button> }"
-        ></el-table-column>
-        <el-table-column
-          label="支付宝二维码"
-          width="120"
-          scopedSlots="{ default: scope => <el-button type='text' @click='viewImage(scope.row.manual_refund_qrcode)'>查看</el-button> }"
-        ></el-table-column>
-        <el-table-column prop="created_at" label="创建时间"></el-table-column>
-        <el-table-column prop="updated_at" label="更新时间"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="220">
+        <el-table-column label="补充说明" align="center" width="120">
           <template slot-scope="scope">
+            <el-image
+              style="width: 100px; height: 100px"
+              :src="scope.row.refund_photo"
+              :preview-src-list="[scope.row.refund_photo]"
+            >
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column label="支付宝二维码" width="120">
+          <template slot-scope="scope">
+            <el-image
+              style="width: 100px; height: 100px"
+              :src="scope.row.manual_refund_qrcode"
+              :preview-src-list="[scope.row.manual_refund_qrcode]"
+            >
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_at" align="center" label="创建时间">
+          <template slot-scope="scope">
+            {{ scope.row.created_at | dateFormatter }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="updated_at" align="center" label="更新时间">
+          <template slot-scope="scope">
+            {{ scope.row.updated_at | dateFormatter }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" fixed="right" width="300">
+          <template
+            slot-scope="scope"
+            v-if="
+              scope.row.refund_status == 'PENDING' ||
+              scope.row.refund_status == 'AUTO_REFUND_FAILED' ||
+              scope.row.refund_status == 'MANUAL_REFUND_SUCCESS'
+            "
+          >
             <el-button
               @click="handleAudit(scope.row, 'PASS')"
-              type="text"
-              size="small"
+              type="primary"
+              plain
+              size="mini"
               >审核通过</el-button
             >
             <el-button
               @click="handleAudit(scope.row, 'REJECT')"
-              type="text"
-              size="small"
+              type="primary"
+              plain
+              size="mini"
               >拒绝</el-button
             >
             <el-button
               @click="handleAudit(scope.row, 'MANUAL')"
-              type="text"
-              size="small"
+              type="primary"
+              plain
+              size="mini"
               >人工处理完成</el-button
             >
           </template>
@@ -101,6 +145,7 @@
 
 <script>
 import { apply_list, confirm_apply } from "@/api/paper";
+import { mapGetters } from "vuex";
 
 export default {
   data() {
@@ -111,6 +156,7 @@ export default {
         page_num: 1,
         page_size: 10,
       },
+
       refundTableData: [],
       refundTotal: 0,
       remarkDialogVisible: false,
@@ -118,6 +164,9 @@ export default {
       currentAuditOpt: "",
       remark: "",
     };
+  },
+  computed: {
+    ...mapGetters(["globalCode"]),
   },
   methods: {
     getRefundList() {
@@ -137,13 +186,14 @@ export default {
       this.getRefundList();
     },
     formatRefundStatus(status) {
-      const statusMap = {
-        PENDING: "待处理",
-        PASS: "审核通过",
-        REJECT: "已拒绝",
-        MANUAL: "人工处理完成",
-      };
-      return statusMap[status] || status;
+      const statusMap = this.globalCode.refund_status_code;
+      let name = "";
+      statusMap.forEach((item) => {
+        if (item.code == status) {
+          name = item.description;
+        }
+      });
+      return name || "未知状态";
     },
     viewImage(url) {
       window.open(url);
