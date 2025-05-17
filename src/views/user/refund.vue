@@ -64,7 +64,7 @@
       <div class="pageBox">
         <el-pagination
           background
-          layout="prev, pager, next"
+          layout="total,prev, pager, next"
           :total="total"
           :page-size="searchForm.page_size"
           @current-change="handlePageChange"
