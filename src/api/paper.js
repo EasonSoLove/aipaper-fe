@@ -23,6 +23,13 @@ export function user_info(params) {
     params,
   });
 }
+export function third_aigc_task(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/task",
+    method: "get",
+    params,
+  });
+}
 export function references(params) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/references",
@@ -76,6 +83,20 @@ export function paper_status(data) {
 export function confirm_apply(data) {
   return request({
     url: baseUrl + "/api/ai-paper/refund/confirm_apply",
+    method: "post",
+    data,
+  });
+}
+export function task_complete(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/task_complete",
+    method: "post",
+    data,
+  });
+}
+export function once_aigc_order(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/once_aigc_order",
     method: "post",
     data,
   });

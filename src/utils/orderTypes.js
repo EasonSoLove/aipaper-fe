@@ -15,6 +15,8 @@ const OrderType = {
   EXTRA_TASK_ASSIGNMENT: "任务书",
   EXTRA_SURVEY: "调查问卷",
   EXTRA_JOURNAL_REVIEWED: "文献综述",
+  REDUCE_AIGC_ONCE: "一键降AIGC",
+  REDUCE_AIGC: "降AIGC",
 };
 
 export default OrderType;

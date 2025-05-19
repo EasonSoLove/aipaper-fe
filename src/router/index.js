@@ -307,6 +307,15 @@ export const constantRoutes = [
         },
       },
       {
+        path: "AIGClist",
+        name: "AIGClist",
+        component: () => import("@/views/user/AIGClist.vue"),
+        meta: {
+          title: "aigc任务",
+          icon: "AIGClist",
+        },
+      },
+      {
         path: "userInfo",
         name: "userInfo",
         component: () => import("@/views/user/userinfo"),

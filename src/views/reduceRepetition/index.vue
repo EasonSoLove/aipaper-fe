@@ -4,6 +4,13 @@
     <div class="outlineTab">
       <div class="outLeft">
         <p
+          @click="checkoutPaper(0)"
+          :class="['outLeftTitle', activeIndex == 0 ? 'activeLT' : '']"
+        >
+          降AIGC率-上传文件
+          <span class="underLeft"></span>
+        </p>
+        <p
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
         >
@@ -56,7 +63,7 @@
         </div>
       </div>
     </div>
-    <template v-if="activeIndex != 4">
+    <template v-if="activeIndex != 4 && activeIndex != 0">
       <div
         v-loading="sendStatus"
         element-loading-text="使用高级推理AI, 润色中..."
@@ -183,6 +190,23 @@
         :paperPercent="paperPercent"
       /> -->
     </template>
+    <template v-if="activeIndex == 0">
+      <div style="">
+        <filereduce></filereduce>
+      </div>
+
+      <!-- <progressonly
+        :requestKey="requestKey"
+        :payStatus="payStatusPro"
+        :paperPercent="paperPercent"
+      /> -->
+    </template>
+    <reducepay2
+      :requestKey="requestKey2"
+      :payStatus="popupStatus2"
+      :paperPercent="paperPercent2"
+    />
+
     <reducepay
       :requestKey="requestKey"
       :selectedPackage="selectedPackage"
@@ -254,6 +278,7 @@ import {
 } from "@/api/wallet";
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
+import reducepay2 from "./components/reducePay.vue";
 import eventBus from "@/utils/eventBus";
 import { getToken, setToken } from "@/utils/auth"; // get token from cookie
 
@@ -263,21 +288,25 @@ export default {
     swiperOne,
     reducepay,
     filereduce,
+    reducepay2,
   },
   data() {
     return {
       popupStatus: 0,
+      popupStatus2: 0,
       requestKey: "", //out_trade_no
+      requestKey2: "", //out_trade_no
       payStatusPro: 0,
       paperPercent: 0,
+      payStatusPro2: 0,
+      paperPercent2: 0,
       useImg: require("@/assets/images/bg/AIGC_kefu.png"),
-
       logo: require("@/assets/images/logo_paper.png"),
       drawer: false,
       direction: "rtl", //抽屉方向
       textareaOut: "",
       sendStatus: false,
-      activeIndex: 1,
+      activeIndex: 0,
       placeText: [
         "请输入文章段落，待降AIGC率均可，每次最多500字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
@@ -323,6 +352,11 @@ export default {
     }
   },
   methods: {
+    showPayDialog(data) {
+      console.log("dddd", data);
+      this.requestKey2 = data.requestKey;
+      this.popupStatus2 = Date.now();
+    },
     formatDescription(description) {
       if (!description || description.length < 5) {
         return description; // 字符串长度不足时，直接返回原字符串
@@ -369,6 +403,7 @@ export default {
       //   this.paperPercent = data.paperPercent;
       // }
     },
+
     submitBuyInfo(item) {
       let data = {
         index: this.selectedPackage.index,
@@ -647,8 +682,8 @@ export default {
   .outLeftTitle {
     font-family: PingFangSC, PingFang SC;
     font-weight: 500;
-    margin-right: 30px;
-    font-size: 22px;
+    margin-right: 20px;
+    font-size: 18px;
     color: #000000;
     line-height: 30px;
     text-align: left;

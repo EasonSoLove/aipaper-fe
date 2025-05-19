@@ -55,7 +55,12 @@
                 style="margin-bottom: 8px"
                 :key="'case2' + j"
               >
-                <span v-show="orderObj.order.order_type != 'REDUCE_AIGC'">
+                <span
+                  v-show="
+                    orderObj.order.order_type != 'REDUCE_AIGC' &&
+                    orderObj.order.order_type != 'REDUCE_AIGC_ONCE'
+                  "
+                >
                   论文题目:
                 </span>
                 {{ item.case.paper_case.title }}
@@ -110,7 +115,10 @@
                     type="text"
                     :disabled="item.case.paper_case.stage !== 1"
                     @click="pushStep3(orderObj)"
-                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type != 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE'
+                    "
                   >
                     查看论文进度
                   </el-button>
@@ -119,7 +127,10 @@
                     type="text"
                     :disabled="item.case.paper_case.stage !== 1"
                     @click="pushStep2(orderObj)"
-                    v-show="orderObj.order.order_type == 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type == 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE'
+                    "
                   >
                     查看降重进度
                   </el-button>
@@ -128,7 +139,10 @@
                     type="text"
                     :disabled="!item.case.file_urls.pdf"
                     @click="openPaper(orderObj)"
-                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type != 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE'
+                    "
                   >
                     预览
                   </el-button>
@@ -163,7 +177,8 @@
           <div v-else>
             <div style="margin-bottom: 8px" class="orderTitle">
               <!-- 论文题目: {{ orderObj.outline.title }} -->
-              论文题目: {{ orderObj.outline.title }}
+              <span>论文题目</span>
+              {{ orderObj.outline.title }}
             </div>
 
             <div class="orderTitle orderTitleSpan">
@@ -299,6 +314,7 @@ export default {
       payType: {
         PAY_ALL: "正式版",
         PAY_STAGES: "预览版",
+        PAY_FREE: "免费",
       },
       payStatusObj: {
         WAIT_BUYER_PAY: "待支付",
@@ -542,6 +558,13 @@ export default {
     },
     downLoadPaper: _.debounce(function (item) {
       this.downStatus = true;
+      if (item.order.order_type == "REDUCE_AIGC_ONCE") {
+        let downUrl = item.order_item_response[0].case.file_urls.word;
+        window.open(downUrl, "_blank");
+        this.downStatus = false;
+
+        return false;
+      }
       if (item.order.order_type == "REDUCE_AIGC") {
         zhuge.track(`下载降重压缩包`);
         let data = {

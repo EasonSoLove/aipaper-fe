@@ -32,6 +32,10 @@
         </el-table-column>
         <el-table-column prop="total_price" label="订单金额"></el-table-column>
         <el-table-column prop="pay_amount" label="实付金额"></el-table-column>
+        <el-table-column
+          prop="refundable_amount"
+          label="可退款金额"
+        ></el-table-column>
         <el-table-column prop="created_at" label="订单创建时间">
           <template slot-scope="scope">
             {{ scope.row.created_at | dateFormatter }}
