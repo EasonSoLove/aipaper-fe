@@ -1,6 +1,31 @@
 <template>
   <div>
     <div class="setContainer">
+      <template>
+        <el-form inline :model="searchForm" class="demo-form-inline">
+          <el-form-item label="订单编号">
+            <el-input
+              style="width: 400px"
+              v-model="searchForm.out_trade_no"
+              placeholder="请输入订单编号"
+            ></el-input>
+          </el-form-item>
+          <!-- <el-form-item label="降AIGC类别">
+            <el-select
+              v-model="searchForm.reduce_aigc_type"
+              placeholder="请选择降AIGC类别"
+            >
+              <el-option label="降知网AIGC" value="kns"></el-option>
+              <el-option label="降维普AIGC" value="weipu"></el-option>
+              <el-option label="降格子达AIGC" value="gezida"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <el-form-item>
+            <el-button type="primary" @click="getRefundList">查询</el-button>
+            <el-button @click="handleReset">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </template>
       <!-- 表格 -->
       <el-table :data="refundTableData" border style="width: 100%">
         <!-- ID -->
@@ -22,7 +47,11 @@
           prop="reduce_aigc_type"
           label="降AIGC类别"
           align="center"
-        ></el-table-column>
+        >
+          <template slot-scope="scope">
+            {{ formatOrderTypeStatus2(scope.row.reduce_aigc_type) }}
+          </template>
+        </el-table-column>
         <!-- 字符数 -->
         <el-table-column
           prop="total_chars"
@@ -135,6 +164,8 @@ export default {
   data() {
     return {
       searchForm: {
+        out_trade_no: "",
+        reduce_aigc_type: "",
         page_num: 1,
         page_size: 10,
       },
@@ -151,6 +182,23 @@ export default {
     openUpload(row) {
       this.uploadDialogVisible = true;
       this.uploadId = row.id;
+    },
+    formatOrderTypeStatus2(status) {
+      const statusMap = [
+        { code: "kns", name: "知网" },
+        { code: "kns_urgent", name: "知网加急" },
+        { code: "weipu", name: "维普" },
+        { code: "weipu_urgent", name: "维普加急" },
+        { code: "gezida", name: "格子达" },
+        { code: "gezida_urgent", name: "格子达加急" },
+      ];
+      let name = "";
+      statusMap.forEach((item) => {
+        if (item.code == status) {
+          name = item.name;
+        }
+      });
+      return name || "未知状态";
     },
     handleUpload({ file, onProgress, onSuccess, onError }) {
       console.log("fiel", file);
@@ -206,6 +254,10 @@ export default {
 
     downloadUrl(row) {
       window.open(row.file_path, "_blank");
+    },
+    handleReset() {
+      this.searchForm.out_trade_no = "";
+      this.searchForm.reduce_aigc_type = "";
     },
   },
   mounted() {

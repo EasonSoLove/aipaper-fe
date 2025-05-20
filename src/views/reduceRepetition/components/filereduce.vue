@@ -47,23 +47,43 @@
           "
         >
           <el-radio-group v-model="reduce_aigc_type">
-            <div class="radioItem">
-              <el-radio label="kns"
-                >降知网AIGC（AIGC率超20%包退）：预计30分钟，不含检测报告</el-radio
-              >
-            </div>
-            <div class="radioItem">
-              <el-radio label="weipu"
-                >降维普AIGC率（AIGC率超20%包退）：预计30分钟，不含检测报告</el-radio
-              >
-            </div>
-            <div class="radioItem">
-              <el-radio label="gezida"
-                >降格子达AIGC率（AIGC率超20%包退）：预计30分钟，不含检测报告</el-radio
-              >
+            <div style="display: flex">
+              <div class="leftRadio">
+                <div class="radioItem">
+                  <b>降知网AIGC</b>（AIGC率超20%包退）：
+                  <el-radio label="kns">预计12小时，不含检测报告</el-radio>
+                </div>
+                <div class="radioItem">
+                  <b> 降维普AIGC率</b>（AIGC率超20%包退）：
+                  <el-radio label="weipu">预计12小时，不含检测报告</el-radio>
+                </div>
+                <div class="radioItem">
+                  <b>降格子达AIGC率</b>（AIGC率超20%包退）：
+                  <el-radio label="gezida">预计12小时，不含检测报告</el-radio>
+                </div>
+              </div>
+              <div class="rightRadio" style="padding-left: 20px">
+                <div class="radioItem">
+                  <el-radio label="kns_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+                <div class="radioItem">
+                  <el-radio label="weipu_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+                <div class="radioItem">
+                  <el-radio label="gezida_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+              </div>
             </div>
           </el-radio-group>
-
+          <p style="margin-top: 20px; font-size: 12px; color: #909399">
+            温馨提示: 凌晨0:00 - 8:00 客服未在线, 不能及时处理加急的文件!
+          </p>
           <div
             style="
               display: flex;
@@ -396,7 +416,10 @@ export default {
   padding-top: 0px !important;
 }
 .radioItem {
-  margin-top: 8px;
+  margin-top: 15px;
+  display: flex;
+  font-size: 13px;
+  align-items: center;
 }
 .reduceBtn2 {
   width: 49%;
