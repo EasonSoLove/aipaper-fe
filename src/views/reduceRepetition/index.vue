@@ -49,7 +49,7 @@
           </p>
         </div> -->
       </div>
-      <div class="card">
+      <div v-if="activeIndex != 0" class="card">
         <div class="header">
           <span>可用次数：</span>
           <span class="count">{{ remaining_nums }}次</span>

@@ -129,7 +129,7 @@
               <p style="margin: 10px 0; color: #606266">
                 限时优惠:
                 <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
-                  >3元/1000字(不满千字按千字计算)</span
+                  >5元/1000字(不满千字按千字计算)</span
                 >
               </p>
 
@@ -142,7 +142,7 @@
                 >
                   郑重承诺:
                   <span style="font-weight: bold; color: red">
-                    保证降低至30%以内，超出必定退款!!!
+                    保证降低至20%以内，超出必定退款!!!
                   </span>
                 </p>
                 <div class="markBox">

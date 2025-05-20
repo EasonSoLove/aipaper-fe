@@ -1061,9 +1061,13 @@ export default {
       free_pay(data).then((res) => {
         console.log(res, "res");
         // 打开step3
-        this.$store.dispatch("app/setActiveIndex", 3);
         // step3开始循环
         let _this = this;
+        setTimeout(() => {
+          _this.$nextTick(() => {
+            _this.$store.dispatch("app/setActiveIndex", 3);
+          });
+        }, 1000);
         setTimeout(() => {
           _this.$nextTick(() => {
             eventBus.emit("startStep3Polling", {
