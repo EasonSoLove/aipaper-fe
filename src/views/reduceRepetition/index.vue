@@ -31,13 +31,13 @@
           降AIGC率-格子达
           <span class="underLeft"></span>
         </p>
-        <p
+        <!-- <p
           @click="checkoutPaper(4)"
           :class="['outLeftTitle', activeIndex == 4 ? 'activeLT' : '']"
         >
           降AIGC率-人工版
           <span class="underLeft"></span>
-        </p>
+        </p> -->
         <!-- <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
           <p style="color: #606266">推荐字数: 300-400字效果最佳</p>
