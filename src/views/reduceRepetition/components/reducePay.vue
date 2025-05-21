@@ -132,6 +132,12 @@
                   >5元/1000字(不满千字按千字计算)</span
                 >
               </p>
+              <p style="margin: 10px 0; color: #606266">
+                加急价格:
+                <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
+                  >10元/1000字(不满千字按千字计算)</span
+                >
+              </p>
 
               <div class="cardChildList">
                 <p>总字数: {{ currentOrder.word_count }}</p>
