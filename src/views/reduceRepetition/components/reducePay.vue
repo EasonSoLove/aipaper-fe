@@ -129,7 +129,13 @@
               <p style="margin: 10px 0; color: #606266">
                 限时优惠:
                 <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
-                  >3元/1000字(不满千字按千字计算)</span
+                  >5元/1000字(不满千字按千字计算)</span
+                >
+              </p>
+              <p style="margin: 10px 0; color: #606266">
+                加急价格:
+                <span style="color: #f56c6c; font-size: 18px; font-weight: bold"
+                  >10元/1000字(不满千字按千字计算)</span
                 >
               </p>
 
@@ -142,7 +148,7 @@
                 >
                   郑重承诺:
                   <span style="font-weight: bold; color: red">
-                    保证降低至30%以内，超出必定退款!!!
+                    保证降低至20%以内，超出必定退款!!!
                   </span>
                 </p>
                 <div class="markBox">
@@ -183,7 +189,6 @@ export default {
     return {
       // 定义变量
       selectValue: "left", // 初始状态未选中任何卡片
-
       indexNum: 5,
       activeName: "PAY_ALL", // 支付类型：PAY_ALL-正式版，PAY_STAGES-预览版
       popupStatus: false,
@@ -613,7 +618,11 @@ export default {
       });
       this.$log("this.requestForm,扫码成功后调用回调11", this.requestForm);
 
-      eventBus.emit("showEmitReduceDialog", {
+      this.$message({
+        type: "success",
+        message: "支付成功, 查询记录在我的订单里查看!",
+      });
+      eventBus.emit("showEmitReduceDialog2", {
         requestKey: this.currentOrder.out_trade_no,
         payStatus: 2,
         paperPercent: 0,

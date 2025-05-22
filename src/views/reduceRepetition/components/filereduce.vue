@@ -2,45 +2,10 @@
   <div class="container">
     <!-- 左右布局 -->
     <div v-loading="loading" class="layout">
-      <!-- 左侧文件列表 -->
-      <el-card class="box-card file-list-card">
-        <div slot="header" class="file-list-header">
-          <span>已上传文件列表</span>
-        </div>
-        <!-- 文件列表 -->
-        <ul v-if="fileList.length" class="file-list">
-          <li
-            v-for="(file, index) in fileList"
-            :key="index"
-            class="file-item"
-            @mouseover="hoverIndex = index"
-            @mouseleave="hoverIndex = null"
-          >
-            <div class="file-content">
-              <div class="file-info">
-                <span class="file-name">{{ file.file_name }}</span>
-                <span class="file-chars">字符数: {{ file.file_chars }}</span>
-              </div>
-              <button class="delete-button" @click="removeFile(file)">
-                删除
-                <!-- v-if="hoverIndex === index" -->
-              </button>
-            </div>
-          </li>
-        </ul>
-        <!-- 空状态 -->
-        <div v-else>
-          <el-empty description="无上传文件"></el-empty>
-        </div>
-        <!-- 总字符数固定在底部 -->
-        <div class="file-summary">
-          <p>总字符数: {{ totalChars }}</p>
-        </div>
-      </el-card>
       <!-- 右侧上传区域 -->
       <el-card class="upload-section">
         <div slot="header" class="file-list-header">
-          <span>文件上传与解析</span>
+          <span>文件上传</span>
         </div>
         <el-upload
           ref="upload"
@@ -54,46 +19,126 @@
           multiple
         >
           <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">
-            <span style="font-weight: bold; font-size: 14px"> 温馨提示: </span>
+          <div class="el-upload__text">
+            <p>
+              将文件拖到此处，或<em style="font-weight: bold; color: #0066ff"
+                >点击上传</em
+              >
+            </p>
+            <p style="margin-top: 10px">
+              仅支持上传
+              <i style="color: #0066ff; font-weight: bold">docx / txt </i>
+              文件, 大小不超过
+              <i style="color: #0066ff; font-weight: bold">10M</i>
+            </p>
           </div>
-          <div class="el-upload__tip" slot="tip">可上传多个文件</div>
+
           <div class="el-upload__tip" slot="tip">
-            限制降重总数:
-            <i style="color: #0066ff; font-weight: bold">30000</i> 字
-          </div>
-          <div class="el-upload__tip" slot="tip">
-            仅支持上传
-            <i style="color: #0066ff; font-weight: bold">.docx</i>
-            文件
+            省钱小妙招：只需要上传重复率超标的片段即可哦～
           </div>
         </el-upload>
+
+        <div
+          style="
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+          "
+        >
+          <el-radio-group v-model="reduce_aigc_type">
+            <div style="display: flex">
+              <div class="leftRadio">
+                <div class="radioItem">
+                  <b>降知网AIGC</b>（AIGC率超20%包退）：
+                  <el-radio label="kns">预计12小时，不含检测报告</el-radio>
+                </div>
+                <div class="radioItem">
+                  <b> 降维普AIGC率</b>（AIGC率超20%包退）：
+                  <el-radio label="weipu">预计12小时，不含检测报告</el-radio>
+                </div>
+                <div class="radioItem">
+                  <b>降格子达AIGC率</b>（AIGC率超20%包退）：
+                  <el-radio label="gezida">预计12小时，不含检测报告</el-radio>
+                </div>
+              </div>
+              <div class="rightRadio" style="padding-left: 20px">
+                <div class="radioItem">
+                  <el-radio label="kns_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+                <div class="radioItem">
+                  <el-radio label="weipu_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+                <div class="radioItem">
+                  <el-radio label="gezida_urgent"
+                    >加急, 预计30分钟，不含检测报告</el-radio
+                  >
+                </div>
+              </div>
+            </div>
+          </el-radio-group>
+          <p style="margin-top: 20px; font-size: 12px; color: #909399">
+            温馨提示: 凌晨0:00 - 8:00 客服未在线, 不能及时处理加急的文件!
+          </p>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-top: 20px;
+              width: 100%;
+            "
+          >
+            <div @click="sentPayAi" class="reduceBtn2 g_poin">
+              <p>开始降重</p>
+            </div>
+          </div>
+        </div>
       </el-card>
+
+      <el-dialog
+        title="支付成功"
+        :visible.sync="showPaperDialog2Status"
+        width="30%"
+      >
+        <div>
+          <el-result icon="success" title="成功提示" subTitle="您已成功付款">
+            <template slot="extra">
+              订单详情及查重后文件, 在右上角
+              <span style="color: #0066ff; font-weight: bold"> 我的订单 </span>
+              <p style="margin-top: 10px">查看支付记录及下载查重文件!</p>
+            </template>
+          </el-result>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="showPaperDialog2Status = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
 
     <!-- 去支付按钮 -->
-    <div class="pay-button-container">
-      <el-button
-        @click="payReduce"
-        :disabled="fileList.length === 0"
-        type="primary"
-        style="width: 100%"
-      >
+    <!-- <div class="pay-button-container">
+      <el-button @click="payReduce" type="primary" style="width: 100%">
         一键降AIGC
       </el-button>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import eventBus from "@/utils/eventBus";
+
 import {
-  upload_reduce_file,
+  once_aigc_order,
   reduce_aigc_pay,
   remove_reduce_file,
 } from "@/api/paper";
-import eventBus from "@/utils/eventBus";
 import Progress from "@/components/progressonly.vue";
 
 export default {
@@ -103,7 +148,9 @@ export default {
       fileList: [],
       loading: false,
       reduceKey: "",
+      showPaperDialog2Status: false,
       totalChars: 0,
+      reduce_aigc_type: "kns",
       hoverIndex: null, // 当前鼠标悬浮的索引
       resdata: {
         file_list: [
@@ -125,7 +172,22 @@ export default {
       },
     };
   },
+  created() {
+    eventBus.on("showEmitReduceDialog2", this.showPaperDialog2); // 订阅事件
+  },
+  beforeDestroy() {
+    eventBus.off("showEmitReduceDialog2", this.showPaperDialog2); // 订阅事件
+  },
   methods: {
+    showPaperDialog2(data) {
+      this.showPaperDialog2Status = true;
+      // this.requestKey = data.requestKey;
+      // this.payStatusPro = new Date().getTime();
+      // this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
+      // if (data.paperPercent && data.paperPercent > 0) {
+      //   this.paperPercent = data.paperPercent;
+      // }
+    },
     removeFile(file) {
       // 删除文件的逻辑
       console.log("remove-file", file);
@@ -147,35 +209,23 @@ export default {
       });
     },
 
-    payReduce() {
-      if (this.totalChars > 30000) {
-        this.$message({
-          type: "warning",
-          message: "降重最大字数为30000字,请修改部分文件后重试!",
-        });
-        return false;
+    beforeUpload(file) {
+      const isDocxOrTxt =
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        file.type === "text/plain";
+      if (!isDocxOrTxt) {
+        this.$message.error("上传文件只能是.docx或.txt格式!");
       }
-      let data = {
-        reduce_key: this.reduceKey,
-        payment_method: "alipay",
-      };
-
-      reduce_aigc_pay(data).then((res) => {
-        // let res = {
-        //   result: {
-        //     reduce_key: "64a450fa-a773-4900-8662-ac21b62df5ca",
-        //     payment_method: "alipay",
-        //     pay_link:
-        //       "https://openapi.alipay.com/gateway.do?app_id=2021004165663603&biz_content=%7B%22out_trade_no%22%3A%2281dbc973-f032-4771-8bcc-c6997768bd9a%22%2C%22product_code%22%3A%22FAST_INSTANT_TRADE_PAY%22%2C%22qr_pay_mode%22%3A4%2C%22subject%22%3A%22%E6%B5%85%E6%80%9D%E7%A7%91%E6%8A%80%22%2C%22total_amount%22%3A0.01%7D&charset=utf-8&format=JSON&method=alipay.trade.page.pay&notify_url=https%3A%2F%2Fapi.mixpaper.cn%2Fapi%2Fai-paper%2Fnotify%2Falipay_dispatch&return_url=https%3A%2F%2Fmixpaper.cn%2F%23%2Fdashboard&sign=OemC44EgAtjHa3ajM5qtt4tABagdAXl%2FZpO3ZEuLQOgtpnAQkE04L86xuOStki2gn9WEsvh9MXua56bDQhOon65nQ%2FAQsdxBiS8hY6%2BA9G50eXM%2FQdvIUbiyf9lCotB%2Bdm3rSjC0s7djnzW4aAz2wriAmTupGpFwyEyjroO2XthaFdze5W%2BhEXP4686Fe9ECQ8N3JsCFg6QlnauinVt1Jo9CxLpzB29eMGfLnALLIYnFwmuw43oqpShySkIn94m898zBXF2Lt8dlFl9YEkGHenBM37Lg2XecQKDdKO6g4XgWgxCaRJnbLlCtf1dKgOO7buvuNpL9jvQThAZa2rXo7g%3D%3D&sign_type=RSA2&timestamp=2025-03-06+14%3A28%3A56&version=1.0",
-        //     pay_amount: 32,
-        //     original_amount: 64,
-        //     discounted_price: 32,
-        //     out_trade_no: "81dbc973-f032-4771-8bcc-c6997768bd9a",
-        //     word_count: 15339,
-        //     is_discount: 2,
-        //     order_type: "REDUCE_AIGC",
-        //   },
-        // };
+      return isDocxOrTxt;
+    },
+    sentPayAi() {
+      let data = new FormData();
+      data.append("reduce_aigc_type", this.reduce_aigc_type);
+      data.append("payment_method", "alipay");
+      data.append("files", this.fileList[0]);
+      once_aigc_order(data).then((res) => {
+        console.log(res, res, "sres");
         let order = {
           out_trade_no: res.result.out_trade_no,
           pay_amount: res.result.pay_amount,
@@ -190,57 +240,48 @@ export default {
           is_discount: res.result.is_discount, // 优惠金额
         };
         this.$store.dispatch("app/toggleCurrentOrder", order);
-
         eventBus.emit("showEmitPaypopup", {
           requestKey: res.result.out_trade_no,
           payStatus: 300,
-          paperPercent: 0,
         });
       });
     },
-    beforeUpload(file) {
-      const isDocx =
-        file.type ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-      if (!isDocx) {
-        this.$message.error("上传文件只能是.docx格式!");
-      }
-      return isDocx;
-    },
     async handleUpload({ file, onProgress, onSuccess, onError }) {
       console.log("fiel", file);
-      const formData = new FormData();
-      formData.append("files", file);
-      if (this.reduceKey) {
-        formData.append("reduce_key", this.reduceKey);
-      }
-      this.loading = true;
-      try {
-        upload_reduce_file(formData)
-          .then((res) => {
-            console.log("res", res);
-            if (res.code === 200) {
-              //       this.fileList = this.resdata.file_list;
-              // this.totalChars = this.resdata.word_count;
-              // this.reduceKey = this.resdata.reduce_key;
-              this.fileList = res.result.file_list;
-              this.reduceKey = res.result.reduce_key;
-              this.totalChars = res.result.word_count;
-              this.loading = false;
-            } else {
-              this.loading = false;
-              onError();
-            }
-          })
-          .catch(() => {
-            this.loading = false;
-          });
-      } catch (error) {
-        console.error("Upload error:", error);
-        this.$message.error("上传出错，请检查网络或联系管理员");
-        this.loading = false;
-        onError(error);
-      }
+      this.fileList = [];
+      this.fileList.push(file);
+      // const formData = new FormData();
+      // formData.append("files", file);
+      // if (this.reduceKey) {
+      //   formData.append("reduce_key", this.reduceKey);
+      // }
+      // this.loading = true;
+      // try {
+      //   upload_reduce_file(formData)
+      //     .then((res) => {
+      //       console.log("res", res);
+      //       if (res.code === 200) {
+      //         //       this.fileList = this.resdata.file_list;
+      //         // this.totalChars = this.resdata.word_count;
+      //         // this.reduceKey = this.resdata.reduce_key;
+      //         this.fileList = res.result.file_list;
+      //         this.reduceKey = res.result.reduce_key;
+      //         this.totalChars = res.result.word_count;
+      //         this.loading = false;
+      //       } else {
+      //         this.loading = false;
+      //         onError();
+      //       }
+      //     })
+      //     .catch(() => {
+      //       this.loading = false;
+      //     });
+      // } catch (error) {
+      //   console.error("Upload error:", error);
+      //   this.$message.error("上传出错，请检查网络或联系管理员");
+      //   this.loading = false;
+      //   onError(error);
+      // }
     },
   },
 };
@@ -264,6 +305,7 @@ export default {
 /* 布局样式 */
 .layout {
   display: flex;
+  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
 }
@@ -271,8 +313,8 @@ export default {
 /* 左侧文件列表样式 */
 .file-list-card {
   flex: 1;
-  margin-left: 20px;
   position: relative;
+  margin-top: 20px;
 }
 
 .file-list-header {
@@ -367,5 +409,29 @@ export default {
 .pay-button-container {
   text-align: center;
   margin-top: 20px;
+}
+::v-deep .el-upload-dragger {
+  height: 180px !important;
+  width: 100%;
+  padding-top: 0px !important;
+}
+.radioItem {
+  margin-top: 15px;
+  display: flex;
+  font-size: 13px;
+  align-items: center;
+}
+.reduceBtn2 {
+  width: 49%;
+  height: 44px;
+  background: #3355ff;
+  border-radius: 24px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 10px;
 }
 </style>

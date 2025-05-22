@@ -197,7 +197,7 @@
 import { mapGetters } from "vuex";
 // import { sms } from "@/api/login";
 // import webinfo from "@/components/webinfo.vue";
-import { getHomeInfo } from "@/api/user";
+import { getHomeInfo, global_code } from "@/api/user";
 import { getDomain } from "@/utils/index.js";
 
 export default {
@@ -230,6 +230,10 @@ export default {
       getHomeInfo(data).then((res) => {
         this.$store.dispatch("app/setHomeData", res.result);
         this.$store.dispatch("user/setAgentImage", res.result.agent_image);
+      });
+      global_code(data).then((res) => {
+        console.log("setGlobalCode", res);
+        this.$store.dispatch("app/setGlobalCode", res.result);
       });
     });
   },

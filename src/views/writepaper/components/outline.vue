@@ -1071,6 +1071,7 @@ export default {
         )
           .then(() => {
             // 存储用户数据并跳转
+            this.$store.dispatch("paper/setAdditionList", []);
 
             this.saveInput();
           })

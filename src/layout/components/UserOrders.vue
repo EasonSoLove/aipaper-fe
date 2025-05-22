@@ -55,7 +55,13 @@
                 style="margin-bottom: 8px"
                 :key="'case2' + j"
               >
-                <span v-show="orderObj.order.order_type != 'REDUCE_AIGC'">
+                <span
+                  v-show="
+                    orderObj.order.order_type != 'REDUCE_AIGC' &&
+                    orderObj.order.order_type != 'REDUCE_AIGC_ONCE' &&
+                    orderObj.order.order_type != 'REDUCE_AIGC_PACKAGES'
+                  "
+                >
                   论文题目:
                 </span>
                 {{ item.case.paper_case.title }}
@@ -83,7 +89,7 @@
                 订单类型:
                 <span class="info">{{
                   orderObj.order.order_type
-                    ? orderTypes[orderObj.order.order_type]
+                    ? getCNname(orderObj.order.order_type)
                     : "正文"
                 }}</span>
               </div>
@@ -110,7 +116,11 @@
                     type="text"
                     :disabled="item.case.paper_case.stage !== 1"
                     @click="pushStep3(orderObj)"
-                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type != 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_PACKAGES'
+                    "
                   >
                     查看论文进度
                   </el-button>
@@ -119,7 +129,11 @@
                     type="text"
                     :disabled="item.case.paper_case.stage !== 1"
                     @click="pushStep2(orderObj)"
-                    v-show="orderObj.order.order_type == 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type == 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_PACKAGES'
+                    "
                   >
                     查看降重进度
                   </el-button>
@@ -128,7 +142,11 @@
                     type="text"
                     :disabled="!item.case.file_urls.pdf"
                     @click="openPaper(orderObj)"
-                    v-show="orderObj.order.order_type != 'REDUCE_AIGC'"
+                    v-show="
+                      orderObj.order.order_type != 'REDUCE_AIGC' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_ONCE' &&
+                      orderObj.order.order_type != 'REDUCE_AIGC_PACKAGES'
+                    "
                   >
                     预览
                   </el-button>
@@ -163,7 +181,8 @@
           <div v-else>
             <div style="margin-bottom: 8px" class="orderTitle">
               <!-- 论文题目: {{ orderObj.outline.title }} -->
-              论文题目: {{ orderObj.outline.title }}
+              <span>论文题目</span>
+              {{ orderObj.outline.title }}
             </div>
 
             <div class="orderTitle orderTitleSpan">
@@ -227,17 +246,74 @@
           class="order"
           style="font-size: 14px; line-height: 20px"
         >
-          <p>订单类型:支付订单</p>
-          <p>
-            支付状态:
-            <span class="warning">{{
-              payStatusObj[orderObj.order.payment_status]
-            }}</span>
-          </p>
-          <p>
-            订单金额:
-            <span class="price">￥{{ orderObj.order.total_price }}</span>
-          </p>
+          <div class="orderNum rowBetween">
+            <!-- <div class="left">订单号：{{ orderObj.order.out_trade_no }}</div> -->
+            <div class="left" style="width: 60%">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="`订单号: ${orderObj.order.out_trade_no}`"
+                placement="top"
+              >
+                <p class="overHidden">
+                  订单号: {{ orderObj.order.out_trade_no }}
+                  <!-- 订单修改 -->
+                </p>
+              </el-tooltip>
+            </div>
+            <div class="right">
+              时间：{{ orderObj.order.created_at | dateFormatter }}
+            </div>
+          </div>
+          <div>
+            <template v-for="(item, j) in orderObj.order_item_response">
+              <div
+                class="orderTitle"
+                style="margin-bottom: 8px"
+                :key="'case2' + j"
+              >
+                <span
+                  v-show="
+                    orderObj.order.order_type != 'REDUCE_AIGC' &&
+                    orderObj.order.order_type != 'REDUCE_AIGC_ONCE' &&
+                    orderObj.order.order_type != 'REDUCE_AIGC_PACKAGES'
+                  "
+                >
+                  论文题目:
+                </span>
+                {{ item.case.paper_case.title }}
+              </div>
+
+              <div class="orderTitle orderTitleSpan" :key="'title' + j">
+                <!-- {{ item.product.name }} -->
+                订单类型:
+                <span class="info">{{
+                  orderObj.order.order_type
+                    ? getCNname(orderObj.order.order_type)
+                    : "正文"
+                }}</span>
+              </div>
+
+              <div class="orderTitle orderTitleSpan" :key="'title12' + j">
+                <!-- {{ item.product.name }} -->
+                支付状态:
+                <span class="warning">{{
+                  payStatusObj[orderObj.order.payment_status]
+                }}</span>
+              </div>
+              <div class="orderText rowBetween handleRow" :key="'case' + j">
+                <div></div>
+                <div class="right"></div>
+              </div>
+            </template>
+          </div>
+
+          <div class="orderText rowBetween handleRow">
+            <div class="left">
+              总价格:
+              <span class="price">￥{{ orderObj.order.total_price }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </el-checkbox-group>
@@ -299,6 +375,7 @@ export default {
       payType: {
         PAY_ALL: "正式版",
         PAY_STAGES: "预览版",
+        PAY_FREE: "免费",
       },
       payStatusObj: {
         WAIT_BUYER_PAY: "待支付",
@@ -328,10 +405,20 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["device"]),
+    ...mapGetters(["device", "globalCode"]),
     // 计算属性
   },
   methods: {
+    getCNname(orderType) {
+      const statusMap = this.globalCode.order_type_code;
+      let name = "";
+      statusMap.forEach((item) => {
+        if (item.code == orderType) {
+          name = item.description;
+        }
+      });
+      return name || "未知状态";
+    },
     sendReLoad(obj) {
       Ming("obj", obj);
       if (obj.order.order_type == "REDUCE_AIGC") {
@@ -542,6 +629,13 @@ export default {
     },
     downLoadPaper: _.debounce(function (item) {
       this.downStatus = true;
+      if (item.order.order_type == "REDUCE_AIGC_ONCE") {
+        let downUrl = item.order_item_response[0].case.file_urls.word;
+        window.open(downUrl, "_blank");
+        this.downStatus = false;
+
+        return false;
+      }
       if (item.order.order_type == "REDUCE_AIGC") {
         zhuge.track(`下载降重压缩包`);
         let data = {

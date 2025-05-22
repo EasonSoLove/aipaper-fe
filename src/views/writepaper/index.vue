@@ -200,6 +200,7 @@ export default {
     zhuge.track(`访问域名`, {
       domain: getDomain(),
     });
+    // 获取礼包列表
   },
 
   beforeDestroy() {

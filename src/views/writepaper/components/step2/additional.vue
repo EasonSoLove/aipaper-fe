@@ -83,7 +83,18 @@
               />论文正文(Word版)
             </p>
           </div>
+          <!-- {{ homeData.additional_service }} -->
           <div
+            v-show="
+              requestForm.product == '毕业论文' ||
+              requestForm.product ==
+                '结课论文                                                       '
+            "
+          >
+            <mingcard></mingcard>
+          </div>
+
+          <!-- <div
             v-show="
               requestForm.product == '毕业论文' ||
               requestForm.product ==
@@ -94,7 +105,7 @@
             <MingBtn :value="is_reduce_aigc" @change="handleCheckboxChange">
               论文是否开启降AIGC
             </MingBtn>
-          </div>
+          </div> -->
           <div class="cardPress">
             <img src="@/assets/images/step/icon_24_bz@2x.png" alt="" />
             <p>承诺知网维普查重率低于20%，超过退款！</p>
@@ -277,11 +288,12 @@
 // import eventBus from "@/utils/eventBus";
 import { mapGetters } from "vuex";
 import { predict_price } from "@/api/paper";
-
+import mingcard from "@/components/mingcard.vue";
 export default {
   name: "additional",
   data() {
     return {
+      checkList: [],
       selectedCard: "left", // 用于跟踪选中的卡片
       // 定义变量
       checkboxGroup1: ["6", "7", "10", "11", "12", "13", "14", "15"],
@@ -361,6 +373,7 @@ export default {
   },
   components: {
     // webinfo,
+    mingcard,
   },
   watch: {
     requestForm: {
@@ -630,7 +643,7 @@ export default {
     margin-right: 8px;
   }
   p {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
   }
@@ -642,7 +655,7 @@ export default {
   color: #00b42a;
   letter-spacing: 0;
   line-height: 18px;
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   font-weight: bold;

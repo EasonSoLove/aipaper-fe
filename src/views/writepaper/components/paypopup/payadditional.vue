@@ -80,6 +80,19 @@
             </p>
           </div>
           <div
+            v-show="
+              currentOrder.order_type == 'PAPER_VOCATIONAL' ||
+              currentOrder.order_type == 'PAPER_VOCATIONAL_STAGES' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE' ||
+              currentOrder.order_type == 'PAPER_UNDERGRADUATE_STAGES' ||
+              currentOrder.order_type == 'PAPER_MASTER' ||
+              currentOrder.order_type == 'PAPER_MASTER_STAGES'
+            "
+            @click.stop="handleCheckboxClick"
+          >
+            <mingcard :disabled="true"></mingcard>
+          </div>
+          <!-- <div
             class="aigcBox"
             v-show="
               currentOrder.order_type == 'PAPER_VOCATIONAL' ||
@@ -98,7 +111,7 @@
             >
               论文是否开启降AIGC
             </MingBtn>
-          </div>
+          </div> -->
           <div class="cardPress">
             <img src="@/assets/images/step/icon_24_bz@2x.png" alt="" />
             <p>承诺知网维普查重率低于20%，超过退款！</p>
@@ -276,6 +289,7 @@
 // import eventBus from "@/utils/eventBus";
 import { mapGetters } from "vuex";
 import { predict_price } from "@/api/paper";
+import mingcard from "@/components/mingcard.vue";
 
 export default {
   name: "additional",
@@ -361,6 +375,7 @@ export default {
     },
   },
   components: {
+    mingcard,
     // webinfo,
   },
   watch: {
@@ -673,7 +688,7 @@ export default {
     margin-right: 8px;
   }
   p {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
   }
@@ -685,7 +700,7 @@ export default {
   color: #00b42a;
   letter-spacing: 0;
   line-height: 18px;
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   font-weight: bold;

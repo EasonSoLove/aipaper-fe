@@ -14,10 +14,18 @@ export function product() {
     method: "get",
   });
 }
+
 // 我的推广获取用户列表
 export function user_info(params) {
   return request({
     url: baseUrl + "/api/ai-paper/agent/user_info",
+    method: "get",
+    params,
+  });
+}
+export function third_aigc_task(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/task",
     method: "get",
     params,
   });
@@ -58,12 +66,46 @@ export function passOrder(params) {
     method: "get",
   });
 }
+export function apply_list(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/refund/apply_list",
+    method: "get",
+    params: params,
+  });
+}
 export function paper_status(data) {
   return request({
     url: baseUrl + "/api/ai-paper/paper/paper_status",
     method: "post",
     data,
-
+  });
+}
+export function confirm_apply(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/refund/confirm_apply",
+    method: "post",
+    data,
+  });
+}
+export function task_complete(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/task_complete",
+    method: "post",
+    data,
+  });
+}
+export function once_aigc_order(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/third_aigc/once_aigc_order",
+    method: "post",
+    data,
+  });
+}
+export function free_pay(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/orders/free_pay",
+    method: "post",
+    data,
   });
 }
 export function down_url(params) {
