@@ -13,10 +13,9 @@
           drag
           action=""
           :show-file-list="true"
-          :limit="1"
           :http-request="handleUpload"
           :before-upload="beforeUpload"
-          multiple
+          :file-list="fileList"
         >
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">
@@ -27,7 +26,7 @@
             </p>
             <p style="margin-top: 10px">
               仅支持上传
-              <i style="color: #0066ff; font-weight: bold">docx / txt </i>
+              <i style="color: #0066ff; font-weight: bold">docx </i>
               文件, 大小不超过
               <i style="color: #0066ff; font-weight: bold">10M</i>
             </p>
@@ -181,6 +180,7 @@ export default {
   methods: {
     showPaperDialog2(data) {
       this.showPaperDialog2Status = true;
+      this.fileList = [];
       // this.requestKey = data.requestKey;
       // this.payStatusPro = new Date().getTime();
       // this.$log("this.requestForm,支付成功打开页面时22", this.requestForm);
@@ -212,10 +212,9 @@ export default {
     beforeUpload(file) {
       const isDocxOrTxt =
         file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-        file.type === "text/plain";
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
       if (!isDocxOrTxt) {
-        this.$message.error("上传文件只能是.docx或.txt格式!");
+        this.$message.error("上传文件暂只支持 docx / doc 文件.");
       }
       return isDocxOrTxt;
     },
@@ -248,7 +247,9 @@ export default {
     },
     async handleUpload({ file, onProgress, onSuccess, onError }) {
       console.log("fiel", file);
+      // this.fileList = [file];
       this.fileList = [];
+      // this.fileList = [];
       this.fileList.push(file);
       // const formData = new FormData();
       // formData.append("files", file);
