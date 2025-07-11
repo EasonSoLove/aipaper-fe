@@ -49,7 +49,7 @@ export default {
   name: "App",
   data() {
     return {
-      isMaintenance: true, // 设置为 true 表示网站正在维护
+      isMaintenance: false, // 设置为 true 表示网站正在维护
     };
   },
   components: {
