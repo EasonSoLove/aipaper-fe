@@ -12,8 +12,8 @@
       <!-- <p>网站升级后, 论文及大纲生成速度提高, 网站访问更流畅!</p> -->
       <p>
         预计维护时间为
-        <b class="red"> 4 </b>
-        小时。 <b>2024-04-23 22:00 恢复网站</b>
+        <b class="red"> 10 </b>
+        小时。 <b>2024-07-12 00:00 恢复网站</b>
       </p>
       <!-- <p>爆肝修复中, 请稍等,或联系客服</p> -->
       <p>给您带来的不便，我们深表歉意，感谢您的理解与支持！</p>
@@ -49,7 +49,7 @@ export default {
   name: "App",
   data() {
     return {
-      isMaintenance: false, // 设置为 true 表示网站正在维护
+      isMaintenance: true, // 设置为 true 表示网站正在维护
     };
   },
   components: {
