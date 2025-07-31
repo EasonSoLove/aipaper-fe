@@ -327,6 +327,22 @@ export const constantRoutes = [
     hidden: true,
   },
   {
+    path: "/distribution",
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "distribution",
+        component: () => import("@/views/distribution/index.vue"),
+        meta: {
+          title: "分销页面",
+          icon: "dashboard",
+        },
+      },
+    ],
+    hidden: true,
+  },
+  {
     path: "/paper",
     component: Layout,
     redirect: "/paper/preview",
