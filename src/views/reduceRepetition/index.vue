@@ -3,13 +3,13 @@
     <!-- <swiper-one class="topSwiper"></swiper-one> -->
     <div class="outlineTab">
       <div class="outLeft">
-        <p
+        <!-- <p
           @click="checkoutPaper(0)"
           :class="['outLeftTitle', activeIndex == 0 ? 'activeLT' : '']"
         >
           降AIGC率-上传文件
           <span class="underLeft"></span>
-        </p>
+        </p> -->
         <p
           @click="checkoutPaper(1)"
           :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
@@ -306,7 +306,7 @@ export default {
       direction: "rtl", //抽屉方向
       textareaOut: "",
       sendStatus: false,
-      activeIndex: 0,
+      activeIndex: 1,
       placeText: [
         "请输入文章段落，待降AIGC率均可，每次最多500字",
         "请输入文章段落，待降AIGC率，每次最多1000字",
