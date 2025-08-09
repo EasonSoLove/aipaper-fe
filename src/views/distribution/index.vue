@@ -10,11 +10,11 @@
     </div>
 
     <!-- 横向文字播报 -->
-    <div class="marquee">
-      <span class="marquee-content">
-        恭喜用户A成功邀请3位好友获得奖励！ |
-        邀请好友最高可得30%现金分成，快来参与吧！ |
-        MixPaper助力高效写作，邀请越多奖励越多！
+    <div class="marquee" ref="marquee">
+      <span class="marquee-content" ref="marqueeContent">
+        <span v-for="(item, index) in duplicatedAnnouncements" :key="index"
+          >{{ item }} |
+        </span>
       </span>
     </div>
 
@@ -109,100 +109,88 @@
           style="display: flex; justify-content: center; margin-bottom: 18px"
         >
           <div class="my-invite-tabs">
-            <button class="my-invite-tab active">
-              已邀请{{ baseInfo.inv_user_num || 0 }}人
-            </button>
+            <span class="invite-count-display">
+              已邀请<span class="invite-number">{{
+                baseInfo.inv_user_num || 0
+              }}</span
+              >人
+            </span>
           </div>
         </div>
         <div class="my-invite-content">
-          <ul class="my-invite-list">
-            <li>暂无数据</li>
-          </ul>
+          <el-table
+            :data="invRecords"
+            style="width: 100%"
+            v-loading="invRecordsLoading"
+            empty-text="暂无数据"
+          >
+            <el-table-column
+              prop="invitee_name"
+              label="被邀请人"
+              width="150"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.invitee_name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="registration_time"
+              label="注册时间"
+              width="180"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span>{{ formatTime(scope.row.registration_time) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="invitee_rewards"
+              label="被邀请人奖励"
+              width="150"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span class="reward-text">{{ scope.row.invitee_rewards }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="inviter_rewards"
+              label="邀请人奖励"
+              width="150"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span class="reward-text">{{ scope.row.inviter_rewards }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="remarks" label="备注" align="center">
+              <template slot-scope="scope">
+                <span class="remarks-text">{{ scope.row.remarks || "-" }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div class="pagination-wrapper">
+            <el-pagination
+              @size-change="handleInvRecordsSizeChange"
+              @current-change="handleInvRecordsCurrentChange"
+              :current-page="invRecordsPagination.page_num"
+              :page-sizes="[5, 10, 20, 50]"
+              :page-size="invRecordsPagination.page_size"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="invRecordsPagination.total"
+            >
+            </el-pagination>
+          </div>
         </div>
       </div>
 
       <!-- 我的推广板块 -->
-      <div class="section-card">
-        <div class="section-title">我的推广</div>
-        <div class="my-invite-stats">
-          <div class="my-invite-stat-card">
-            <div class="my-invite-stat-icon">💰</div>
-            <div class="my-invite-stat-label">累计佣金</div>
-            <div class="my-invite-stat-value">
-              ￥{{ formatAmount(baseInfo.total_income) }}
-            </div>
-          </div>
-          <div class="my-invite-stat-card">
-            <div class="my-invite-stat-icon">🦍</div>
-            <div class="my-invite-stat-label">直推分成比例</div>
-            <div class="my-invite-stat-value">
-              {{ (baseInfo.direct_rewards * 100).toFixed(0) }}%
-            </div>
-          </div>
-          <div class="my-invite-stat-card">
-            <div class="my-invite-stat-icon">🤝</div>
-            <div class="my-invite-stat-label">间推分成比例</div>
-            <div class="my-invite-stat-value">
-              {{ (baseInfo.indirect_rewards * 100).toFixed(0) }}%
-            </div>
-          </div>
-        </div>
-        <div
-          style="display: flex; justify-content: center; margin-bottom: 18px"
-        >
-          <div class="my-invite-tabs">
-            <button
-              v-for="tab in promotionTabs"
-              :key="tab.id"
-              :class="['my-invite-tab', { active: activeTab === tab.id }]"
-              @click="switchTab(tab.id)"
-            >
-              {{ tab.text }}
-            </button>
-          </div>
-        </div>
-        <div
-          v-if="activeTab === 'withdrawable'"
-          class="my-invite-content active-content"
-        >
-          <ul class="my-invite-list">
-            <li v-if="withdrawalRecords.length === 0">暂无数据</li>
-            <li
-              v-else
-              v-for="record in withdrawalRecords"
-              :key="record.trade_no"
-            >
-              {{ record.distribution_change_type }} - ￥{{
-                formatAmount(record.change_amount)
-              }}
-              - {{ formatTime(record.created_time) }}
-            </li>
-          </ul>
-        </div>
-        <div
-          v-else-if="activeTab === 'pending'"
-          class="my-invite-content active-content"
-        >
-          <ul class="my-invite-list">
-            <li v-if="waitingSettleRecords.length === 0">暂无数据</li>
-            <li
-              v-else
-              v-for="record in waitingSettleRecords"
-              :key="record.trade_no"
-            >
-              {{ record.distribution_change_type }} - ￥{{
-                formatAmount(record.change_amount)
-              }}
-              - {{ formatTime(record.created_time) }}
-            </li>
-          </ul>
-        </div>
-        <div v-else class="my-invite-content">
-          <ul class="my-invite-list">
-            <li>暂无数据</li>
-          </ul>
-        </div>
-      </div>
+      <PromotionModule
+        :base-info="baseInfo"
+        @update-base-info="handleUpdateBaseInfo"
+      />
 
       <!-- 常见问题板块 -->
       <div class="section-card">
@@ -314,22 +302,18 @@
 http://localhost:9528/dev-api/api/ai-paper/distribution/base_info
 http://localhost:9528/dev-api/api/ai-paper/orders/order/list?page_num=1&page_size=5
 <script>
-import {
-  getDistributionBaseInfo,
-  getInvRecords,
-  getWithdrawalRecords,
-  getWaitingSettleRecords,
-} from "@/api/distribution";
+import { getDistributionBaseInfo, getInvRecords } from "@/api/distribution";
 import PosterDialog from "./components/PosterDialog.vue";
+import PromotionModule from "./components/PromotionModule.vue";
 
 export default {
   name: "Distribution",
   components: {
     PosterDialog,
+    PromotionModule,
   },
   data() {
     return {
-      activeTab: "withdrawable",
       baseInfo: {
         distribution_name: "",
         inv_code_url: "",
@@ -342,23 +326,90 @@ export default {
         total_income: 0,
         is_login: false,
       },
-      promotionTabs: [
-        { id: "withdrawable", text: "可提现 ￥0.00" },
-        { id: "withdrawn", text: "已提现 ￥0.00" },
-        { id: "pending", text: "待结算 ￥0.00" },
-      ],
       invRecords: [],
-      withdrawalRecords: [],
-      waitingSettleRecords: [],
       loading: false,
       rewardDetailVisible: false,
       posterDialogVisible: false,
+      invRecordsLoading: false,
+      invRecordsPagination: {
+        page_num: 1,
+        page_size: 5,
+        total: 0,
+      },
+      announcements: [
+        "恭喜用户A成功邀请3位好友获得奖励！",
+        "邀请好友最高可得30%现金分成，快来参与吧！",
+        "MixPaper助力高效写作，邀请越多奖励越多！",
+        "新用户注册即送10元优惠券，赶快加入吧！",
+        "分享你的专属链接，每邀请一人得5元奖励！",
+        "恭喜用户A成功邀请3位好友获得奖励！",
+        "邀请好友最高可得30%现金分成，快来参与吧！",
+        "MixPaper助力高效写作，邀请越多奖励越多！",
+        "新用户注册即送10元优惠券，赶快加入吧！",
+        "分享你的专属链接，每邀请一人得5元奖励！",
+        "恭喜用户A成功邀请3位好友获得奖励！",
+        "邀请好友最高可得30%现金分成，快来参与吧！",
+        "MixPaper助力高效写作，邀请越多奖励越多！",
+        "新用户注册即送10元优惠券，赶快加入吧！",
+        "分享你的专属链接，每邀请一人得5元奖励！",
+        "恭喜用户A成功邀请3位好友获得奖励！",
+        "邀请好友最高可得30%现金分成，快来参与吧！",
+        "MixPaper助力高效写作，邀请越多奖励越多！",
+        "新用户注册即送10元优惠券，赶快加入吧！",
+        "分享你的专属链接，每邀请一人得5元奖励！",
+        "恭喜用户A成功邀请3位好友获得奖励！",
+        "邀请好友最高可得30%现金分成，快来参与吧！",
+        "MixPaper助力高效写作，邀请越多奖励越多！",
+        "新用户注册即送10元优惠券，赶快加入吧！",
+        "分享你的专属链接，每邀请一人得5元奖励！",
+      ],
+      duplicatedAnnouncements: [],
+      animationDuration: 40,
+      scrollInterval: null,
+      scrollSpeed: 1, // 每帧滚动的像素数，调整此值以控制速度
     };
   },
-  created() {
-    this.getBaseInfo();
+  mounted() {
+    this.duplicateAnnouncements();
+    this.$nextTick(() => {
+      this.startScrolling();
+    });
+  },
+  beforeDestroy() {
+    if (this.scrollInterval) {
+      clearInterval(this.scrollInterval);
+    }
   },
   methods: {
+    duplicateAnnouncements() {
+      // 复制公告内容以实现无缝循环效果
+      this.duplicatedAnnouncements = [
+        ...this.announcements,
+        ...this.announcements,
+      ];
+    },
+    startScrolling() {
+      const marquee = this.$refs.marquee;
+      const marqueeContent = this.$refs.marqueeContent;
+      if (marquee && marqueeContent) {
+        console.log("Starting scroll for marquee");
+        let scrollPosition = 0;
+        const contentWidth = marqueeContent.scrollWidth / 2; // 由于内容重复，只需滚动一半宽度即可循环
+        console.log("Content width:", contentWidth);
+
+        this.scrollInterval = setInterval(() => {
+          scrollPosition += this.scrollSpeed;
+          if (scrollPosition >= contentWidth) {
+            scrollPosition = 0; // 重置到起始位置，实现无缝循环
+            console.log("Reset scroll position");
+          }
+          marquee.scrollLeft = scrollPosition;
+          console.log("Scroll position:", scrollPosition);
+        }, 20); // 每 20 毫秒更新一次，模拟流畅滚动
+      } else {
+        console.log("Marquee or content not found");
+      }
+    },
     // 获取基础信息
     async getBaseInfo() {
       try {
@@ -378,79 +429,26 @@ export default {
 
     // 更新 Tab 文本
     updateTabTexts() {
-      this.promotionTabs = [
-        {
-          id: "withdrawable",
-          text: `可提现 ￥${this.formatAmount(this.baseInfo.balance)}`,
-        },
-        {
-          id: "withdrawn",
-          text: `已提现 ￥${this.formatAmount(this.baseInfo.withdrawn_amount)}`,
-        },
-        {
-          id: "pending",
-          text: `待结算 ￥${this.formatAmount(this.baseInfo.frozen_amount)}`,
-        },
-      ];
-    },
-
-    // 切换 Tab
-    async switchTab(tabId) {
-      this.activeTab = tabId;
-
-      // 根据 Tab 加载对应数据
-      if (tabId === "withdrawable" && this.withdrawalRecords.length === 0) {
-        await this.getWithdrawalRecords();
-      } else if (
-        tabId === "pending" &&
-        this.waitingSettleRecords.length === 0
-      ) {
-        await this.getWaitingSettleRecords();
-      }
+      // 这个方法现在主要用于更新其他地方的tab文本
+      // 推广模块的tab文本更新已经移到组件内部
     },
 
     // 获取邀请记录
     async getInvRecords() {
       try {
+        this.invRecordsLoading = true;
         const res = await getInvRecords({
-          page_num: 1,
-          page_size: 10,
+          page_num: this.invRecordsPagination.page_num,
+          page_size: this.invRecordsPagination.page_size,
         });
         if (res.code === 200) {
           this.invRecords = res.result.invited_record_list || [];
+          this.invRecordsPagination.total = res.result.total || 0;
         }
       } catch (error) {
         console.error("获取邀请记录失败:", error);
-      }
-    },
-
-    // 获取可提现记录
-    async getWithdrawalRecords() {
-      try {
-        const res = await getWithdrawalRecords({
-          page_num: 1,
-          page_size: 10,
-        });
-        if (res.code === 200) {
-          this.withdrawalRecords = res.result.settling_record_list || [];
-        }
-      } catch (error) {
-        console.error("获取可提现记录失败:", error);
-      }
-    },
-
-    // 获取待结算记录
-    async getWaitingSettleRecords() {
-      try {
-        const res = await getWaitingSettleRecords({
-          page_num: 1,
-          page_size: 10,
-        });
-        if (res.code === 200) {
-          this.waitingSettleRecords = res.result.settling_record_list || [];
-        }
-      } catch (error) {
-        console.error("获取待结算记录失败:", error);
+      } finally {
+        this.invRecordsLoading = false;
       }
     },
 
@@ -502,6 +500,24 @@ export default {
     scrollToInvite() {
       this.$scrollTo("#invite-section", 500, { offset: -100 });
     },
+
+    // 处理基础信息更新
+    handleUpdateBaseInfo(newBaseInfo) {
+      this.baseInfo = newBaseInfo;
+      this.updateTabTexts();
+    },
+
+    // 处理邀请记录每页显示数量变化
+    handleInvRecordsSizeChange(val) {
+      this.invRecordsPagination.page_size = val;
+      this.getInvRecords();
+    },
+
+    // 处理邀请记录当前页变化
+    handleInvRecordsCurrentChange(val) {
+      this.invRecordsPagination.page_num = val;
+      this.getInvRecords();
+    },
   },
 };
 </script>
@@ -538,27 +554,24 @@ $title-color: #fff;
 .marquee {
   width: 100%;
   background: rgba(255, 255, 255, 0.7);
-  color: $title-color;
+  color: #333;
   font-size: 16px;
   padding: 8px 0;
-  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: hidden;
   margin-top: 16px;
   box-shadow: 0 2px 8px rgba(108, 99, 255, 0.04);
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; /* 确保在移动端平滑滚动 */
+  scrollbar-width: none; /* 隐藏滚动条 */
+  &::-webkit-scrollbar {
+    display: none; /* 隐藏滚动条 */
+  }
 }
 
 .marquee-content {
   display: inline-block;
   white-space: nowrap;
-  animation: marquee 12s linear infinite;
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
 }
 
 /* 主体内容容器 */
@@ -582,6 +595,18 @@ $title-color: #fff;
   padding: 10px 36px 10px 24px;
   margin-bottom: 18px;
   box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+}
+
+/* 区块头部样式 */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
 }
 
 /* 奖励卡片 */
@@ -650,14 +675,6 @@ $title-color: #fff;
   color: #6c63ff;
 }
 
-.reward-card-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 180px;
-  position: relative;
-}
-
 .reward-card-img-box {
   position: relative;
   width: 140px;
@@ -698,7 +715,7 @@ $title-color: #fff;
 }
 
 .virtual-reward-mini-card {
-  flex: 1;
+  width: 50%;
   background: linear-gradient(135deg, #e3eaff 0%, #f8f8ff 100%);
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(108, 99, 255, 0.08);
@@ -810,88 +827,6 @@ $title-color: #fff;
   background: linear-gradient(90deg, #b6c7f7 0%, #6c63ff 100%);
 }
 
-/* 我的推广区域 */
-.my-invite-stats {
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  margin: 18px 0 28px 0;
-}
-
-.my-invite-stat-card {
-  flex: 1;
-  background: linear-gradient(135deg, #edeaff 0%, #f8f8ff 100%);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.06);
-  padding: 18px 0 14px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.my-invite-stat-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
-
-.my-invite-stat-label {
-  font-size: 15px;
-  color: #000;
-  margin-bottom: 4px;
-}
-
-.my-invite-stat-value {
-  font-size: 20px;
-  font-weight: bold;
-  color: #000;
-}
-
-.my-invite-tabs {
-  background: #edeaff;
-  border-radius: 12px;
-  padding: 4px;
-  width: fit-content;
-}
-
-.my-invite-tab {
-  border: none;
-  outline: none;
-  background: none;
-  font-size: 16px;
-  font-weight: 500;
-  color: $title-color;
-  padding: 8px 32px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  margin: 0 auto;
-}
-
-.my-invite-tab.active {
-  background: linear-gradient(90deg, #6c63ff 0%, #b6c7f7 100%);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.1);
-}
-
-.my-invite-tab:not(.active):hover {
-  background: #f3f3ff;
-}
-
-.my-invite-content {
-  background: #f8f8ff;
-  border-radius: 10px;
-  padding: 18px 16px;
-}
-
-.my-invite-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: center;
-  color: #888;
-  font-size: 16px;
-}
-
 /* 常见问题区域 */
 .qa-section {
   margin-top: 32px;
@@ -926,11 +861,10 @@ $title-color: #fff;
 
 .reward-section-new {
   max-width: 900px;
-  margin: 32px auto 0 auto;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(108, 99, 255, 0.08);
-  padding: 32px 24px 24px 24px;
+  padding: 32px 24px 2px 24px;
 }
 
 /* 响应式设计 */
@@ -940,18 +874,9 @@ $title-color: #fff;
     padding: 18px 10px 18px 10px;
   }
 
-  .reward-card-right {
-    margin-top: 18px;
-  }
-
   .virtual-reward-list-row {
     flex-direction: column;
     gap: 16px;
-  }
-
-  .my-invite-stats {
-    flex-direction: column;
-    gap: 12px;
   }
 
   .invite-link-box {
@@ -1009,6 +934,7 @@ $title-color: #fff;
   font-weight: bold;
   color: $title-color;
   margin: 0;
+  margin-bottom: 20px;
 }
 
 .section-content {
@@ -1060,5 +986,92 @@ $title-color: #fff;
 /* 弹窗内容区域 */
 .el-drawer__body {
   padding: 0;
+}
+
+.pagination-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* 邀请记录表格样式 */
+.reward-text {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.remarks-text {
+  color: #666;
+  font-size: 14px;
+}
+
+/* 邀请人数显示样式 */
+.invite-count-display {
+  background: linear-gradient(90deg, #6c63ff 0%, #b6c7f7 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 32px;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.1);
+  cursor: default;
+  user-select: none;
+}
+
+.invite-number {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.my-invite-bg {
+  width: 100%;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* 刷新按钮样式 */
+.refresh-btn {
+  background: linear-gradient(90deg, #6c63ff 0%, #b6c7f7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 36px;
+  margin-left: 10px;
+}
+
+.refresh-btn:hover {
+  background: linear-gradient(90deg, #b6c7f7 0%, #6c63ff 100%);
+}
+
+.refresh-btn.refreshing {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #888;
+}
+
+.refresh-btn.refreshing i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
