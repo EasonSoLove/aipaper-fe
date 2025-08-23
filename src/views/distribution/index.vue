@@ -302,7 +302,7 @@
 http://localhost:9528/dev-api/api/ai-paper/distribution/base_info
 http://localhost:9528/dev-api/api/ai-paper/orders/order/list?page_num=1&page_size=5
 <script>
-import { getDistributionBaseInfo, getInvRecords } from "@/api/distribution";
+import { getInvRecords } from "@/api/distribution";
 import PosterDialog from "./components/PosterDialog.vue";
 import PromotionModule from "./components/PromotionModule.vue";
 
@@ -374,6 +374,8 @@ export default {
     this.$nextTick(() => {
       this.startScrolling();
     });
+    // 进入/刷新页面时获取基础信息并写入 Vuex
+    this.getBaseInfo();
   },
   beforeDestroy() {
     if (this.scrollInterval) {
@@ -392,31 +394,27 @@ export default {
       const marquee = this.$refs.marquee;
       const marqueeContent = this.$refs.marqueeContent;
       if (marquee && marqueeContent) {
-        console.log("Starting scroll for marquee");
         let scrollPosition = 0;
         const contentWidth = marqueeContent.scrollWidth / 2; // 由于内容重复，只需滚动一半宽度即可循环
-        console.log("Content width:", contentWidth);
 
         this.scrollInterval = setInterval(() => {
           scrollPosition += this.scrollSpeed;
           if (scrollPosition >= contentWidth) {
             scrollPosition = 0; // 重置到起始位置，实现无缝循环
-            console.log("Reset scroll position");
           }
           marquee.scrollLeft = scrollPosition;
-          console.log("Scroll position:", scrollPosition);
         }, 20); // 每 20 毫秒更新一次，模拟流畅滚动
       } else {
-        console.log("Marquee or content not found");
+        // ignore
       }
     },
     // 获取基础信息
     async getBaseInfo() {
       try {
         this.loading = true;
-        const res = await getDistributionBaseInfo();
-        if (res.code === 200) {
-          this.baseInfo = res.result;
+        const res = await this.$store.dispatch("distribution/fetchBaseInfo");
+        if (res && res.code === 200) {
+          this.baseInfo = this.$store.getters.distributionBaseInfo;
           this.updateTabTexts();
         }
       } catch (error) {
@@ -503,6 +501,13 @@ export default {
 
     // 处理基础信息更新
     handleUpdateBaseInfo(newBaseInfo) {
+      // 如果未传入数据，表示子组件请求刷新，直接重新拉取
+      if (!newBaseInfo) {
+        this.getBaseInfo();
+        return;
+      }
+      // 否则同步写入 Vuex 并更新本地展示
+      this.$store.dispatch("distribution/setBaseInfo", newBaseInfo);
       this.baseInfo = newBaseInfo;
       this.updateTabTexts();
     },

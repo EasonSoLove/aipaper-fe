@@ -27,5 +27,6 @@ const getters = {
   formdataV2: (state) => state.paper.formdataV2,
   outlineVersion: (state) => state.paper.outlineVersion,
   is_reduce_aigc: (state) => state.paper.is_reduce_aigc,
+  distributionBaseInfo: (state) => state.distribution.baseInfo,
 };
 export default getters;

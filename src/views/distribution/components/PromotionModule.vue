@@ -15,6 +15,7 @@
 
     <div class="my-invite-bg">
       <img src="@/assets/images/distribution/bg4.png" alt="" />
+      <div class="upgrade-btn" @click="openUpgradeDialog">升级为分享商</div>
     </div>
 
     <div class="my-invite-stats">
@@ -22,7 +23,15 @@
         <div class="my-invite-stat-icon">💰</div>
         <div class="my-invite-stat-label">累计佣金</div>
         <div class="my-invite-stat-value">
-          ￥{{ formatAmount(baseInfo.total_income) }}
+          ￥{{ formatAmount(baseInfo.total_income)
+          }}<el-button
+            style="margin-left: 10px"
+            type="primary"
+            size="small"
+            @click="handleWithdraw"
+          >
+            提现
+          </el-button>
         </div>
       </div>
       <div class="my-invite-stat-card">
@@ -121,6 +130,79 @@
       </div>
     </div>
 
+    <!-- 已提现记录 -->
+    <div
+      v-else-if="activeTab === 'withdrawn'"
+      class="my-invite-content active-content"
+    >
+      <el-table
+        :data="withdrawnRecords"
+        style="width: 100%"
+        v-loading="loading"
+        empty-text="暂无数据"
+      >
+        <el-table-column prop="trade_no" label="单号" width="260">
+          <template slot-scope="scope">
+            <span class="trade-no-text">{{ scope.row.trade_no }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="distribution_change_type"
+          label="类型"
+          width="120"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span
+              :class="getChangeTypeClass(scope.row.distribution_change_type)"
+            >
+              {{ translateChangeType(scope.row.distribution_change_type) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="change_amount" label="金额" width="120">
+          <template slot-scope="scope">
+            <span class="amount-text"
+              >￥{{ formatAmount(scope.row.change_amount) }}</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column prop="settle_status" label="状态" width="120">
+          <template slot-scope="scope">
+            <span>{{
+              translateWithdrawStatus(
+                scope.row.settle_status,
+                $store.getters.globalCode
+              )
+            }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_time" label="申请时间" width="180">
+          <template slot-scope="scope">
+            <span>{{ formatTime(scope.row.created_time) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="complete_time" label="处理时间" width="180">
+          <template slot-scope="scope">
+            <span>{{ formatTime(scope.row.complete_time) }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="pagination-wrapper">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pagination.page_num"
+          :page-sizes="[5, 10, 20, 50, 100]"
+          :page-size="pagination.page_size"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pagination.total"
+        >
+        </el-pagination>
+      </div>
+    </div>
+
     <!-- 待结算记录 -->
     <div
       v-else-if="activeTab === 'pending'"
@@ -195,6 +277,120 @@
         <p>暂无数据</p>
       </div>
     </div>
+
+    <!-- 实名认证弹窗（待激活） -->
+    <el-dialog
+      :visible.sync="realNameDialogVisible"
+      title="实名认证"
+      width="520px"
+    >
+      <el-form
+        ref="realNameFormRef"
+        :model="realNameForm"
+        :rules="realNameRules"
+        style="margin: -20px 10px"
+        label-position="top"
+      >
+        <el-form-item label="姓名" prop="real_name" :required="true">
+          <el-input
+            v-model.trim="realNameForm.real_name"
+            placeholder="请输入真实姓名"
+          />
+        </el-form-item>
+        <el-form-item label="身份证号" prop="id_card" :required="true">
+          <el-input
+            v-model.trim="realNameForm.id_card"
+            placeholder="请输入身份证号"
+          />
+        </el-form-item>
+        <el-form-item
+          label="支付宝账号（手机号）"
+          prop="ali_account"
+          :required="true"
+        >
+          <el-input
+            v-model.trim="realNameForm.ali_account"
+            placeholder="请输入支付宝账号（手机号）"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="hasAgreedContract">
+            我已阅读并同意
+            <a
+              v-if="contractInfo.title"
+              href="javascript:void(0)"
+              @click.prevent="openContractLink"
+              style="color: #67c23a; margin-left: 4px"
+            >
+              {{ contractInfo.title }}
+            </a>
+          </el-checkbox>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="realNameDialogVisible = false">取 消</el-button>
+        <el-button
+          type="success"
+          :disabled="disableSignButton()"
+          @click="handleSignSubmit"
+          >认证并签约</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- 状态提示弹窗（冻结/关闭/已签约） -->
+    <el-dialog
+      :visible.sync="statusDialogVisible"
+      title="提现提示"
+      width="420px"
+    >
+      <div style="padding: 8px 0">{{ statusDialogText }}</div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="statusDialogVisible = false"
+          >我知道了</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- 提现弹窗 -->
+    <el-dialog
+      :visible.sync="withdrawDialogVisible"
+      title="提交提现申请"
+      width="520px"
+    >
+      <div style="margin: -10px 10px 0">
+        <div style="margin-bottom: 10px; font-size: 14px">
+          可提现：<b>￥{{ formatAmount(baseInfo.balance) }}</b>
+        </div>
+        <el-form label-position="top">
+          <el-form-item label="提现金额 *">
+            <el-input-number
+              size="medium"
+              :min="0.01"
+              :max="Number(baseInfo.balance) || 0"
+              :step="0.01"
+              :precision="2"
+              v-model="withdrawForm.withdrawn_amount"
+              @change="handleWithdrawAmountChange"
+            />
+            <div style="margin-top: 8px; color: #999; font-size: 12px">
+              实际到账金额（预估）：￥{{ withdrawForm.expected_amount }}
+            </div>
+            <div style="margin-top: 4px; color: #e6a23c; font-size: 12px">
+              手续费和个税暂按预估扣除约6.5%
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="withdrawDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitWithdraw">提交申请</el-button>
+      </span>
+    </el-dialog>
+    <UpgradeDialog
+      :visible.sync="upgradeDialogVisible"
+      @success="$emit('update-base-info', null)"
+    />
   </div>
 </template>
 
@@ -203,12 +399,24 @@ import {
   getDistributionBaseInfo,
   getWithdrawalRecords,
   getWaitingSettleRecords,
+  getWithdrawnRecords,
   refreshDistributionAccount,
+  getDistributionContract,
+  postDistributionSign,
+  postDistributionWithdrawn,
+  getDistributionUpgrade,
 } from "@/api/distribution";
-import { translateChangeType, getChangeTypeClass } from "../constants.js";
+import {
+  translateChangeType,
+  getChangeTypeClass,
+  translateWithdrawStatus,
+} from "../constants.js";
+import { orderDetailById } from "@/api/user";
+import UpgradeDialog from "./UpgradeDialog.vue";
 
 export default {
   name: "PromotionModule",
+  components: { UpgradeDialog },
   props: {
     baseInfo: {
       type: Object,
@@ -235,9 +443,99 @@ export default {
         { id: "pending", text: "待结算 ￥0.00" },
       ],
       withdrawalRecords: [],
+      withdrawnRecords: [],
       waitingSettleRecords: [],
       loading: false,
       refreshing: false,
+      // 实名认证弹窗相关
+      realNameDialogVisible: false,
+      realNameForm: {
+        real_name: "",
+        id_card: "",
+        ali_account: "",
+      },
+      hasAgreedContract: false,
+      contractInfo: {
+        title: "",
+        url: "",
+      },
+      realNameRules: {
+        real_name: [
+          {
+            required: true,
+            message: "请输入真实姓名",
+            trigger: ["blur", "change"],
+          },
+          {
+            validator: (rule, value, callback) => {
+              const nameRegex = /^[\u4e00-\u9fa5·\sA-Za-z]{2,30}$/;
+              if (!value) return callback();
+              if (!nameRegex.test(value)) {
+                return callback(new Error("姓名格式不正确，不能包含特殊字符"));
+              }
+              callback();
+            },
+            trigger: ["blur", "change"],
+          },
+        ],
+        id_card: [
+          {
+            required: true,
+            message: "请输入身份证号",
+            trigger: ["blur", "change"],
+          },
+          {
+            validator: (rule, value, callback) => {
+              // 简易大陆二代身份证校验（18位，含校验位X/x）
+              const idRegex =
+                /^(^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0][1-9])|([12]\d)|(3[01]))\d{3}[0-9Xx]$)$/;
+              if (!value) return callback();
+              if (!idRegex.test(value)) {
+                return callback(new Error("身份证号格式不正确"));
+              }
+              callback();
+            },
+            trigger: ["blur", "change"],
+          },
+        ],
+        ali_account: [
+          {
+            required: true,
+            message: "请输入支付宝账号（手机号）",
+            trigger: ["blur", "change"],
+          },
+          {
+            validator: (rule, value, callback) => {
+              const phoneRegex = /^(?:(?:\+|00)86)?1[3-9]\d{9}$/;
+              if (!value) return callback();
+              if (!phoneRegex.test(value)) {
+                return callback(new Error("手机号格式不正确"));
+              }
+              callback();
+            },
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
+      // 状态提示弹窗
+      statusDialogVisible: false,
+      statusDialogText: "",
+      // 提现弹窗
+      withdrawDialogVisible: false,
+      withdrawForm: {
+        withdrawn_amount: 0.01,
+        expected_amount: 0,
+      },
+      // 升级支付（交由子组件控制显示，仅提供开关）
+      upgradeDialogVisible: false,
+      upgradeLoading: false,
+      upgradeOrder: {
+        out_trade_no: "",
+        original_amount: 199,
+        pay_amount: 99,
+        pay_link: "",
+      },
+      upgradePolling: false,
       pagination: {
         page_num: 1,
         page_size: 5,
@@ -246,6 +544,7 @@ export default {
       // 翻译函数
       translateChangeType,
       getChangeTypeClass,
+      translateWithdrawStatus,
     };
   },
   watch: {
@@ -261,6 +560,195 @@ export default {
     this.getWithdrawalRecords();
   },
   methods: {
+    openUpgradeDialog() {
+      this.upgradeDialogVisible = true;
+    },
+    // 升级入口
+    async handleUpgrade() {
+      try {
+        this.upgradeDialogVisible = true;
+        this.upgradeLoading = true;
+        const res = await getDistributionUpgrade();
+        if (res && res.code === 200 && res.result) {
+          this.upgradeOrder = {
+            out_trade_no: res.result.out_trade_no,
+            original_amount: res.result.original_amount || 199,
+            pay_amount: res.result.pay_amount || 99,
+            pay_link: res.result.pay_link,
+          };
+          this.upgradePolling = true;
+          // 启动查询
+          this.pollUpgradeStatus();
+        } else {
+          this.$message.error((res && res.message) || "获取升级订单失败");
+        }
+      } catch (e) {
+        this.$message.error("获取升级订单失败");
+      } finally {
+        this.upgradeLoading = false;
+      }
+    },
+
+    // 轮询支付结果（默认2s）
+    pollUpgradeStatus(delay = 2000) {
+      if (!this.upgradePolling || !this.upgradeOrder.out_trade_no) return;
+      orderDetailById({ key: this.upgradeOrder.out_trade_no })
+        .then((res) => {
+          if (!this.upgradePolling) return;
+          const order = res && res.result && res.result.order;
+          const status = order && order.payment_status;
+          if (status === "TRADE_SUCCESS") {
+            this.upgradePolling = false;
+            this.upgradeDialogVisible = false;
+            this.$message.success("升级成功！");
+            this.$emit("update-base-info", null);
+          } else {
+            setTimeout(() => this.pollUpgradeStatus(delay), delay);
+          }
+        })
+        .catch(() => {
+          if (!this.upgradePolling) return;
+          setTimeout(() => this.pollUpgradeStatus(delay), delay);
+        });
+    },
+    // 提现入口
+    async handleWithdraw() {
+      const status = this.baseInfo && this.baseInfo.distribution_account_status;
+      if (status === "PENDING_ACTIVATION") {
+        this.realNameDialogVisible = true;
+        try {
+          const res = await getDistributionContract();
+          if (res && res.code === 200 && res.result) {
+            this.contractInfo.title = res.result.title || "";
+            this.contractInfo.url = res.result.url || "";
+          }
+        } catch (e) {
+          // 忽略错误，仅不展示合同信息
+        }
+        return;
+      }
+
+      // 已签约等状态：校验并进入提现弹窗
+      if (status === "NORMAL") {
+        // 先刷新基础数据，确保余额最新
+        try {
+          await this.$emit("update-base-info", null);
+        } catch (e) {}
+        const balance = Number(this.baseInfo && this.baseInfo.balance) || 0;
+        if (balance < 0.01) {
+          this.$message.warning("金额不足，无法提现");
+          return;
+        }
+
+        // 打开提现弹窗
+        this.openWithdrawDialog();
+        return;
+      }
+
+      // 其他状态展示状态说明
+      const text = this.translateAccountStatus(status);
+      this.statusDialogText = text || "状态未知";
+      this.statusDialogVisible = true;
+    },
+
+    openWithdrawDialog() {
+      const balance = Number(this.baseInfo && this.baseInfo.balance) || 0;
+      this.withdrawForm.withdrawn_amount = Math.min(0.01, balance);
+      this.withdrawForm.expected_amount = (
+        this.withdrawForm.withdrawn_amount *
+        (1 - 0.065)
+      ).toFixed(2);
+      this.withdrawDialogVisible = true;
+    },
+
+    handleWithdrawAmountChange(val) {
+      const v = Number(val) || 0;
+      this.withdrawForm.expected_amount = (v * (1 - 0.065)).toFixed(2);
+    },
+
+    submitWithdraw() {
+      const balance = Number(this.baseInfo && this.baseInfo.balance) || 0;
+      const amt = Number(this.withdrawForm.withdrawn_amount) || 0;
+      if (amt < 0.01) {
+        this.$message.warning("提现金额小于最小提现金额");
+        return;
+      }
+      if (amt > balance) {
+        this.$message.error("提现金额超出可提现金额");
+        return;
+      }
+      postDistributionWithdrawn({ withdrawn_amount: String(amt) })
+        .then((res) => {
+          if (res && res.code === 200) {
+            this.$message.success("提现申请已成功发起！");
+            this.withdrawDialogVisible = false;
+            // 申请成功后刷新基础信息
+            this.$emit("update-base-info", null);
+          } else {
+            this.$message.error((res && res.message) || "提现申请失败");
+          }
+        })
+        .catch((err) => {
+          this.$message.error((err && err.message) || "提现申请失败");
+        });
+    },
+
+    // 账户状态翻译
+    translateAccountStatus(status) {
+      const map = {
+        PENDING_ACTIVATION: "待激活（需先完成实名认证与签约）",
+        NORMAL: "已签约（后续将完善提现流程）",
+        FROZEN: "账户已冻结，禁止提现",
+        CLOSED: "账户已关闭，禁止提现",
+      };
+      return map[status] || status || "";
+    },
+
+    // 打开合同链接
+    openContractLink() {
+      if (this.contractInfo && this.contractInfo.url) {
+        window.open(this.contractInfo.url, "_blank");
+      }
+    },
+
+    // 是否禁用“认证并签约”按钮（只根据必填项，不强制勾选，从而可以提示）
+    disableSignButton() {
+      const f = this.realNameForm;
+      return !(f.real_name && f.id_card && f.ali_account);
+    },
+
+    // 表单校验并提交
+    handleSignSubmit() {
+      if (!this.$refs.realNameFormRef) return;
+      this.$refs.realNameFormRef.validate((valid) => {
+        if (!valid) return;
+        if (!this.hasAgreedContract) {
+          this.$message.warning("请勾选并同意协议");
+          return;
+        }
+        // 提交签约
+        const payload = {
+          real_name: this.realNameForm.real_name,
+          id_card: this.realNameForm.id_card,
+          ali_account: this.realNameForm.ali_account,
+        };
+        postDistributionSign(payload)
+          .then((res) => {
+            if (res && res.code === 200) {
+              this.$message.success("签约成功！");
+              this.realNameDialogVisible = false;
+              // 通知父组件刷新基础信息
+              this.$emit("update-base-info", null); // 父组件内会重新触发getBaseInfo
+            } else {
+              this.$message.error((res && res.message) || "签约失败");
+            }
+          })
+          .catch((err) => {
+            const msg = (err && err.message) || "签约失败";
+            this.$message.error(msg);
+          });
+      });
+    },
     // 更新 Tab 文本
     updateTabTexts() {
       this.promotionTabs = [
@@ -287,6 +775,8 @@ export default {
       // 根据 Tab 加载对应数据
       if (tabId === "withdrawable") {
         await this.getWithdrawalRecords();
+      } else if (tabId === "withdrawn") {
+        await this.getWithdrawnRecords();
       } else if (tabId === "pending") {
         await this.getWaitingSettleRecords();
       }
@@ -332,11 +822,33 @@ export default {
       }
     },
 
+    // 获取已提现记录
+    async getWithdrawnRecords() {
+      this.loading = true;
+      try {
+        const res = await getWithdrawnRecords({
+          page_num: this.pagination.page_num,
+          page_size: this.pagination.page_size,
+        });
+        if (res.code === 200) {
+          this.withdrawnRecords = res.result.withdrawn_record_list || [];
+          this.pagination.total = res.result.total || 0;
+        }
+      } catch (error) {
+        console.error("获取已提现记录失败:", error);
+        this.$message.error("获取已提现记录失败");
+      } finally {
+        this.loading = false;
+      }
+    },
+
     // 处理页码改变
     handleCurrentChange(page) {
       this.pagination.page_num = page;
       if (this.activeTab === "withdrawable") {
         this.getWithdrawalRecords();
+      } else if (this.activeTab === "withdrawn") {
+        this.getWithdrawnRecords();
       } else if (this.activeTab === "pending") {
         this.getWaitingSettleRecords();
       }
@@ -348,6 +860,8 @@ export default {
       this.pagination.page_num = 1; // 重置到第一页
       if (this.activeTab === "withdrawable") {
         this.getWithdrawalRecords();
+      } else if (this.activeTab === "withdrawn") {
+        this.getWithdrawnRecords();
       } else if (this.activeTab === "pending") {
         this.getWaitingSettleRecords();
       }
@@ -391,6 +905,12 @@ export default {
       if (!timeStr) return "";
       const date = new Date(timeStr);
       return date.toLocaleString("zh-CN");
+    },
+
+    // 关闭升级弹窗
+    closeUpgradeDialog() {
+      this.upgradeDialogVisible = false;
+      this.upgradePolling = false; // 停止轮询
     },
   },
 };
@@ -606,6 +1126,7 @@ export default {
 
 .my-invite-bg {
   width: 100%;
+  position: relative;
   img {
     width: 100%;
     height: auto;
@@ -639,5 +1160,22 @@ export default {
   .section-card {
     max-width: 100%;
   }
+}
+/* 占位：移除空样式规则 */
+.upgrade-btn {
+  font-size: 15px;
+  position: absolute;
+  bottom: 20px;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
+  width: 170px;
+  text-align: center;
+  color: #fff;
+  background: #6c63ff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 2;
 }
 </style>

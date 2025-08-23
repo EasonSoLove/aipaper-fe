@@ -35,3 +35,40 @@ export function getChangeTypeClass(changeType) {
   };
   return classMap[changeType] || "change-type-default";
 }
+
+/**
+ * 翻译提现状态 settle_status
+ * 依赖全局码值 distribution_withdrawn_status_code
+ * @param {string|number} status
+ * @param {Array} globalCode 由 /api/ai-paper/home/global_code 设置到 Vuex 的 app.globalCode
+ */
+export function translateWithdrawStatus(status, globalCode = []) {
+  // 新结构：globalCode 为对象，直接包含 distribution_withdrawn_status_code 数组
+  if (
+    globalCode &&
+    typeof globalCode === "object" &&
+    !Array.isArray(globalCode) &&
+    Array.isArray(globalCode.distribution_withdrawn_status_code)
+  ) {
+    const arr = globalCode.distribution_withdrawn_status_code;
+    const found = arr.find((i) => String(i.code) === String(status));
+    return (
+      (found && (found.description || found.desc || found.value)) || status
+    );
+  }
+
+  // 兼容旧结构：globalCode 为数组，元素包含 code_key 与 code_values
+  if (Array.isArray(globalCode)) {
+    const group = globalCode.find(
+      (g) => g && g.code_key === "distribution_withdrawn_status_code"
+    );
+    if (group && Array.isArray(group.code_values)) {
+      const item = group.code_values.find(
+        (i) => String(i.code) === String(status)
+      );
+      return (item && (item.value || item.desc || item.name)) || status;
+    }
+  }
+
+  return status;
+}
