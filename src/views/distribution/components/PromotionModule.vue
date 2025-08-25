@@ -141,12 +141,30 @@
         v-loading="loading"
         empty-text="暂无数据"
       >
-        <el-table-column prop="trade_no" label="单号" width="260">
+        <el-table-column prop="trade_no" label="单号">
           <template slot-scope="scope">
-            <span class="trade-no-text">{{ scope.row.trade_no }}</span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              :content="scope.row.trade_no"
+              placement="top"
+            >
+              <span
+                class="trade-no-text"
+                style="
+                  display: inline-block;
+                  width: 100%;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                "
+              >
+                {{ scope.row.trade_no }}
+              </span>
+            </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           prop="distribution_change_type"
           label="类型"
           width="120"
@@ -159,30 +177,55 @@
               {{ translateChangeType(scope.row.distribution_change_type) }}
             </span>
           </template>
-        </el-table-column>
-        <el-table-column prop="change_amount" label="金额" width="120">
+        </el-table-column> -->
+        <el-table-column
+          prop="change_amount"
+          label="金额"
+          align="center"
+          width="120"
+        >
           <template slot-scope="scope">
             <span class="amount-text"
               >￥{{ formatAmount(scope.row.change_amount) }}</span
             >
           </template>
         </el-table-column>
-        <el-table-column prop="settle_status" label="状态" width="120">
+        <el-table-column
+          prop="settle_status"
+          label="状态"
+          align="center"
+          width="120"
+        >
           <template slot-scope="scope">
-            <span>{{
-              translateWithdrawStatus(
-                scope.row.settle_status,
-                $store.getters.globalCode
-              )
-            }}</span>
+            <el-tag
+              :type="getStatusTagType(scope.row.settle_status)"
+              size="small"
+            >
+              {{
+                translateWithdrawStatus(
+                  scope.row.settle_status,
+                  $store.getters.globalCode
+                )
+              }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="created_time" label="申请时间" width="180">
+        <el-table-column
+          prop="created_time"
+          label="申请时间"
+          align="center"
+          width="180"
+        >
           <template slot-scope="scope">
             <span>{{ formatTime(scope.row.created_time) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="complete_time" label="处理时间" width="180">
+        <el-table-column
+          prop="complete_time"
+          label="处理时间"
+          align="center"
+          width="180"
+        >
           <template slot-scope="scope">
             <span>{{ formatTime(scope.row.complete_time) }}</span>
           </template>
@@ -696,6 +739,19 @@ export default {
         .catch((err) => {
           this.$message.error((err && err.message) || "提现申请失败");
         });
+    },
+
+    // 获取状态标签类型
+    getStatusTagType(status) {
+      // 根据接口文档，settle_status: "1" 表示成功，"0" 表示失败
+      // 成功为 success，失败为 error，其他状态为 warning
+      if (status === "1") {
+        return "success";
+      } else if (status === "0") {
+        return "error";
+      } else {
+        return "warning";
+      }
     },
 
     // 账户状态翻译
