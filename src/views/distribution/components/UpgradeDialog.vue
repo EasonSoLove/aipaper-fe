@@ -59,26 +59,33 @@
 </template>
 
 <script>
-import { getDistributionUpgrade } from "@/api/distribution";
 import { orderDetailById } from "@/api/user";
 
 export default {
   name: "UpgradeDialog",
   props: {
     visible: { type: Boolean, default: false },
+    upgradeOrder: {
+      type: Object,
+      default: () => ({
+        out_trade_no: "",
+        original_amount: 199,
+        pay_amount: 99,
+        pay_link: "",
+      }),
+    },
   },
   data() {
     return {
       loading: false,
       polling: false,
-      order: {
-        out_trade_no: "",
-        original_amount: 199,
-        pay_amount: 99,
-        pay_link: "",
-      },
       intervalMs: 2000,
     };
+  },
+  computed: {
+    order() {
+      return this.upgradeOrder;
+    },
   },
   watch: {
     visible(val) {
@@ -91,25 +98,10 @@ export default {
   },
   methods: {
     async initUpgrade() {
-      this.loading = true;
-      try {
-        const res = await getDistributionUpgrade();
-        if (res && res.code === 200 && res.result) {
-          this.order = {
-            out_trade_no: res.result.out_trade_no,
-            original_amount: res.result.original_amount || 199,
-            pay_amount: res.result.pay_amount || 99,
-            pay_link: res.result.pay_link,
-          };
-          this.polling = true;
-          this.pollOnce();
-        } else {
-          this.$message.error((res && res.message) || "获取升级订单失败");
-        }
-      } catch (e) {
-        this.$message.error("获取升级订单失败");
-      } finally {
-        this.loading = false;
+      // 直接使用父组件传递的订单信息，避免重复API调用
+      if (this.order && this.order.out_trade_no && this.order.pay_link) {
+        this.polling = true;
+        this.pollOnce();
       }
     },
     pollOnce() {

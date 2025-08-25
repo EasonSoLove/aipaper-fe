@@ -389,6 +389,7 @@
     </el-dialog>
     <UpgradeDialog
       :visible.sync="upgradeDialogVisible"
+      :upgradeOrder="upgradeOrder"
       @success="$emit('update-base-info', null)"
     />
   </div>
@@ -528,7 +529,7 @@ export default {
       },
       // 升级支付（交由子组件控制显示，仅提供开关）
       upgradeDialogVisible: false,
-      upgradeLoading: false,
+
       upgradeOrder: {
         out_trade_no: "",
         original_amount: 199,
@@ -560,32 +561,36 @@ export default {
     this.getWithdrawalRecords();
   },
   methods: {
-    openUpgradeDialog() {
-      this.upgradeDialogVisible = true;
-    },
     // 升级入口
-    async handleUpgrade() {
-      try {
+    async openUpgradeDialog() {
+      const res = await getDistributionUpgrade();
+
+      // 如果已经是高级分销商，显示提示信息，不打开弹窗
+      if (res && res.code === 10004) {
+        this.$message.info(res.message || "您已经是高级分销商了，无需升级！");
+        return;
+      }
+
+      // 如果接口返回成功且有订单信息，打开升级弹窗
+      if (
+        res &&
+        res.code === 200 &&
+        res.result &&
+        res.result.out_trade_no &&
+        res.result.pay_amount
+      ) {
+        this.upgradeOrder = {
+          out_trade_no: res.result.out_trade_no,
+          original_amount: res.result.original_amount || 199,
+          pay_amount: res.result.pay_amount || 99,
+          pay_link: res.result.pay_link,
+        };
         this.upgradeDialogVisible = true;
-        this.upgradeLoading = true;
-        const res = await getDistributionUpgrade();
-        if (res && res.code === 200 && res.result) {
-          this.upgradeOrder = {
-            out_trade_no: res.result.out_trade_no,
-            original_amount: res.result.original_amount || 199,
-            pay_amount: res.result.pay_amount || 99,
-            pay_link: res.result.pay_link,
-          };
-          this.upgradePolling = true;
-          // 启动查询
-          this.pollUpgradeStatus();
-        } else {
-          this.$message.error((res && res.message) || "获取升级订单失败");
-        }
-      } catch (e) {
-        this.$message.error("获取升级订单失败");
-      } finally {
-        this.upgradeLoading = false;
+        this.upgradePolling = true;
+        // 启动查询
+        this.pollUpgradeStatus();
+      } else {
+        this.$message.error((res && res.message) || "获取升级订单失败");
       }
     },
 
