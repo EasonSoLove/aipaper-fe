@@ -65,3 +65,11 @@ export function find_user_coupons(params) {
     params,
   });
 }
+
+// 获取优惠券背包
+export function getCouponBag() {
+  return request({
+    url: baseUrl + "/api/ai-paper/coupon/bag",
+    method: "get",
+  });
+}
