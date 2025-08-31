@@ -1672,7 +1672,12 @@ export default {
                 is_discount: res.result.is_discount, // 优惠金额
               };
               this.$store.dispatch("app/toggleCurrentOrder", order);
-
+              if (res.result.available_coupons) {
+                this.$store.dispatch(
+                  "user/setAvailableCoupons",
+                  res.result.available_coupons
+                );
+              }
               eventBus.emit("showEmitPaypopup", {
                 requestKey: res.result.out_trade_no,
                 payStatus: 2,
