@@ -10,6 +10,7 @@ const getters = {
   userInfo: (state) => state.user.userInfo,
   agent_image: (state) => state.user.agent_image,
   walletsOrder: (state) => state.user.walletsOrder,
+  availableCoupons: (state) => state.user.available_coupons,
   homeData: (state) => state.app.homeData,
   lineTitle: (state) => state.app.lineTitle,
   requestForm: (state) => state.app.requestForm,

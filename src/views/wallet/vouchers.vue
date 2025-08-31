@@ -18,7 +18,9 @@
             </div>
             <div class="right">
               <div class="discount">{{ getCouponDisplay(item) }}</div>
-              <button class="use-button">去使用</button>
+              <button class="use-button" @click="useCoupon(item)">
+                去使用
+              </button>
             </div>
           </div>
         </div>
@@ -52,7 +54,7 @@
       <el-tab-pane label="已失效">
         <div v-if="expired_coupons.length > 0" class="flexBox">
           <div
-            class="coupon couponUse"
+            class="coupon couponDated"
             v-for="item in expired_coupons"
             :key="item.coupon_code"
           >
@@ -91,6 +93,12 @@ export default {
     this.getList();
   },
   methods: {
+    useCoupon(item) {
+      console.log("item", item);
+      this.$router.push({
+        path: "/main/writepaper",
+      });
+    },
     getList() {
       getCouponBag()
         .then((res) => {
@@ -122,7 +130,7 @@ export default {
         if (item.discount_rate === 0) {
           return "免费";
         } else {
-          return `${(item.discount_rate * 10).toFixed(1)}折`;
+          return `${(item.discount_rate * 10).toFixed(0)}折`;
         }
       } else if (item.type === 3) {
         // 降AIGC次数券
@@ -162,16 +170,19 @@ body {
   width: 300px;
   height: 150px;
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   position: relative;
 }
 .couponUse {
-  width: 350px;
+  width: 300px;
 
-  background: url("../../assets/images/wallets/used.png");
+  background: url("../../assets/images/wallets/used.png") no-repeat center
+    center / 100% 100%;
 }
-.couponUse {
-  background: url("../../assets/images/wallets/used.png");
+
+.couponDated {
+  background: url("../../assets/images/wallets/dated.png") no-repeat center
+    center / 100% 100%;
 }
 .content {
   color: #fff;
@@ -185,28 +196,37 @@ body {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .validity {
   font-size: 14px;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .restriction {
   font-size: 12px;
+  text-align: left;
+  padding-right: 60px;
+  margin-top: 25px;
 }
 
 .right {
   display: flex;
+  width: 60px;
+  right: 10px;
+  top: 15px;
+  padding-bottom: 20px;
+  font-size: 14px;
   height: 90%;
-
+  position: absolute;
   flex-direction: column;
   justify-content: space-between;
   color: #fff;
 }
 
 .discount {
-  font-size: 16px;
   background: rgba(0, 0, 0, 0.2);
   padding: 5px 10px;
   border-radius: 5px;
@@ -219,10 +239,12 @@ body {
   background: transparent;
   border: 1px solid #fff;
   color: #fff;
-  padding: 5px 10px;
+  padding: 5px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  position: relative;
+  top: 10px;
 }
 
 .use-button:hover {

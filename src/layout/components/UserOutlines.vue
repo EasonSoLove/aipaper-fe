@@ -14,12 +14,19 @@
         <!-- <el-checkbox :label="orderObj.id" :value="orderObj.id"></el-checkbox> -->
         <div class="order">
           <div class="orderNum rowBetween">
-            <!-- <div class="left">大纲号：{{ orderObj.order.out_trade_no }}</div> -->
-            <div
-              class="left"
-              style="color: #f56c6c; font-weight: bold; font-size: 13px"
-            >
-              <p v-show="orderObj.free_num > 0">
+            <div class="left">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="`大纲号： ${orderObj.key1}`"
+                placement="top"
+              >
+                <p class="overHidden">大纲号：{{ orderObj.key1 }}</p>
+              </el-tooltip>
+              <p
+                v-show="orderObj.free_num > 0"
+                style="color: #f56c6c; font-weight: bold; font-size: 13px"
+              >
                 本大纲可免费生成正文 <b>{{ orderObj.free_num }}</b> 次
               </p>
             </div>
@@ -232,7 +239,7 @@ export default {
       });
       // 获取数据再跳转
       this.loading = true;
-      outlineStatus({ key: row.key1 })
+      outlineStatus({ key: row.key1, type: "1" })
         .then((res) => {
           console.log("res", res);
           let data = {
@@ -492,5 +499,11 @@ export default {
 }
 .price {
   color: #303133;
+}
+.overHidden {
+  width: 100%; /* 根据需要调整宽度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

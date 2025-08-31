@@ -137,7 +137,7 @@
             class="navOrderBtn g_hover"
             @click="navClickOrder(3)"
           >
-            <span> 降AIGC卷 </span>
+            <span> 优惠卷 </span>
           </div>
           <div
             v-if="avatar"

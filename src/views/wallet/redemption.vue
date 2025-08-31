@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%; background-color: #fff">
     <div class="exchange-component">
-      <div class="header">降AIGC率优惠券兑换</div>
+      <div class="header">优惠券兑换</div>
       <div
         style="
           display: flex;
@@ -13,7 +13,7 @@
         <el-input
           v-model="exchangeCode"
           style="width: 470px"
-          placeholder="请输入降AIGC率优惠券的兑换码"
+          placeholder="请输入优惠券的兑换码"
           clearable
           prefix-icon="el-icon-goods"
           @blur="handleInputBlur"

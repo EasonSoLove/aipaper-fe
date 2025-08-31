@@ -46,6 +46,13 @@ const GlobalMethodsPlugin = {
 
       const processResponse = (res, currentOrder, status) => {
         this.$log("去支付 res", res);
+        // 存储可用优惠券到vuex
+        if (res.result.available_coupons) {
+          store.dispatch(
+            "user/setAvailableCoupons",
+            res.result.available_coupons
+          );
+        }
         // 关闭弹窗
         eventBus.emit("orderDialogChange", false);
 
@@ -80,11 +87,6 @@ const GlobalMethodsPlugin = {
         store.dispatch("app/toggleCurrentOrder", order);
 
         // 复现aigc选项
-        console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
-        console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
-        console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
-        console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
-        console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
         console.log("res.result.is_reduce_aigc", res.result.is_reduce_aigc);
         store.dispatch("paper/setAigc", res.result.is_reduce_aigc);
 

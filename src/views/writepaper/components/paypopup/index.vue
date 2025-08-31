@@ -14,7 +14,7 @@
     >
       <template slot="title">
         <div class="titleHeader">
-          <p class="dialogTitleP">订单支付</p>
+          <p class="dialogTitleP">订单支付.</p>
         </div>
       </template>
       <div
