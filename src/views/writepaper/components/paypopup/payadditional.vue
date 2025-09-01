@@ -469,6 +469,7 @@ export default {
       // this.$store.dispatch("paper/setAigc", newValue);
     },
     selectCard(card) {
+      console.log("card", card);
       if (this.orderPayDisabled) {
         this.$message({
           type: "warning",
@@ -477,7 +478,7 @@ export default {
         return false;
       }
       this.internalValue = card;
-      this.$emit("changeCard", this.internalValue);
+      this.$emit("changeCard", card);
     },
     cellSpanMethod({ row, column, rowIndex, columnIndex }) {
       if (columnIndex >= 5) {

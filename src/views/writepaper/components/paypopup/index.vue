@@ -148,7 +148,8 @@
                   currentOrder.order_type !== 'EXTRA_TASK_ASSIGNMENT' &&
                   currentOrder.order_type !== 'EXTRA_SURVEY' &&
                   currentOrder.order_type !== 'EXTRA_JOURNAL_REVIEWED' &&
-                  currentOrder.order_type !== 'REDUCE_AIGC'
+                  currentOrder.order_type !== 'REDUCE_AIGC' &&
+                  couponOptions.length > 0
                 "
                 class="newJuan"
                 style="margin-top: 10px; margin-bottom: 10px"
@@ -432,6 +433,8 @@ export default {
               "user/setAvailableCoupons",
               res.result.available_coupons
             );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
           }
           let _this = this;
           setTimeout(() => {
@@ -467,6 +470,8 @@ export default {
               "user/setAvailableCoupons",
               res.result.available_coupons
             );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
           }
           let order = {
             ...this.currentOrder,
@@ -507,8 +512,11 @@ export default {
         }
       });
     },
-    handleClick(tab, event) {
-      console.log(tab, "sttabbb", tab, event);
+    handleClick(tab) {
+      console.log("sttabbb", tab);
+      if (tab == "PAY_STAGES") {
+        this.coupon_code = "";
+      }
       this.loading = true;
       this.startCountdown();
       // 停止上一次循环
@@ -554,6 +562,8 @@ export default {
               "user/setAvailableCoupons",
               res.result.available_coupons
             );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
           }
           this.$store.dispatch("app/toggleCurrentOrder", order);
           this.resetForm();

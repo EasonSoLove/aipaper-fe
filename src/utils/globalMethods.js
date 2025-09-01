@@ -52,6 +52,8 @@ const GlobalMethodsPlugin = {
             "user/setAvailableCoupons",
             res.result.available_coupons
           );
+        } else {
+          store.dispatch("user/setAvailableCoupons", []);
         }
         // 关闭弹窗
         eventBus.emit("orderDialogChange", false);
