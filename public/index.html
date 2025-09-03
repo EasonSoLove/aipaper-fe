@@ -76,18 +76,18 @@
             window.zhuge._init(b, x);
           }
         };
-        window.zhuge.load("45898ab9e60e4856aab3fc5fcf67c117", {
-          // 配置应用的AppKey
+        window.zhuge.load("16a051317559452c82745a1718f27f23", {
+          //配置应用的AppKey
           superProperty: {
-            // 全局的事件属性(选填)
-            mixpaper: "数据分析",
+            //全局的事件属性(选填)
+            应用名称: "数据分析",
           },
+          adTrack: false, //广告监测开关，默认为false
+          zgsee: false, //视屏采集开关， 默认为false
+          autoTrack: true,
           // debug: true,
-          adTrack: false, // 广告监测开关，默认为false
-          zgsee: false, // 视屏采集开关， 默认为false
-          autoTrack: false,
-          // 启用全埋点采集（选填，默认false）
-          singlePage: true, // 是否是单页面应用（SPA），启用autoTrack后生效（选填，默认false）
+          //启用全埋点采集（选填，默认false）
+          singlePage: false, //是否是单页面应用（SPA），启用autoTrack后生效（选填，默认false）
         });
       })();
     </script>
