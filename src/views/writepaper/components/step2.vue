@@ -1157,7 +1157,7 @@ export default {
       });
     },
     getList() {
-      polling({ key: this.requestForm.key || this.requestForm.key1 })
+      polling({ key: this.requestForm.key || this.requestForm.key1, type: 2 })
         .then((res) => {
           if (res == "生成失败") {
             this.$message({
