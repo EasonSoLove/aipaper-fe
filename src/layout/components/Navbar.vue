@@ -117,7 +117,7 @@
             <span class="icoSpan"> HOT </span>
             <span class="giftSpanMain">最新活动 </span>
           </div> -->
-          <el-tooltip
+          <!-- <el-tooltip
             class="item"
             effect="dark"
             content="分享获取免费查重券"
@@ -130,13 +130,16 @@
                 </svg>
               </span>
             </div>
-          </el-tooltip>
+          </el-tooltip> -->
 
           <div
             v-if="avatar"
             class="navOrderBtn g_hover"
             @click="navClickOrder(3)"
           >
+            <span class="menuIcon">
+              <img src="@/assets/images/nav/coupon_menu_icon.png" alt="" />
+            </span>
             <span> 优惠卷 </span>
           </div>
           <div
@@ -144,6 +147,9 @@
             class="navOrderBtn g_hover"
             @click="navClickOrder(1)"
           >
+            <span class="menuIcon">
+              <img src="@/assets/images/nav/order_menu_icon.png" alt="" />
+            </span>
             <span> 我的订单 </span>
           </div>
           <div
@@ -151,6 +157,9 @@
             class="navOrderBtn g_hover"
             @click="navClickOrder(2)"
           >
+            <span class="menuIcon">
+              <img src="@/assets/images/nav/outline_menu_icon.png" alt="" />
+            </span>
             <span> 我的大纲 </span>
           </div>
           <!-- 钱包 -->
@@ -923,6 +932,9 @@ export default {
   padding: 0px 10px;
   height: 32px;
   background: #0066ff1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   color: #0066ff;
   line-height: 32px;
@@ -1034,6 +1046,18 @@ export default {
 .homeSwiper {
   width: 280px;
   height: 40px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+.menuIcon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 3px;
   img {
     width: 100%;
     height: 100%;
