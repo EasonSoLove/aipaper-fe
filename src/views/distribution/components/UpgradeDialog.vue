@@ -2,15 +2,85 @@
   <el-dialog :visible.sync="visible" title="升级为分享商" width="720px">
     <div class="payCodeBox" v-loading="loading">
       <div class="payRightPrice">
-        <div class="reduceCard">
-          <p>解锁更高分成</p>
-          <div class="cardChildList">
-            <p>解锁金额 ¥{{ order.pay_amount || 99 }}</p>
-            <p>原价 ¥{{ order.original_amount || 199 }}</p>
+        <!-- 高级代理权益介绍 -->
+        <div class="agent-benefits">
+          <div class="agent-header">
+            <div class="agent-title-section">
+              <div class="agent-subtitle">专业代理服务</div>
+              <div class="agent-title">高级代理</div>
+            </div>
+            <div class="agent-discount-tag">推荐</div>
+            <div class="agent-icon">🚀</div>
           </div>
-        </div>
-        <div class="popupSpan" style="margin-top: 16px">
-          支持分销商付费升级，以解锁间推奖励。完成支付后系统将自动为您生效更高分成。
+
+          <div class="agent-content">
+            <!-- 原有价格信息 -->
+            <div class="agent-price-section">
+              <div class="agent-price-title">解锁更高分成</div>
+              <div class="agent-price-details">
+                <div class="agent-price-item">
+                  <span class="agent-price-label">解锁金额</span>
+                  <span class="agent-price-value"
+                    >¥{{ order.pay_amount || 99 }}</span
+                  >
+                </div>
+                <div class="agent-price-item">
+                  <span class="agent-price-label">原价</span>
+                  <span class="agent-price-original"
+                    >¥{{ order.original_amount || 199 }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- 原有说明文案 -->
+            <div class="agent-description">
+              支持分销商付费升级，以解锁间推奖励。完成支付后系统将自动为您生效更高分成。
+            </div>
+
+            <!-- 权益列表 -->
+            <div class="agent-service-list">
+              <div class="agent-service-item">
+                <span class="agent-service-name">直接推广佣金</span>
+                <span class="agent-service-count">30%</span>
+              </div>
+              <div class="agent-service-item">
+                <span class="agent-service-name">间接推广佣金</span>
+                <span class="agent-service-count">10%</span>
+              </div>
+              <div class="agent-service-item">
+                <span class="agent-service-name">下级用户开通代理分成</span>
+                <span class="agent-service-count">50%</span>
+              </div>
+              <div class="agent-service-item agent-gift-item">
+                <img
+                  src="@/assets/images/distribution/present1.png"
+                  alt="赠品"
+                  class="agent-gift-icon"
+                />
+                <span class="agent-service-name">邀请新用户注册可获得</span>
+                <span class="agent-service-count">奖励</span>
+              </div>
+              <div class="agent-service-item agent-gift-item">
+                <img
+                  src="@/assets/images/distribution/present1.png"
+                  alt="赠品"
+                  class="agent-gift-icon"
+                />
+                <span class="agent-service-name">AIGC次数及优惠券</span>
+                <span class="agent-service-count">免费</span>
+              </div>
+              <div class="agent-service-item agent-gift-item">
+                <img
+                  src="@/assets/images/distribution/present1.png"
+                  alt="赠品"
+                  class="agent-gift-icon"
+                />
+                <span class="agent-service-name">流量获取及运营教学服务</span>
+                <span class="agent-service-count">提供</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="payLeftCode">
@@ -134,6 +204,11 @@ export default {
   display: flex;
   align-items: flex-start;
 }
+
+.payRightPrice {
+  flex: 1;
+  padding: 20px;
+}
 .payLeftCode {
   width: 307px;
   padding: 20px 30px;
@@ -199,5 +274,163 @@ export default {
       font-size: 16px;
     }
   }
+}
+
+/* 高级代理权益介绍样式 */
+.agent-benefits {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.agent-header {
+  position: relative;
+  height: 80px;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.agent-title-section {
+  color: #fff;
+  z-index: 2;
+}
+
+.agent-subtitle {
+  font-size: 11px;
+  opacity: 0.9;
+  margin-bottom: 2px;
+  font-weight: normal;
+}
+
+.agent-title {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.agent-discount-tag {
+  background: #ffd700;
+  color: #333;
+  padding: 3px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.agent-icon {
+  font-size: 18px;
+  opacity: 0.3;
+  z-index: 2;
+}
+
+.agent-content {
+  padding: 16px;
+}
+
+/* 价格信息样式 */
+.agent-price-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.agent-price-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.agent-price-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.agent-price-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.agent-price-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.agent-price-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.agent-price-original {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* 说明文案样式 */
+.agent-description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #f0f8ff;
+  border-radius: 6px;
+  border-left: 3px solid #4caf50;
+}
+
+.agent-service-list {
+  margin-bottom: 0;
+}
+
+.agent-service-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.agent-gift-item {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.agent-gift-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+}
+
+.agent-service-name {
+  font-size: 12px;
+  color: #333;
+}
+
+.agent-gift-item .agent-service-name {
+  color: #4caf50;
+}
+
+.agent-service-count {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
 }
 </style>

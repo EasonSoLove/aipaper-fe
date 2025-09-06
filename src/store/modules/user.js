@@ -120,6 +120,8 @@ const actions = {
           removeToken(); // must remove  token  first
           resetRouter();
           commit("RESET_STATE");
+          // 清除首次登录弹窗标记
+          sessionStorage.removeItem("firstTag");
           resolve();
         })
         .catch((error) => {
@@ -150,6 +152,8 @@ const actions = {
     return new Promise((resolve) => {
       removeToken(); // must remove  token  first
       commit("RESET_STATE");
+      // 清除首次登录弹窗标记
+      sessionStorage.removeItem("firstTag");
       resolve();
     });
   },

@@ -11,7 +11,19 @@
     >
       <div class="popup-overlay">
         <div class="popup-container">
-          <div class="popup-left">
+          <!-- Banner区 -->
+          <div style="width: 100%; height: 100%; padding-top: 20px">
+            <img
+              src="@/assets/images/distribution/banner.png"
+              alt="邀请有礼Banner"
+              style="width: 100%; height: 100%"
+              @click="handleGiftBoxClick"
+            />
+            <span @click="closeDialog" class="closeIconImg">
+              <i class="el-icon-close"></i>
+            </span>
+          </div>
+          <!-- <div class="popup-left">
             <div class="popConTitle">免费参加活动, 优惠享不停</div>
 
             <div class="test2Box">
@@ -26,10 +38,8 @@
               <p style="font-size: 16px; margin-top: 20px; padding-right: 40px">
                 享折扣券、免费生成券、论文查重券等各种福利
               </p>
-              <!-- <img src="@/assets/images/bg/text2.png" alt="" /> -->
             </div>
 
-            <!-- <div class="countImg">送 <span>10000字</span> 论文查重券</div> -->
             <div class="content">
               <h4>小红书专属福利：</h4>
               <p>-- 点赞、收藏+关注，享8折优惠券</p>
@@ -43,7 +53,6 @@
             <span @click="closeDialog" class="closeIcon">
               <i class="el-icon-close"></i>
             </span>
-            <!-- <img src="qr-code-placeholder.png" alt="QR Code" /> -->
             <div class="popupHeader">
               <span>
                 <img src="@/assets/images/logoMax.png" alt="" />
@@ -56,7 +65,7 @@
             <div class="popupBottom">
               <p>添加客服微信 <span class="red">免费</span> 领礼包</p>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </el-dialog>
@@ -84,6 +93,10 @@ export default {
     },
   },
   methods: {
+    handleGiftBoxClick() {
+      this.closeDialog();
+      this.$router.push("/distribution");
+    },
     showInit() {
       this.dialogVisible = true;
       // inviteFetch().then((res) => {
@@ -92,6 +105,8 @@ export default {
     },
     closeDialog() {
       this.dialogVisible = false;
+      // 设置sessionStorage标记，表示用户已经看过弹窗
+      sessionStorage.setItem("firstTag", "1");
     },
     copyLink() {
       const el = document.createElement("textarea");
@@ -108,6 +123,7 @@ export default {
     },
     // 定义方法
     handleClose(done) {
+      sessionStorage.setItem("firstTag", "1");
       done();
 
       // this.$confirm('确认关闭？')
@@ -268,5 +284,21 @@ h4 {
   font-size: 20px;
   line-height: 30px;
   margin-bottom: 30px;
+}
+.closeIconImg {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 22px;
+  background-color: #fff;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    cursor: pointer;
+  }
 }
 </style>

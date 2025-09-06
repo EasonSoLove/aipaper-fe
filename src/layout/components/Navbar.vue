@@ -148,8 +148,8 @@
               <span class="menuIcon">
                 <img src="@/assets/images/nav/coupon_menu_icon.png" alt="" />
               </span>
-              <span> 优惠卷 </span>
             </el-tooltip>
+            <span> 优惠卷 </span>
           </div>
           <div
             v-if="avatar"
@@ -440,9 +440,9 @@ export default {
       (obj) => obj.name == "main" && obj.meta.id == "5"
     );
     this.routerList = arr.children;
-    // console.log('loca', localStorage.getItem('firstTag'))
-    let firstTag = localStorage.getItem('firstTag');
-    if (firstTag != '1') {
+    // console.log('loca', sessionStorage.getItem('firstTag'))
+    let firstTag = sessionStorage.getItem("firstTag");
+    if (firstTag != "1") {
       this.showGift();
     }
   },

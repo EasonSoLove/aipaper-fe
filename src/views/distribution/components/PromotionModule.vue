@@ -15,7 +15,9 @@
 
     <div class="my-invite-bg">
       <img src="@/assets/images/distribution/bg4.png" alt="" />
-      <div class="upgrade-btn" @click="openUpgradeDialog">升级为分享商</div>
+      <div class="upgrade-btn" @click="openMealSelectionDialog">
+        升级为分享商
+      </div>
     </div>
 
     <div class="my-invite-stats">
@@ -435,6 +437,10 @@
       :upgradeOrder="upgradeOrder"
       @success="$emit('update-base-info', null)"
     />
+    <MealSelectionDialog
+      :visible.sync="mealSelectionDialogVisible"
+      @purchase="handleMealPurchase"
+    />
   </div>
 </template>
 
@@ -457,10 +463,11 @@ import {
 } from "../constants.js";
 import { orderDetailById } from "@/api/user";
 import UpgradeDialog from "./UpgradeDialog.vue";
+import MealSelectionDialog from "./MealSelectionDialog.vue";
 
 export default {
   name: "PromotionModule",
-  components: { UpgradeDialog },
+  components: { UpgradeDialog, MealSelectionDialog },
   props: {
     baseInfo: {
       type: Object,
@@ -572,6 +579,8 @@ export default {
       },
       // 升级支付（交由子组件控制显示，仅提供开关）
       upgradeDialogVisible: false,
+      // 套餐选择弹窗
+      mealSelectionDialogVisible: false,
 
       upgradeOrder: {
         out_trade_no: "",
@@ -604,15 +613,21 @@ export default {
     this.getWithdrawalRecords();
   },
   methods: {
+    // 打开套餐选择弹窗
+    openMealSelectionDialog() {
+      this.mealSelectionDialogVisible = true;
+    },
+
+    // 处理套餐购买
+    handleMealPurchase(mealType) {
+      // 关闭套餐选择弹窗，然后调用原有的升级逻辑
+      this.mealSelectionDialogVisible = false;
+      this.openUpgradeDialog();
+    },
+
     // 升级入口
     async openUpgradeDialog() {
       const res = await getDistributionUpgrade();
-
-      // 如果已经是高级分销商，显示提示信息，不打开弹窗
-      if (res && res.code === 10004) {
-        this.$message.info(res.message || "您已经是高级分销商了，无需升级！");
-        return;
-      }
 
       // 如果接口返回成功且有订单信息，打开升级弹窗
       if (

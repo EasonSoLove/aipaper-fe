@@ -32,7 +32,7 @@
             </div>
             <div class="reward-card-highlight">
               您至高获得实付金额
-              <span class="highlight-amount">30%现金分成</span>
+              <span class="highlight-amount">80%现金分成</span>
             </div>
             <div class="reward-card-link">
               <a href="#" class="reward-card-detail" @click="showRewardDetail"
@@ -59,32 +59,10 @@
               <span class="reward-card-title-main">虚拟物品奖励</span>
             </div>
             <div class="virtual-reward-list-row">
-              <div class="virtual-reward-mini-card">
-                <div class="mini-card-header">
-                  <div class="mini-card-logo" style="background: #2563eb">
-                    🟦
-                  </div>
-                  <div class="mini-card-title">ProcessOn</div>
-                  <div class="mini-card-tag">邀请后，双方都可获得</div>
-                </div>
-                <div class="mini-card-desc">正文 8折优惠码</div>
-                <div class="mini-card-detail">一笔成文，最高可省约XX元</div>
-                <div class="mini-card-vip">VIP</div>
-              </div>
-              <div class="virtual-reward-mini-card">
-                <div class="mini-card-header">
-                  <div class="mini-card-logo" style="background: #ff5e5e">
-                    🟥
-                  </div>
-                  <div class="mini-card-title">降AIGC</div>
-                  <div class="mini-card-tag">邀请后，双方都可获得</div>
-                </div>
-                <div class="mini-card-desc">降AIGC 100次</div>
-                <div class="mini-card-detail">
-                  降AIGC无忧，维普、知网、格子达通用
-                </div>
-                <div class="mini-card-vip">VIP</div>
-              </div>
+              <InviteProgress
+                :current-progress="currentInviteProgress"
+                @invite="handleInviteClick"
+              />
             </div>
           </div>
           <div class="reward-card-right"></div>
@@ -200,7 +178,7 @@
             <ol>
               <li>
                 活动时间如何计算？<br />
-                本次活动时间为2024年1月1日至2024年12月31日。在此期间，邀请好友注册并完成首单，即可获得奖励。
+                本次活动时间为2025年9月1日至2026年9月1日。在此期间，邀请好友注册，即可获得奖励。好友进行消费，您可获得一定比例的佣金。
               </li>
               <li>
                 什么是邀请链接，生成海报有什么用？<br />
@@ -208,11 +186,11 @@
               </li>
               <li>
                 奖励如何发放？<br />
-                奖励将在好友完成首单后7个工作日内发放至你的账户，请注意查收。
+                虚拟物品在好友注册后自动发放，佣金奖励在好友消费7日后即可提现。
               </li>
               <li>
                 邀请奖励有上限吗？<br />
-                邀请奖励无上限，邀请越多奖励越多，快来邀请好友一起参与吧！
+                佣金奖励无上限，邀请越多奖励越多，快来邀请好友一起参与吧！
               </li>
             </ol>
           </div>
@@ -241,9 +219,38 @@
               <li>
                 推荐新客户下单即可获得奖励，一次邀请终身享受订单佣金分红。
               </li>
-              <li>所有产品均可享受现金佣金。</li>
+              <li>除查重产品之外的所有产品均可享受现金佣金。</li>
               <li>
-                佣金为被邀请人消费金额的<span class="highlight-red">10%</span>。
+                佣金<span class="highlight-red">最高</span
+                >为被邀请人消费金额的<span class="highlight-red">80%</span>。
+              </li>
+            </ul>
+          </div>
+          <div class="section-content">
+            <ul class="user-type-list">
+              <li class="user-type-item">
+                <div class="user-type">
+                  <span class="type-label">普通用户</span>
+                </div>
+                <div class="user-benefits">
+                  <span class="benefit-text">20%直推佣金</span>
+                </div>
+              </li>
+              <li class="user-type-item">
+                <div class="user-type">
+                  <span class="type-label">代理用户</span>
+                </div>
+                <div class="user-benefits">
+                  <span class="benefit-text">30%直推佣金+10%间推佣金</span>
+                </div>
+              </li>
+              <li class="user-type-item">
+                <div class="user-type">
+                  <span class="type-label">城市合伙人</span>
+                </div>
+                <div class="user-benefits">
+                  <span class="benefit-text">80%站内佣金+代理开放权限</span>
+                </div>
               </li>
             </ul>
           </div>
@@ -257,17 +264,14 @@
           </div>
           <div class="section-content">
             <ul>
+              <li>单次提现最低金额为50元。</li>
               <li>
-                仅付费用户（平台有消费记录，无消费金额限制）可使用提现功能。
+                被邀请的用户消费后，您的佣金计入待结算，7日后将划转到可提现，此时可以进行提现。
               </li>
-              <li>至少邀请5位付费用户方可申请提现。</li>
-              <li>提现申请审核约需一个工作日。</li>
-              <li>
-                如上一笔提现申请仍在审核中，新提现申请将不予受理，请确保上一笔提现完成后再申请，保障资金安全，避免重复申请。
-              </li>
+
               <li class="important-note">
                 <span class="highlight-orange">重要提示：</span
-                >系统目前仅支持支付宝提现，用户必须准确填写支付宝账号及对应真实姓名，因信息错误导致的提现失败本站概不负责。
+                >系统目前仅支持支付宝提现，用户在提现前务必准确填写支付宝账号及对应真实姓名，因信息错误导致的提现失败本站概不负责。
               </li>
             </ul>
           </div>
@@ -299,21 +303,24 @@
     />
   </div>
 </template>
-http://localhost:9528/dev-api/api/ai-paper/distribution/base_info
-http://localhost:9528/dev-api/api/ai-paper/orders/order/list?page_num=1&page_size=5
+
 <script>
 import { getInvRecords } from "@/api/distribution";
 import PosterDialog from "./components/PosterDialog.vue";
 import PromotionModule from "./components/PromotionModule.vue";
+import InviteProgress from "./components/InviteProgress.vue";
 
 export default {
   name: "Distribution",
   components: {
     PosterDialog,
     PromotionModule,
+    InviteProgress,
   },
   data() {
     return {
+      // 当前邀请进度（示例数据，实际应该从API获取）
+      currentInviteProgress: 0,
       baseInfo: {
         distribution_name: "",
         inv_code_url: "",
@@ -383,6 +390,12 @@ export default {
     }
   },
   methods: {
+    // 处理邀请点击事件
+    handleInviteClick() {
+      // 可以在这里添加邀请逻辑，比如打开邀请弹窗或跳转到邀请页面
+      this.generatePoster();
+    },
+
     duplicateAnnouncements() {
       // 复制公告内容以实现无缝循环效果
       this.duplicatedAnnouncements = [
@@ -429,6 +442,7 @@ export default {
     updateTabTexts() {
       // 这个方法现在主要用于更新其他地方的tab文本
       // 推广模块的tab文本更新已经移到组件内部
+      this.currentInviteProgress = this.baseInfo.inv_user_num || 0;
     },
 
     // 获取邀请记录
@@ -466,9 +480,6 @@ export default {
 
     generatePoster() {
       this.posterDialogVisible = true;
-      this.$nextTick(() => {
-        this.generateQRCodes();
-      });
     },
 
     // 格式化金额
@@ -954,6 +965,52 @@ $title-color: #fff;
 
 .section-content li {
   margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* 用户类型列表样式 */
+.user-type-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-type-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #a18fff;
+  transition: all 0.3s ease;
+}
+
+.user-type-item:hover {
+  background: #f0f7ff;
+  transform: translateX(5px);
+}
+
+.user-type {
+  flex: 1;
+}
+
+.type-label {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.user-benefits {
+  flex: 1;
+  text-align: right;
+}
+
+.benefit-text {
+  color: #a18fff;
+  font-weight: 500;
+  font-weight: bold;
   font-size: 14px;
 }
 
