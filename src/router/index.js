@@ -279,15 +279,15 @@ export const constantRoutes = [
     path: "/user",
     component: Layout,
     children: [
-      {
-        path: "promotion",
-        name: "promotion",
-        component: () => import("@/views/user/index.vue"),
-        meta: {
-          title: "我的推广",
-          icon: "dashboard",
-        },
-      },
+      // {
+      //   path: "promotion",
+      //   name: "promotion",
+      //   component: () => import("@/views/user/index.vue"),
+      //   meta: {
+      //     title: "我的推广",
+      //     icon: "dashboard",
+      //   },
+      // },
       {
         path: "setting",
         name: "setting",
@@ -306,15 +306,15 @@ export const constantRoutes = [
           icon: "dashboard",
         },
       },
-      {
-        path: "AIGClist",
-        name: "AIGClist",
-        component: () => import("@/views/user/AIGClist.vue"),
-        meta: {
-          title: "aigc任务",
-          icon: "AIGClist",
-        },
-      },
+      // {
+      //   path: "AIGClist",
+      //   name: "AIGClist",
+      //   component: () => import("@/views/user/AIGClist.vue"),
+      //   meta: {
+      //     title: "aigc任务",
+      //     icon: "AIGClist",
+      //   },
+      // },
       {
         path: "userInfo",
         name: "userInfo",
