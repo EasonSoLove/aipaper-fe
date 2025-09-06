@@ -3,8 +3,13 @@
     <div class="payCodeBox" v-loading="loading">
       <div class="payRightPrice">
         <!-- 高级代理权益介绍 -->
-        <div class="agent-benefits">
+        <div class="agent-benefits" style="margin-top: -40px">
           <div class="agent-header">
+            <img
+              src="@/assets/images/distribution/meal1.png"
+              alt="高级代理背景"
+              class="agent-bg-image"
+            />
             <div class="agent-title-section">
               <div class="agent-subtitle">专业代理服务</div>
               <div class="agent-title">高级代理</div>
@@ -287,46 +292,86 @@ export default {
 
 .agent-header {
   position: relative;
-  height: 80px;
-  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  height: 90px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+
+.agent-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.agent-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 2;
 }
 
 .agent-title-section {
   color: #fff;
-  z-index: 2;
+  z-index: 3;
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  float: left;
 }
 
 .agent-subtitle {
-  font-size: 11px;
-  opacity: 0.9;
-  margin-bottom: 2px;
-  font-weight: normal;
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 4px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .agent-title {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .agent-discount-tag {
-  background: #ffd700;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
   color: #333;
-  padding: 3px 6px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: bold;
-  z-index: 2;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 3;
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .agent-icon {
-  font-size: 18px;
-  opacity: 0.3;
-  z-index: 2;
+  font-size: 24px;
+  opacity: 0.4;
+  z-index: 3;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .agent-content {

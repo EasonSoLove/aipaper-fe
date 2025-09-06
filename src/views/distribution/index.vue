@@ -380,6 +380,7 @@ export default {
     this.duplicateAnnouncements();
     this.$nextTick(() => {
       this.startScrolling();
+      this.getInvRecords();
     });
     // 进入/刷新页面时获取基础信息并写入 Vuex
     this.getBaseInfo();
