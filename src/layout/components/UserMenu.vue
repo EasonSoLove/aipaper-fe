@@ -82,7 +82,7 @@
                 {{ $t("navbar.myOutline") }}
               </div>
               <!-- v-if="userInfo.role == 'LEVEL_PROXY'" -->
-              <div
+              <!-- <div
                 v-if="
                   userInfo.permission == 'AGENT' ||
                   userInfo.permission == 'SUPER_ADMIN'
@@ -92,7 +92,7 @@
               >
                 <i class="el-icon-tickets"></i>
                 {{ $t("navbar.myPromotion") }}
-              </div>
+              </div> -->
             </div>
             <div class="menuGroup menuAboutMixPaper">
               <!-- v-if="userInfo.permission == 'SUPER_ADMIN'" -->
@@ -115,14 +115,14 @@
                 <i class="el-icon-heavy-rain"></i>
                 退款管理
               </div>
-              <div
+              <!-- <div
                 v-if="userInfo.permission == 'SUPER_ADMIN'"
                 class="menuItem"
                 @click="jumpDetail('/user/AIGClist')"
               >
                 <i class="el-icon-heavy-rain"></i>
                 降AIGC任务
-              </div>
+              </div> -->
               <div class="menuItem gray" @click="$devf">
                 <svg class="icon svg-icon" aria-hidden="true">
                   <use xlink:href="#icon-updatelog"></use>

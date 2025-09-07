@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="visible" title="升级为分享商" width="720px">
+  <el-dialog :visible.sync="dialogVisible" title="升级为分享商" width="720px">
     <div class="payCodeBox" v-loading="loading">
       <div class="payRightPrice">
         <!-- 高级代理权益介绍 -->
@@ -57,14 +57,10 @@
                 <span class="agent-service-name">下级用户开通代理分成</span>
                 <span class="agent-service-count">50%</span>
               </div>
-              <div class="agent-service-item agent-gift-item">
-                <img
-                  src="@/assets/images/distribution/present1.png"
-                  alt="赠品"
-                  class="agent-gift-icon"
-                />
-                <span class="agent-service-name">邀请新用户注册可获得</span>
-                <span class="agent-service-count">奖励</span>
+              <div class="agent-service-item">
+                <p style="text-align: center; width: 100%; margin-top: 10px">
+                  邀请新用户注册可获得
+                </p>
               </div>
               <div class="agent-service-item agent-gift-item">
                 <img
@@ -73,7 +69,7 @@
                   class="agent-gift-icon"
                 />
                 <span class="agent-service-name">AIGC次数及优惠券</span>
-                <span class="agent-service-count">免费</span>
+                <span class="agent-service-count">奖励</span>
               </div>
               <div class="agent-service-item agent-gift-item">
                 <img
@@ -128,7 +124,7 @@
       </div>
     </div>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="$emit('update:visible', false)">关 闭</el-button>
+      <el-button @click="dialogVisible = false">关 闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -155,6 +151,7 @@ export default {
       loading: false,
       polling: false,
       intervalMs: 2000,
+      dialogVisible: false,
     };
   },
   computed: {
@@ -164,12 +161,20 @@ export default {
   },
   watch: {
     visible(val) {
+      this.dialogVisible = val;
       if (val) {
         this.initUpgrade();
       } else {
-        this.polling = false;
+        this.stopPolling();
       }
     },
+    dialogVisible(val) {
+      this.$emit("update:visible", val);
+    },
+  },
+  beforeDestroy() {
+    // 组件销毁时确保停止轮询
+    this.stopPolling();
   },
   methods: {
     async initUpgrade() {
@@ -178,6 +183,10 @@ export default {
         this.polling = true;
         this.pollOnce();
       }
+    },
+    stopPolling() {
+      // 停止轮询
+      this.polling = false;
     },
     pollOnce() {
       if (!this.polling || !this.order.out_trade_no) return;
@@ -189,7 +198,7 @@ export default {
             this.polling = false;
             this.$message.success("升级成功！");
             this.$emit("success");
-            this.$emit("update:visible", false);
+            this.dialogVisible = false;
           } else {
             setTimeout(() => this.pollOnce(), this.intervalMs);
           }

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :visible.sync="visible"
+    :visible.sync="dialogVisible"
     title="万象升级套餐介绍"
     width="950px"
     :show-close="true"
@@ -39,14 +39,16 @@
                 <span class="service-name">下级用户开通代理分成</span>
                 <span class="service-count">50%</span>
               </div>
-              <div class="service-item gift-item">
-                <img
+              <div class="service-item">
+                <!-- <img
                   src="@/assets/images/distribution/present1.png"
                   alt="赠品"
                   class="gift-icon"
-                />
-                <span class="service-name">邀请新用户注册可获得</span>
-                <span class="service-count">奖励</span>
+                /> -->
+                <p style="text-align: center; width: 100%; margin-top: 10px">
+                  邀请新用户注册可获得
+                </p>
+                <!-- <span class="service-count">奖励</span> -->
               </div>
               <div class="service-item gift-item">
                 <img
@@ -55,7 +57,7 @@
                   class="gift-icon"
                 />
                 <span class="service-name">AIGC次数及优惠券</span>
-                <span class="service-count">免费</span>
+                <span class="service-count">奖励</span>
               </div>
               <div class="service-item gift-item">
                 <img
@@ -184,9 +186,20 @@
             </div>
 
             <div class="action-buttons">
-              <button class="btn-contact" @click="handleContact">
-                联系客服
-              </button>
+              <el-popover placement="top" width="150" trigger="hover">
+                <div class="qywxBox">
+                  <img :src="contactService.image_url" alt="" />
+                </div>
+                <p>扫描二维码，<br />联系客服</p>
+                <button
+                  class="btn-contact"
+                  slot="reference"
+                  style="width: 225px"
+                  @click="handleContact"
+                >
+                  联系客服
+                </button>
+              </el-popover>
             </div>
           </div>
         </div>
@@ -249,12 +262,33 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "MealSelectionDialog",
   props: {
     visible: {
       type: Boolean,
       default: false,
+    },
+  },
+  data() {
+    return {
+      dialogVisible: false,
+    };
+  },
+  computed: {
+    ...mapGetters(["agent_image"]),
+    contactService() {
+      return this.agent_image.find((image) => image.id === 5);
+    },
+  },
+  watch: {
+    visible(val) {
+      this.dialogVisible = val;
+    },
+    dialogVisible(val) {
+      this.$emit("update:visible", val);
     },
   },
   methods: {
@@ -276,7 +310,7 @@ export default {
 
           // 如果不是高级分销商，继续原有的升级流程
           this.$emit("purchase", mealType);
-          this.$emit("update:visible", false);
+          this.dialogVisible = false;
         } catch (error) {
           console.error("检查升级状态失败:", error);
           this.$message.error("检查升级状态失败，请稍后重试");
@@ -285,7 +319,7 @@ export default {
     },
     handleContact() {
       // 联系客服
-      this.$message.info("正在为您转接客服，请稍候...");
+      this.$message.info("请扫码添加客服微信, 了解套餐详情!");
       // 这里可以添加具体的联系客服逻辑
       // 比如打开客服窗口、跳转到客服页面等
     },
@@ -575,6 +609,26 @@ export default {
 
   .meal-content {
     padding: 15px;
+  }
+}
+
+// 客服二维码样式
+.qywxBox {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+
+  & + p {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
   }
 }
 </style>

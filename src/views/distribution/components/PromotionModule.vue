@@ -15,7 +15,7 @@
 
     <div class="my-invite-bg">
       <img src="@/assets/images/distribution/bg4.png" alt="" />
-      <div class="upgrade-btn" @click="openMealSelectionDialog">
+      <div class="upgrade-btn" @click.stop="openMealSelectionDialog">
         升级为分享商
       </div>
     </div>
@@ -461,7 +461,6 @@ import {
   getChangeTypeClass,
   translateWithdrawStatus,
 } from "../constants.js";
-import { orderDetailById } from "@/api/user";
 import UpgradeDialog from "./UpgradeDialog.vue";
 import MealSelectionDialog from "./MealSelectionDialog.vue";
 
@@ -588,7 +587,6 @@ export default {
         pay_amount: 99,
         pay_link: "",
       },
-      upgradePolling: false,
       pagination: {
         page_num: 1,
         page_size: 5,
@@ -644,36 +642,11 @@ export default {
           pay_link: res.result.pay_link,
         };
         this.upgradeDialogVisible = true;
-        this.upgradePolling = true;
-        // 启动查询
-        this.pollUpgradeStatus();
       } else {
         this.$message.error((res && res.message) || "获取升级订单失败");
       }
     },
 
-    // 轮询支付结果（默认2s）
-    pollUpgradeStatus(delay = 2000) {
-      if (!this.upgradePolling || !this.upgradeOrder.out_trade_no) return;
-      orderDetailById({ key: this.upgradeOrder.out_trade_no })
-        .then((res) => {
-          if (!this.upgradePolling) return;
-          const order = res && res.result && res.result.order;
-          const status = order && order.payment_status;
-          if (status === "TRADE_SUCCESS") {
-            this.upgradePolling = false;
-            this.upgradeDialogVisible = false;
-            this.$message.success("升级成功！");
-            this.$emit("update-base-info", null);
-          } else {
-            setTimeout(() => this.pollUpgradeStatus(delay), delay);
-          }
-        })
-        .catch(() => {
-          if (!this.upgradePolling) return;
-          setTimeout(() => this.pollUpgradeStatus(delay), delay);
-        });
-    },
     // 提现入口
     async handleWithdraw() {
       const status = this.baseInfo && this.baseInfo.distribution_account_status;
@@ -981,12 +954,6 @@ export default {
       if (!timeStr) return "";
       const date = new Date(timeStr);
       return date.toLocaleString("zh-CN");
-    },
-
-    // 关闭升级弹窗
-    closeUpgradeDialog() {
-      this.upgradeDialogVisible = false;
-      this.upgradePolling = false; // 停止轮询
     },
   },
 };
