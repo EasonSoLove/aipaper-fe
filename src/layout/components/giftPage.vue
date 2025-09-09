@@ -24,30 +24,32 @@
             </span>
           </div> -->
           <div class="popup-left">
-            <div class="popConTitle">免费参加活动, 优惠享不停</div>
+            <div class="popConTitle">免费领取论文资料大礼包</div>
 
             <div class="test2Box">
               <p>
-                参加
+                参与
                 <span>
-                  <i><b>B站 / </b></i>
-                  <i><b>小红书</b></i>
-                </span>
-                专属活动
+                  <i><b>邀请好友拿现金 </b></i> </span
+                >活动
               </p>
               <p style="font-size: 16px; margin-top: 20px; padding-right: 40px">
                 享折扣券、免费生成券、论文查重券等各种福利
               </p>
             </div>
 
-            <div class="content">
-              <h4>小红书专属福利：</h4>
-              <p>-- 点赞、收藏+关注，享8折优惠券</p>
-              <p>-- +转发笔记，享7折优惠券</p>
-              <h4>B站专属福利：</h4>
-              <p>-- 一键三连 享8折优惠券</p>
-              <p>-- +转发视频，享7折优惠券</p>
+            <div style="width: 100%; height: auto; padding-top: 20px">
+              <img
+                src="@/assets/images/distribution/banner.png"
+                alt="邀请有礼Banner"
+                style="width: 100%; height: 100%"
+                @click="handleGiftBoxClick"
+              />
+              <!-- <span @click="closeDialog" class="closeIconImg">
+                <i class="el-icon-close"></i>
+              </span> -->
             </div>
+            <div class="detailBtn">点击去查看详情</div>
           </div>
           <div class="popup-right">
             <span @click="closeDialog" class="closeIcon">
@@ -300,5 +302,23 @@ h4 {
   &:hover {
     cursor: pointer;
   }
+}
+.detailBtn {
+  text-align: center;
+  margin-top: 20px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #fff;
+  line-height: 40px;
+  height: 40px;
+  border-radius: 20px;
+  width: 180px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+.detailBtn:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 </style>
