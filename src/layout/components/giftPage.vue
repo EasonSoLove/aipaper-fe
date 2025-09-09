@@ -12,7 +12,7 @@
       <div class="popup-overlay">
         <div class="popup-container">
           <!-- Banner区 -->
-          <div style="width: 100%; height: 100%; padding-top: 20px">
+          <!-- <div style="width: 100%; height: 100%; padding-top: 20px">
             <img
               src="@/assets/images/distribution/banner.png"
               alt="邀请有礼Banner"
@@ -22,8 +22,8 @@
             <span @click="closeDialog" class="closeIconImg">
               <i class="el-icon-close"></i>
             </span>
-          </div>
-          <!-- <div class="popup-left">
+          </div> -->
+          <div class="popup-left">
             <div class="popConTitle">免费参加活动, 优惠享不停</div>
 
             <div class="test2Box">
@@ -65,7 +65,7 @@
             <div class="popupBottom">
               <p>添加客服微信 <span class="red">免费</span> 领礼包</p>
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
     </el-dialog>
