@@ -617,33 +617,29 @@ export default {
     },
 
     // 处理套餐购买
-    handleMealPurchase(mealType) {
+    handleMealPurchase(purchaseData) {
       // 关闭套餐选择弹窗，然后调用原有的升级逻辑
       this.mealSelectionDialogVisible = false;
-      this.openUpgradeDialog();
+      this.openUpgradeDialog(purchaseData.orderInfo);
     },
 
     // 升级入口
-    async openUpgradeDialog() {
-      const res = await getDistributionUpgrade();
-
-      // 如果接口返回成功且有订单信息，打开升级弹窗
-      if (
-        res &&
-        res.code === 200 &&
-        res.result &&
-        res.result.out_trade_no &&
-        res.result.pay_amount
-      ) {
+    async openUpgradeDialog(orderInfo) {
+      // const res = await getDistributionUpgrade();
+      console.log("orderInfo", orderInfo);
+      // // 如果接口返回成功且有订单信息，打开升级弹窗
+      if (orderInfo && orderInfo.out_trade_no && orderInfo.pay_amount) {
         this.upgradeOrder = {
-          out_trade_no: res.result.out_trade_no,
-          original_amount: res.result.original_amount || 199,
-          pay_amount: res.result.pay_amount || 99,
-          pay_link: res.result.pay_link,
+          out_trade_no: orderInfo.out_trade_no,
+          original_amount: orderInfo.original_amount || 199,
+          pay_amount: orderInfo.pay_amount || 99,
+          pay_link: orderInfo.pay_link,
         };
         this.upgradeDialogVisible = true;
       } else {
-        this.$message.error((res && res.message) || "获取升级订单失败");
+        this.$message.error(
+          (orderInfo && orderInfo.message) || "获取升级订单失败"
+        );
       }
     },
 

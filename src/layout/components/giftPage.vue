@@ -49,7 +49,9 @@
                 <i class="el-icon-close"></i>
               </span> -->
             </div>
-            <div class="detailBtn">点击去查看详情</div>
+            <div class="detailBtn" @click="handleGiftBoxClick">
+              点击去查看详情
+            </div>
           </div>
           <div class="popup-right">
             <span @click="closeDialog" class="closeIcon">

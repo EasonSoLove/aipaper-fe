@@ -296,7 +296,7 @@ export default {
       // 只有第一个套餐（高级代理）可以购买
       if (mealType === 1) {
         try {
-          // 先调用升级接口判断用户状态
+          // 调用升级接口
           const { getDistributionUpgrade } = await import("@/api/distribution");
           const res = await getDistributionUpgrade();
 
@@ -308,12 +308,32 @@ export default {
             return;
           }
 
-          // 如果不是高级分销商，继续原有的升级流程
-          this.$emit("purchase", mealType);
-          this.dialogVisible = false;
+          // 如果接口返回成功且有订单信息，直接处理升级流程
+          if (
+            res &&
+            res.code === 200 &&
+            res.result &&
+            res.result.out_trade_no &&
+            res.result.pay_amount
+          ) {
+            // 关闭弹窗
+            this.dialogVisible = false;
+            // 通知父组件处理升级订单
+            this.$emit("purchase", {
+              mealType,
+              orderInfo: {
+                out_trade_no: res.result.out_trade_no,
+                original_amount: res.result.original_amount || 199,
+                pay_amount: res.result.pay_amount || 99,
+                pay_link: res.result.pay_link,
+              },
+            });
+          } else {
+            this.$message.error((res && res.message) || "获取升级订单失败");
+          }
         } catch (error) {
-          console.error("检查升级状态失败:", error);
-          this.$message.error("检查升级状态失败，请稍后重试");
+          console.error("升级失败:", error);
+          this.$message.error("升级失败，请稍后重试");
         }
       }
     },
