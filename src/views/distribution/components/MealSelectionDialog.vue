@@ -6,6 +6,8 @@
     :show-close="true"
     :close-on-click-modal="true"
     :close-on-press-escape="false"
+    :lock-scroll="false"
+    :append-to-body="true"
   >
     <div class="meal-selection-container">
       <div class="meal-cards">

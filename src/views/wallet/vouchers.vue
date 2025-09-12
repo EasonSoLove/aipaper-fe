@@ -10,7 +10,7 @@
             :key="item.coupon_code"
           >
             <div class="content">
-              <div class="title">{{ getCouponTitle(item.type) }}</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
@@ -36,7 +36,7 @@
             :key="item.coupon_code"
           >
             <div class="content">
-              <div class="title">{{ getCouponTitle(item.type) }}</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
@@ -59,7 +59,7 @@
             :key="item.coupon_code"
           >
             <div class="content">
-              <div class="title">{{ getCouponTitle(item.type) }}</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
@@ -115,12 +115,15 @@ export default {
         });
     },
     // 获取优惠券标题
-    getCouponTitle(type) {
+    getCouponTitle(rule_id) {
       const titleMap = {
-        1: "学位论文抵扣券",
-        3: "降AIGC次数券",
+        1: "毕业论文 - 优惠券",
+        2: "结课论文 - 优惠券",
+        3: "开题报告 - 优惠券",
+        4: "任务书 - 优惠券",
+        5: "文献综述 - 优惠券",
       };
-      return titleMap[type] || "优惠券";
+      return titleMap[rule_id] || "优惠券";
     },
 
     // 获取优惠券显示内容

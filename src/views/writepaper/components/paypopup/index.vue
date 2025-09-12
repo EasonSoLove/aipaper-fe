@@ -144,10 +144,6 @@
               <div
                 v-show="
                   currentOrder.order_type !== 'OUTLINE_DOWNLOAD' &&
-                  currentOrder.order_type !== 'EXTRA_PROPOSAL' &&
-                  currentOrder.order_type !== 'EXTRA_TASK_ASSIGNMENT' &&
-                  currentOrder.order_type !== 'EXTRA_SURVEY' &&
-                  currentOrder.order_type !== 'EXTRA_JOURNAL_REVIEWED' &&
                   currentOrder.order_type !== 'REDUCE_AIGC' &&
                   couponOptions.length > 0
                 "

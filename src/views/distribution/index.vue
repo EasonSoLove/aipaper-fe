@@ -205,6 +205,8 @@
       direction="rtl"
       size="500px"
       :before-close="handleCloseRewardDetail"
+      :lock-scroll="false"
+      :append-to-body="true"
     >
       <div class="reward-detail-content">
         <!-- 邀请返佣机制 -->

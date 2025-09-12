@@ -6,6 +6,7 @@
     append-to-body
     :before-close="handleClose"
     custom-class="poster-dialog"
+    :lock-scroll="false"
   >
     <div class="poster-container">
       <el-carousel

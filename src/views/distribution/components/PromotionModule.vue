@@ -73,7 +73,7 @@
       <el-table
         :data="withdrawalRecords"
         style="width: 100%"
-        v-loading="loading"
+        v-loading="tabLoading.withdrawable"
         empty-text="暂无数据"
       >
         <el-table-column
@@ -140,7 +140,7 @@
       <el-table
         :data="withdrawnRecords"
         style="width: 100%"
-        v-loading="loading"
+        v-loading="tabLoading.withdrawn"
         empty-text="暂无数据"
       >
         <el-table-column prop="trade_no" label="单号">
@@ -256,7 +256,7 @@
       <el-table
         :data="waitingSettleRecords"
         style="width: 100%"
-        v-loading="loading"
+        v-loading="tabLoading.pending"
         empty-text="暂无数据"
       >
         <el-table-column
@@ -328,6 +328,8 @@
       :visible.sync="realNameDialogVisible"
       title="实名认证"
       width="520px"
+      :lock-scroll="false"
+      :append-to-body="true"
     >
       <el-form
         ref="realNameFormRef"
@@ -388,6 +390,8 @@
       :visible.sync="statusDialogVisible"
       title="提现提示"
       width="420px"
+      :lock-scroll="false"
+      :append-to-body="true"
     >
       <div style="padding: 8px 0">{{ statusDialogText }}</div>
       <span slot="footer" class="dialog-footer">
@@ -398,40 +402,11 @@
     </el-dialog>
 
     <!-- 提现弹窗 -->
-    <el-dialog
+    <WithdrawDialog
       :visible.sync="withdrawDialogVisible"
-      title="提交提现申请"
-      width="520px"
-    >
-      <div style="margin: -10px 10px 0">
-        <div style="margin-bottom: 10px; font-size: 14px">
-          可提现：<b>￥{{ formatAmount(baseInfo.balance) }}</b>
-        </div>
-        <el-form label-position="top">
-          <el-form-item label="提现金额 *">
-            <el-input-number
-              size="medium"
-              :min="0.01"
-              :max="Number(baseInfo.balance) || 0"
-              :step="0.01"
-              :precision="2"
-              v-model="withdrawForm.withdrawn_amount"
-              @change="handleWithdrawAmountChange"
-            />
-            <div style="margin-top: 8px; color: #999; font-size: 12px">
-              实际到账金额（预估）：￥{{ withdrawForm.expected_amount }}
-            </div>
-            <div style="margin-top: 4px; color: #e6a23c; font-size: 12px">
-              手续费和个税暂按预估扣除约6.5%
-            </div>
-          </el-form-item>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="withdrawDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitWithdraw">提交申请</el-button>
-      </span>
-    </el-dialog>
+      :balance="Number(baseInfo.balance) || 0"
+      @success="handleWithdrawSuccess"
+    />
     <UpgradeDialog
       :visible.sync="upgradeDialogVisible"
       :upgradeOrder="upgradeOrder"
@@ -463,10 +438,11 @@ import {
 } from "../constants.js";
 import UpgradeDialog from "./UpgradeDialog.vue";
 import MealSelectionDialog from "./MealSelectionDialog.vue";
+import WithdrawDialog from "./WithdrawDialog.vue";
 
 export default {
   name: "PromotionModule",
-  components: { UpgradeDialog, MealSelectionDialog },
+  components: { UpgradeDialog, MealSelectionDialog, WithdrawDialog },
   props: {
     baseInfo: {
       type: Object,
@@ -492,6 +468,12 @@ export default {
         { id: "withdrawn", text: "已提现 ￥0.00" },
         { id: "pending", text: "待结算 ￥0.00" },
       ],
+      // 各 tab 的 loading 状态
+      tabLoading: {
+        withdrawable: false,
+        withdrawn: false,
+        pending: false,
+      },
       withdrawalRecords: [],
       withdrawnRecords: [],
       waitingSettleRecords: [],
@@ -572,10 +554,6 @@ export default {
       statusDialogText: "",
       // 提现弹窗
       withdrawDialogVisible: false,
-      withdrawForm: {
-        withdrawn_amount: 0.01,
-        expected_amount: 0,
-      },
       // 升级支付（交由子组件控制显示，仅提供开关）
       upgradeDialogVisible: false,
       // 套餐选择弹窗
@@ -608,7 +586,10 @@ export default {
   },
   mounted() {
     // 组件初始化时获取可提现记录数据
-    this.getWithdrawalRecords();
+    this.tabLoading.withdrawable = true;
+    this.$nextTick(() => {
+      this.loadTabData("withdrawable");
+    });
   },
   methods: {
     // 打开套餐选择弹窗
@@ -684,45 +665,21 @@ export default {
     },
 
     openWithdrawDialog() {
-      const balance = Number(this.baseInfo && this.baseInfo.balance) || 0;
-      this.withdrawForm.withdrawn_amount = Math.min(0.01, balance);
-      this.withdrawForm.expected_amount = (
-        this.withdrawForm.withdrawn_amount *
-        (1 - 0.065)
-      ).toFixed(2);
       this.withdrawDialogVisible = true;
     },
 
-    handleWithdrawAmountChange(val) {
-      const v = Number(val) || 0;
-      this.withdrawForm.expected_amount = (v * (1 - 0.065)).toFixed(2);
-    },
-
-    submitWithdraw() {
-      const balance = Number(this.baseInfo && this.baseInfo.balance) || 0;
-      const amt = Number(this.withdrawForm.withdrawn_amount) || 0;
-      if (amt < 0.01) {
-        this.$message.warning("提现金额小于最小提现金额");
-        return;
-      }
-      if (amt > balance) {
-        this.$message.error("提现金额超出可提现金额");
-        return;
-      }
-      postDistributionWithdrawn({ withdrawn_amount: String(amt) })
-        .then((res) => {
-          if (res && res.code === 200) {
-            this.$message.success("提现申请已成功发起！");
-            this.withdrawDialogVisible = false;
-            // 申请成功后刷新基础信息
-            this.$emit("update-base-info", null);
-          } else {
-            this.$message.error((res && res.message) || "提现申请失败");
-          }
-        })
-        .catch((err) => {
-          this.$message.error((err && err.message) || "提现申请失败");
+    // 处理提现申请成功后的逻辑
+    handleWithdrawSuccess() {
+      // 如果当前不在已提现列表，则切换到已提现列表
+      if (this.activeTab !== "withdrawn") {
+        this.switchTab("withdrawn");
+      } else {
+        // 如果已经在已提现列表，则只刷新列表
+        this.tabLoading.withdrawn = true;
+        this.$nextTick(() => {
+          this.loadTabData("withdrawn");
         });
+      }
     },
 
     // 获取状态标签类型
@@ -813,23 +770,36 @@ export default {
     },
 
     // 切换 Tab
-    async switchTab(tabId) {
+    switchTab(tabId) {
+      // 1. 立即切换 tab 并显示 loading
       this.activeTab = tabId;
       this.pagination.page_num = 1; // 重置页码
+      this.tabLoading[tabId] = true;
 
-      // 根据 Tab 加载对应数据
-      if (tabId === "withdrawable") {
-        await this.getWithdrawalRecords();
-      } else if (tabId === "withdrawn") {
-        await this.getWithdrawnRecords();
-      } else if (tabId === "pending") {
-        await this.getWaitingSettleRecords();
+      // 2. 使用 nextTick 确保页面渲染完成后再调用接口
+      this.$nextTick(() => {
+        this.loadTabData(tabId);
+      });
+    },
+
+    // 加载指定 tab 的数据
+    async loadTabData(tabId) {
+      try {
+        if (tabId === "withdrawable") {
+          await this.getWithdrawalRecords();
+        } else if (tabId === "withdrawn") {
+          await this.getWithdrawnRecords();
+        } else if (tabId === "pending") {
+          await this.getWaitingSettleRecords();
+        }
+      } finally {
+        // 确保 loading 状态被清除
+        this.tabLoading[tabId] = false;
       }
     },
 
     // 获取可提现记录
     async getWithdrawalRecords() {
-      this.loading = true;
       try {
         const res = await getWithdrawalRecords({
           page_num: this.pagination.page_num,
@@ -842,14 +812,11 @@ export default {
       } catch (error) {
         console.error("获取可提现记录失败:", error);
         this.$message.error("获取可提现记录失败");
-      } finally {
-        this.loading = false;
       }
     },
 
     // 获取待结算记录
     async getWaitingSettleRecords() {
-      this.loading = true;
       try {
         const res = await getWaitingSettleRecords({
           page_num: this.pagination.page_num,
@@ -862,14 +829,11 @@ export default {
       } catch (error) {
         console.error("获取待结算记录失败:", error);
         this.$message.error("获取待结算记录失败");
-      } finally {
-        this.loading = false;
       }
     },
 
     // 获取已提现记录
     async getWithdrawnRecords() {
-      this.loading = true;
       try {
         const res = await getWithdrawnRecords({
           page_num: this.pagination.page_num,
@@ -882,34 +846,28 @@ export default {
       } catch (error) {
         console.error("获取已提现记录失败:", error);
         this.$message.error("获取已提现记录失败");
-      } finally {
-        this.loading = false;
       }
     },
 
     // 处理页码改变
     handleCurrentChange(page) {
       this.pagination.page_num = page;
-      if (this.activeTab === "withdrawable") {
-        this.getWithdrawalRecords();
-      } else if (this.activeTab === "withdrawn") {
-        this.getWithdrawnRecords();
-      } else if (this.activeTab === "pending") {
-        this.getWaitingSettleRecords();
-      }
+      this.tabLoading[this.activeTab] = true;
+
+      this.$nextTick(() => {
+        this.loadTabData(this.activeTab);
+      });
     },
 
     // 处理每页条数改变
     handleSizeChange(size) {
       this.pagination.page_size = size;
       this.pagination.page_num = 1; // 重置到第一页
-      if (this.activeTab === "withdrawable") {
-        this.getWithdrawalRecords();
-      } else if (this.activeTab === "withdrawn") {
-        this.getWithdrawnRecords();
-      } else if (this.activeTab === "pending") {
-        this.getWaitingSettleRecords();
-      }
+      this.tabLoading[this.activeTab] = true;
+
+      this.$nextTick(() => {
+        this.loadTabData(this.activeTab);
+      });
     },
 
     // 刷新推广数据

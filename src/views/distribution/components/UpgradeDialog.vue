@@ -1,5 +1,11 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" title="升级为分享商" width="720px">
+  <el-dialog
+    :visible.sync="dialogVisible"
+    title="升级为分享商"
+    width="720px"
+    :lock-scroll="false"
+    :append-to-body="true"
+  >
     <div class="payCodeBox" v-loading="loading">
       <div class="payRightPrice">
         <!-- 高级代理权益介绍 -->
