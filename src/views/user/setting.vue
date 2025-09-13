@@ -209,7 +209,7 @@ export default {
   methods: {
     getStatusDescription(status) {
       const statusItem = this.coupon_status_list.find(
-        (item) => item.status === String(status)
+        (item) => item.status == String(status)
       );
       return statusItem ? statusItem.status_description : "未知状态";
     },
