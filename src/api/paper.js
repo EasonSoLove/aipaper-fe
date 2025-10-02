@@ -254,3 +254,11 @@ export function reduce_aigc_pay(data) {
     data,
   });
 }
+
+// 获取降AIGC产品信息
+export function getAigcProducts() {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/product",
+    method: "get",
+  });
+}
