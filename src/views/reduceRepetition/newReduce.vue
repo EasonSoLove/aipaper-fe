@@ -1,5 +1,5 @@
 <template>
-  <div class="new-reduce-container">
+  <div>
     <!-- 重要提示弹窗 -->
     <el-dialog
       :visible.sync="showWarningDialog"
@@ -26,13 +26,67 @@
       </div>
     </el-dialog>
 
+    <!-- 处理案例展示弹窗 -->
+    <el-dialog
+      :visible.sync="showCaseDialog"
+      title="处理案例展示"
+      width="600px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      custom-class="case-dialog"
+    >
+      <div class="case-content">
+        <img
+          src="@/assets/images/promotion/translate.png"
+          alt="处理案例展示"
+          class="case-image"
+        />
+
+        <!-- 统计卡片区域 -->
+        <div class="stats-cards">
+          <div class="stat-card stat-card-green">
+            <div class="stat-number">5%</div>
+            <div class="stat-label">查重率</div>
+            <div class="stat-desc">远低于行业标准</div>
+          </div>
+          <div class="stat-card stat-card-blue">
+            <div class="stat-number">6%</div>
+            <div class="stat-label">AI检测率</div>
+            <div class="stat-desc">完全达到发表标准</div>
+          </div>
+        </div>
+
+        <!-- 特点列表区域 -->
+        <div class="features-list">
+          <div class="feature-item">
+            <i class="el-icon-check feature-icon"></i>
+            <span>通过高智能算法,实现超低查重率和AI检测率</span>
+          </div>
+          <div class="feature-item">
+            <i class="el-icon-check feature-icon"></i>
+            <span>保持原文核心观点,提升表达的学术性</span>
+          </div>
+          <div class="feature-item">
+            <i class="el-icon-check feature-icon"></i>
+            <span>一次处理即可达到发表标准,无需多次修改</span>
+          </div>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="showCaseDialog = false"
+          >我知道了</el-button
+        >
+      </div>
+    </el-dialog>
+
     <!-- 主页面内容 -->
     <div class="main-content">
       <!-- 加载状态 -->
       <div v-if="loading" class="loading-container">
-        <el-loading :loading="loading" text="加载中...">
-          <div style="height: 200px"></div>
-        </el-loading>
+        <div class="loading-content">
+          <i class="el-icon-loading"></i>
+          <p>加载中...</p>
+        </div>
       </div>
 
       <!-- 错误状态 -->
@@ -75,8 +129,9 @@
 
                 <!-- 价格 -->
                 <div class="product-price">
-                  <span class="price">{{ product.price }}元</span>
-                  <span class="unit">/{{ product.unit }}字</span>
+                  <span class="price">{{ product.price }}元 </span>
+                  <i style="margin: 0 4px; margin-left: 5px">/</i>
+                  <span class="unit"> {{ product.unit }}字</span>
                 </div>
               </div>
             </div>
@@ -89,7 +144,13 @@
           <div class="language-selection">
             <div class="selection-label">
               <i class="el-icon-document"></i>
-              <span>文本语言</span>
+              <p style="font-size: 16px; color: #1f2937">
+                <span style="margin-right: 8px">文本语言</span>
+                <span
+                  style="font-size: 14px; margin-right: 12px; color: #6b7280"
+                  >请选择需要处理的文本语言</span
+                >
+              </p>
             </div>
             <div class="selection-tabs">
               <div
@@ -137,6 +198,16 @@
 
           <!-- 输入方式选择 -->
           <div class="input-method-selection">
+            <div class="selection-label">
+              <i class="el-icon-guide"></i>
+              <p style="font-size: 16px; color: #1f2937">
+                <span style="margin-right: 8px">输入方式</span>
+                <span
+                  style="font-size: 14px; margin-right: 12px; color: #6b7280"
+                  >请选择需要处理的输入方式</span
+                >
+              </p>
+            </div>
             <div class="selection-tabs">
               <div
                 class="tab-item"
@@ -152,8 +223,7 @@
                 @click="selectInputMethod('file')"
               >
                 <i class="el-icon-upload"></i>
-                文件上传
-                <span class="sub-text">(请上传需要处理的段落)</span>
+                文件上传 (请上传需要处理的段落)
               </div>
             </div>
           </div>
@@ -162,6 +232,16 @@
           <div class="service-header">
             <h3>{{ currentProduct?.product_name || "降重复率" }}</h3>
             <span class="balance">(余额: {{ userBalance }}元)</span>
+
+            <div v-if="activeTab === 'combinedplus'">
+              <el-button
+                type="primary"
+                icon="el-icon-view"
+                style="margin-left: 20px"
+                @click="showCaseDialog = true"
+                >查看处理案例</el-button
+              >
+            </div>
           </div>
 
           <!-- 主要内容区域 -->
@@ -179,48 +259,71 @@
                   show-word-limit
                   @input="handleTextInput"
                 />
-                <div class="input-footer">
-                  <div class="char-count">
-                    {{ inputText.length }}/10000 字符
-                  </div>
-                  <div class="action-buttons">
-                    <el-button @click="resetInput">重置</el-button>
-                    <el-button type="primary" @click="generateText"
-                      >一键生成</el-button
-                    >
-                  </div>
-                </div>
               </div>
 
               <!-- 文件上传模式 -->
               <div v-else class="file-upload-container">
-                <el-upload
-                  class="upload-dragger"
-                  drag
-                  :action="uploadUrl"
-                  :before-upload="beforeUpload"
-                  :on-success="handleUploadSuccess"
-                  :on-error="handleUploadError"
-                  :show-file-list="false"
+                <!-- 隐藏的文件输入框 - 移到外层，确保始终存在 -->
+                <input
+                  ref="fileInput"
+                  type="file"
+                  style="display: none"
                   accept=".docx,.txt"
-                >
-                  <i class="el-icon-document"></i>
+                  @change="handleFileSelect"
+                />
+
+                <!-- 未选择文件状态 -->
+                <div v-if="!showFileInput" class="upload-placeholder">
+                  <i
+                    style="font-size: 40px; color: #c0c4cc; margin-bottom: 16px"
+                    class="el-icon-document"
+                  ></i>
                   <div class="el-upload__text">点击或拖拽文件到此区域上传</div>
                   <div class="el-upload__tip">
                     支持DOCX、txt格式的文件，DOC文件请先在Word中转换为DOCX，最大
                     20MB
                   </div>
-                </el-upload>
-                <div class="upload-footer">
-                  <div class="char-count">
-                    {{ uploadedText.length }}/10000 字符
-                  </div>
-                  <div class="action-buttons">
-                    <el-button @click="resetInput">重置</el-button>
-                    <el-button type="primary" @click="generateText"
-                      >一键生成</el-button
+                  <div style="margin-top: 16px">
+                    <el-button type="primary" @click="triggerFileSelect"
+                      >选择文件</el-button
                     >
                   </div>
+                </div>
+
+                <!-- 已选择文件状态 -->
+                <div v-else class="file-selected-container">
+                  <div class="file-info">
+                    <i class="el-icon-check file-check-icon"></i>
+                    <span class="file-name">{{ selectedFile?.name }}</span>
+                    <el-button
+                      type="danger"
+                      size="mini"
+                      class="delete-btn"
+                      @click="deleteFile"
+                    >
+                      删除
+                    </el-button>
+                  </div>
+                  <div class="file-actions">
+                    <el-button type="primary" @click="triggerFileSelect"
+                      >重新选择</el-button
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="upload-footer">
+                <div class="char-count">
+                  {{ uploadedText.length }}/10000 字符
+                </div>
+                <div class="action-buttons">
+                  <el-button @click="resetInput">重置</el-button>
+                  <el-button
+                    type="primary"
+                    :disabled="isGenerateDisabled"
+                    @click="generateText"
+                  >
+                    一键生成
+                  </el-button>
                 </div>
               </div>
             </div>
@@ -236,8 +339,12 @@
               <div class="output-footer">
                 <div class="char-count">字符数: {{ generatedText.length }}</div>
                 <div class="action-buttons">
-                  <el-button @click="copyResult">复制结果</el-button>
-                  <el-button @click="downloadDocx">下载DOCX</el-button>
+                  <el-button @click="copyResult" icon="el-icon-copy-document"
+                    >复制结果</el-button
+                  >
+                  <el-button @click="downloadDocx" icon="el-icon-download"
+                    >下载DOCX</el-button
+                  >
                 </div>
               </div>
             </div>
@@ -256,6 +363,7 @@ export default {
   data() {
     return {
       showWarningDialog: true,
+      showCaseDialog: false, // 处理案例展示弹窗
       loading: false,
       error: null,
       products: [],
@@ -268,11 +376,28 @@ export default {
       generatedText: "",
       userBalance: "46.130",
       uploadUrl: "/api/upload", // 文件上传地址
+      selectedFile: null, // 选中的文件
+      showFileInput: false, // 是否显示文件选择状态
     };
   },
   computed: {
     currentProduct() {
       return this.products.find((p) => p.product === this.activeTab);
+    },
+
+    // 判断是否有输入内容
+    hasInputContent() {
+      if (this.inputMethod === "text") {
+        return this.inputText.trim().length > 0;
+      } else if (this.inputMethod === "file") {
+        return this.selectedFile !== null && this.uploadedText.length > 0;
+      }
+      return false;
+    },
+
+    // 判断生成按钮是否禁用
+    isGenerateDisabled() {
+      return !this.hasInputContent;
     },
   },
   mounted() {
@@ -420,481 +545,87 @@ export default {
       this.$message.error("文件上传失败");
       console.error("上传失败:", error);
     },
+
+    // 触发文件选择
+    triggerFileSelect() {
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.click();
+      } else {
+        console.error("文件输入框引用不存在");
+        this.$message.error("文件选择功能暂时不可用");
+      }
+    },
+
+    // 处理文件选择
+    handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // 验证文件类型 - 更严格的验证
+        const validExtensions = [".docx", ".txt"];
+        const isValidExtension = validExtensions.some((ext) =>
+          file.name.toLowerCase().endsWith(ext)
+        );
+
+        const isValidMimeType =
+          file.type ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+          file.type === "text/plain" ||
+          file.type === "application/msword"; // 兼容旧版Word格式
+
+        if (!isValidExtension && !isValidMimeType) {
+          this.$message.error("只能选择 DOCX 或 TXT 格式的文件!");
+          // 清空文件输入框
+          event.target.value = "";
+          return;
+        }
+
+        // 验证文件大小
+        const isLt20M = file.size / 1024 / 1024 < 20;
+        if (!isLt20M) {
+          this.$message.error("文件大小不能超过 20MB!");
+          // 清空文件输入框
+          event.target.value = "";
+          return;
+        }
+
+        // 更新文件信息
+        this.selectedFile = file;
+        this.showFileInput = true;
+        this.$message.success("文件选择成功");
+
+        // 这里可以添加文件内容读取逻辑
+        this.readFileContent(file);
+      }
+    },
+
+    // 读取文件内容
+    readFileContent(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        this.uploadedText = content;
+        console.log("文件内容已读取:", content.length, "字符");
+      };
+      reader.onerror = () => {
+        this.$message.error("文件读取失败");
+      };
+      reader.readAsText(file, "UTF-8");
+    },
+
+    // 删除文件
+    deleteFile() {
+      this.selectedFile = null;
+      this.showFileInput = false;
+      this.uploadedText = "";
+      // 清空文件输入框
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.value = "";
+      }
+    },
   },
 };
 </script>
 
-<style scoped>
-.new-reduce-container {
-  min-height: 100vh;
-  background: #f5f5f5;
-  padding: 20px;
-}
-
-.warning-content {
-  text-align: center;
-}
-
-.warning-title {
-  color: #f56c6c;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.warning-text {
-  color: #333;
-  line-height: 1.6;
-  text-align: left;
-}
-
-.main-content {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.loading-container,
-.error-container {
-  text-align: center;
-  padding: 40px;
-}
-
-/* 产品选择区域 */
-.products-selection {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  padding: 20px;
-}
-
-.products-grid {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-}
-
-.product-card {
-  width: 305px;
-  height: 160px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.product-card:hover {
-  border-color: #409eff;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
-}
-
-.product-card.selected {
-  border: 2px solid #409eff;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.15);
-}
-
-/* 选中图标 */
-.selected-icon {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 20px;
-  height: 20px;
-  background: #409eff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 12px;
-  z-index: 1;
-}
-
-/* 产品内容 */
-.product-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* 产品头部（图标和标题） */
-.product-header {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
-/* 产品图标 */
-.product-icon {
-  width: 32px;
-  height: 32px;
-  background: #e6e6fa;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-
-.product-icon i {
-  font-size: 16px;
-  color: #666;
-}
-
-.product-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  line-height: 1.2;
-  flex: 1;
-}
-
-.product-description {
-  font-size: 11px;
-  color: #666;
-  line-height: 1.3;
-  margin: 0 0 8px 0;
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.product-price {
-  display: flex;
-  align-items: baseline;
-  margin-top: auto;
-}
-
-.price {
-  font-size: 16px;
-  font-weight: bold;
-  color: #409eff;
-}
-
-.unit {
-  font-size: 11px;
-  color: #409eff;
-  margin-left: 2px;
-}
-
-/* 功能区域 */
-.function-area {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-/* 语言选择 */
-.language-selection {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.selection-label {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-  font-weight: 500;
-  color: #333;
-}
-
-.selection-label i {
-  margin-right: 8px;
-  color: #409eff;
-}
-
-.selection-tabs {
-  display: flex;
-  gap: 10px;
-}
-
-.tab-item {
-  padding: 8px 16px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-}
-
-.tab-item:hover {
-  color: #409eff;
-  border-color: #409eff;
-}
-
-.tab-item.active {
-  background: #409eff;
-  color: white;
-  border-color: #409eff;
-}
-
-.tab-item i {
-  margin-right: 6px;
-}
-
-.sub-text {
-  font-size: 12px;
-  color: #999;
-  margin-left: 4px;
-}
-
-/* 检测平台选择 */
-.detection-platform-selection {
-  margin-bottom: 20px;
-}
-
-.platform-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.platform-item {
-  padding: 6px 12px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 14px;
-  color: #606266;
-  background: white;
-}
-
-.platform-item:hover {
-  color: #409eff;
-  border-color: #409eff;
-}
-
-.platform-item.active {
-  background: #409eff;
-  color: white;
-  border-color: #409eff;
-}
-
-/* 输入方式选择 */
-.input-method-selection {
-  margin-bottom: 20px;
-}
-
-/* 服务标题和余额 */
-.service-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.service-header h3 {
-  font-size: 20px;
-  color: #333;
-  margin: 0;
-  margin-right: 10px;
-}
-
-.balance {
-  color: #666;
-  font-size: 14px;
-}
-
-/* 主要内容区域 */
-.main-work-area {
-  display: flex;
-  gap: 20px;
-  min-height: 500px;
-}
-
-.input-area,
-.output-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 文本输入区域 */
-.text-input-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.text-input-container .el-textarea {
-  flex: 1;
-}
-
-.text-input-container .el-textarea__inner {
-  height: 100%;
-  resize: none;
-}
-
-.input-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding: 10px 0;
-}
-
-/* 文件上传区域 */
-.file-upload-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.upload-dragger {
-  flex: 1;
-  border: 2px dashed #dcdfe6;
-  border-radius: 6px;
-  background: #fafafa;
-  text-align: center;
-  padding: 40px 20px;
-  transition: all 0.3s;
-}
-
-.upload-dragger:hover {
-  border-color: #409eff;
-}
-
-.upload-dragger i {
-  font-size: 48px;
-  color: #c0c4cc;
-  margin-bottom: 16px;
-}
-
-.el-upload__text {
-  color: #606266;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.el-upload__tip {
-  color: #909399;
-  font-size: 12px;
-}
-
-.upload-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding: 10px 0;
-}
-
-/* 输出区域 */
-.output-container {
-  flex: 1;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  padding: 15px;
-  background: #fafafa;
-  min-height: 400px;
-}
-
-.no-content {
-  color: #c0c4cc;
-  text-align: center;
-  line-height: 400px;
-  font-size: 14px;
-}
-
-.generated-content {
-  color: #333;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.output-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding: 10px 0;
-}
-
-/* 字符统计 */
-.char-count {
-  color: #909399;
-  font-size: 12px;
-}
-
-/* 操作按钮 */
-.action-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.action-buttons .el-button {
-  padding: 8px 16px;
-  font-size: 14px;
-}
-
-.dialog-footer {
-  text-align: center;
-}
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .products-grid {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .product-card {
-    width: calc(50% - 10px);
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .products-grid {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .product-card {
-    width: 100%;
-    max-width: 305px;
-  }
-
-  .main-work-area {
-    flex-direction: column;
-  }
-
-  .language-selection {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .selection-label {
-    margin-bottom: 10px;
-  }
-
-  .service-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .service-header h3 {
-    margin-bottom: 5px;
-  }
-}
+<style lang="scss" scoped>
+@import "./index.scss";
 </style>

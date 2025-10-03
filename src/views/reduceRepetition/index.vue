@@ -2,7 +2,7 @@
   <div class="mainContentSec reduceRepetiton">
     <!-- <swiper-one class="topSwiper"></swiper-one> -->
     <div style="height: 20px"></div>
-    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+    <el-tabs v-model="activeName" type="border-card">
       <el-tab-pane label="新版" name="first"></el-tab-pane>
       <newReduce></newReduce>
       <el-tab-pane label="旧版" name="second">
