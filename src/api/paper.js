@@ -262,3 +262,15 @@ export function getAigcProducts() {
     method: "get",
   });
 }
+
+// 获取预估价格
+export function predictPrice(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/predict_price",
+    method: "post",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}

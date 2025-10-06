@@ -2,9 +2,14 @@
   <div class="mainContentSec reduceRepetiton">
     <!-- <swiper-one class="topSwiper"></swiper-one> -->
     <div style="height: 20px"></div>
-    <el-tabs v-model="activeName" type="border-card">
-      <el-tab-pane label="新版" name="first"></el-tab-pane>
-      <newReduce></newReduce>
+    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+      <el-tab-pane label="新版" name="first">
+        <newReduce></newReduce>
+        <!-- 查重记录列表 -->
+        <div class="record-list-container">
+          <record-list :visible="true" />
+        </div>
+      </el-tab-pane>
       <el-tab-pane label="旧版" name="second">
         <div class="reduce_Old_Page">
           <div class="outlineTab">
@@ -61,12 +66,12 @@
                 <span class="count">{{ remaining_nums }}次</span>
               </div>
               <hr class="divider" />
-              <div class="content">
+              <!-- <div class="content">
                 <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
                 <button @click="showBuyDialog" class="recharge-button">
                   点我补充次数
                 </button>
-              </div>
+              </div> -->
             </div>
           </div>
           <template v-if="activeIndex != 4 && activeIndex != 0">
@@ -336,6 +341,7 @@ import {
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import reducepay2 from "./components/reducePay.vue";
+import recordList from "./components/recordList.vue";
 import eventBus from "@/utils/eventBus";
 import { getToken, setToken } from "@/utils/auth"; // get token from cookie
 import newReduce from "./newReduce.vue";
@@ -348,6 +354,7 @@ export default {
     filereduce,
     reducepay2,
     newReduce,
+    recordList,
   },
   data() {
     return {
@@ -519,7 +526,11 @@ export default {
       console.log(btnItem, "btnItem");
       // 判断次数是否够用
       if (this.remaining_nums < 1) {
-        this.showBuyDialog();
+        // this.showBuyDialog();
+        this.$message({
+          type: "warning",
+          message: "次数不足，请使用新版AIGC降重",
+        });
         return false;
       }
       zhuge.track(`用户点击降重按钮`, {});
@@ -945,5 +956,14 @@ export default {
 .confirm-button:focus {
   background-color: #8b5cf6 !important;
   border-color: #8b5cf6 !important;
+}
+
+/* 查重记录列表容器样式 */
+.record-list-container {
+  margin-top: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 </style>

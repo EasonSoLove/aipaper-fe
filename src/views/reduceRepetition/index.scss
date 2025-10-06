@@ -1,5 +1,5 @@
 // 变量定义
-$primary-color: #409eff;
+$primary-color: #3355ff;
 $success-color: #28a745;
 $warning-color: #f56c6c;
 $text-color: #333;
@@ -33,21 +33,168 @@ $border-radius-large: 12px;
   background: linear-gradient(135deg, $color1, $color2);
 }
 
-// 警告弹窗样式
-.warning-content {
-  text-align: center;
-
-  .warning-title {
-    color: $warning-color;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
+// 重要提示弹窗样式
+:deep(.warning-dialog) {
+  .el-dialog {
+    border-radius: 12px;
+    overflow: hidden;
   }
 
-  .warning-text {
-    color: $text-color;
-    line-height: 1.6;
-    text-align: left;
+  .el-dialog__header {
+    display: none;
+  }
+
+  .el-dialog__body {
+    padding: 0;
+  }
+
+  .el-dialog__footer {
+    display: none;
+  }
+}
+
+.warning-dialog-content {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.warning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+
+  .warning-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #9ca3af;
+    font-size: 16px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    i {
+      font-size: 16px;
+    }
+  }
+}
+
+.warning-body {
+  padding: 20px 24px;
+}
+
+.notice-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .notice-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+
+    i {
+      color: #3b82f6;
+      font-size: 18px;
+    }
+  }
+
+  .notice-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3b82f6;
+  }
+}
+
+.warning-points {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.warning-point {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+
+  .point-icon {
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+
+    i {
+      color: #3b82f6;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+
+  .point-text {
+    font-size: 16px;
+    color: #374151;
+    line-height: 1.5;
+    flex: 1;
+
+    .highlight-text {
+      color: #ef4444;
+      font-weight: bold;
+    }
+  }
+}
+
+.warning-footer {
+  padding: 16px 24px 24px;
+  text-align: right;
+  border-top: 1px solid #f0f0f0;
+
+  .confirm-btn {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+
+    &:focus {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
   }
 }
 
@@ -278,6 +425,8 @@ $border-radius-large: 12px;
 // 检测平台选择
 .detection-platform-selection {
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .platform-options {

@@ -3,26 +3,69 @@
     <!-- 重要提示弹窗 -->
     <el-dialog
       :visible.sync="showWarningDialog"
-      title="重要提示"
       width="600px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
+      custom-class="warning-dialog"
     >
-      <div class="warning-content">
-        <p class="warning-title">重要提示</p>
-        <p class="warning-text">
-          <strong>请注意：</strong><br />
-          不同平台的 AI 检测算法各不相同，检测结果之间没有参考价值<br />
-          知网维普格子达查重 100%一次过<br />
-          paperpass 的 AI 查重逻辑和主流的付费的 AI
-          查重如知网维普格子达不一致，若选择知网维普则无法通过 paperpass 的检测
-        </p>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="closeWarningDialog"
-          >我知道了</el-button
-        >
+      <div class="warning-dialog-content">
+        <!-- 自定义标题栏 -->
+        <div class="warning-header">
+          <h3 class="warning-title">重要提示</h3>
+          <button class="close-btn" @click="closeWarningDialog">
+            <i class="el-icon-close"></i>
+          </button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="warning-body">
+          <!-- 请注意部分 -->
+          <div class="notice-section">
+            <div class="notice-icon">
+              <i class="el-icon-info"></i>
+            </div>
+            <span class="notice-text">请注意：</span>
+          </div>
+
+          <!-- 提示点列表 -->
+          <div class="warning-points">
+            <div class="warning-point">
+              <div class="point-icon">
+                <i class="el-icon-check"></i>
+              </div>
+              <span class="point-text"
+                >不同平台的AI检测算法各不相同，检测结果之间没有参考价值</span
+              >
+            </div>
+
+            <div class="warning-point">
+              <div class="point-icon">
+                <i class="el-icon-check"></i>
+              </div>
+              <span class="point-text">
+                知网维普格子达查重100%一次过。
+                <span class="highlight-text">30万单0失败</span>
+              </span>
+            </div>
+
+            <div class="warning-point">
+              <div class="point-icon">
+                <i class="el-icon-check"></i>
+              </div>
+              <span class="point-text"
+                >paperpass的AI查重逻辑和主流的付费的AI查重如知网维普格子达都不一样，如果选了知网维普的话通过不了paperpass</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="warning-footer">
+          <el-button class="confirm-btn" @click="closeWarningDialog">
+            我知道了
+          </el-button>
+        </div>
       </div>
     </el-dialog>
 
@@ -180,8 +223,14 @@
             class="detection-platform-selection"
           >
             <div class="selection-label">
-              <i class="el-icon-monitor"></i>
-              <span>检测平台</span>
+              <i class="el-icon-s-platform"></i>
+              <p style="font-size: 16px; color: #1f2937">
+                <span style="margin-right: 8px">检测平台</span>
+                <span
+                  style="font-size: 14px; margin-right: 12px; color: #6b7280"
+                  >请选择需要适配的查重平台</span
+                >
+              </p>
             </div>
             <div class="platform-options">
               <div
@@ -312,8 +361,22 @@
                 </div>
               </div>
               <div class="upload-footer">
-                <div class="char-count">
-                  {{ uploadedText.length }}/10000 字符
+                <div
+                  class="char-count"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  {{ displayChars || uploadedText.length }}/10000 字符
+
+                  <p
+                    style="margin-left: 10px; color: #3355ff; font-weight: bold"
+                    v-if="predictPrice !== null"
+                  >
+                    <span> 预估价格: {{ predictPrice }}元 </span>
+                  </p>
                 </div>
                 <div class="action-buttons">
                   <el-button @click="resetInput">重置</el-button>
@@ -356,7 +419,7 @@
 </template>
 
 <script>
-import { getAigcProducts } from "@/api/paper";
+import { getAigcProducts, predictPrice } from "@/api/paper";
 
 export default {
   name: "NewReduce",
@@ -378,6 +441,11 @@ export default {
       uploadUrl: "/api/upload", // 文件上传地址
       selectedFile: null, // 选中的文件
       showFileInput: false, // 是否显示文件选择状态
+      predictPrice: null, // 预估价格
+      totalChars: 0, // 总字符数
+      displayChars: 0, // 显示的字符数（从接口获取）
+      priceLoading: false, // 价格预估加载状态
+      predictPriceTimer: null, // 防抖定时器
     };
   },
   computed: {
@@ -402,6 +470,12 @@ export default {
   },
   mounted() {
     this.loadProducts();
+  },
+  beforeDestroy() {
+    // 清理防抖定时器
+    if (this.predictPriceTimer) {
+      clearTimeout(this.predictPriceTimer);
+    }
   },
   methods: {
     // 关闭警告弹窗
@@ -451,8 +525,8 @@ export default {
     getProductIcon(productType) {
       const iconMap = {
         deduplication: "el-icon-document",
-        aigc: "el-icon-star-on",
-        combined: "el-icon-collection",
+        aigc: "el-icon-reading",
+        combined: "el-icon-coin",
         combinedplus: "el-icon-collection",
       };
       return iconMap[productType] || "el-icon-document";
@@ -476,6 +550,8 @@ export default {
     // 处理文本输入
     handleTextInput(value) {
       this.inputText = value;
+      // 防抖调用价格预估
+      this.debouncePredictPrice();
     },
 
     // 重置输入
@@ -483,6 +559,14 @@ export default {
       this.inputText = "";
       this.uploadedText = "";
       this.generatedText = "";
+      this.predictPrice = null;
+      this.totalChars = 0;
+      this.displayChars = 0;
+      // 清除防抖定时器
+      if (this.predictPriceTimer) {
+        clearTimeout(this.predictPriceTimer);
+        this.predictPriceTimer = null;
+      }
     },
 
     // 生成文本
@@ -605,6 +689,8 @@ export default {
         const content = e.target.result;
         this.uploadedText = content;
         console.log("文件内容已读取:", content.length, "字符");
+        // 文件读取完成后调用价格预估
+        this.debouncePredictPrice();
       };
       reader.onerror = () => {
         this.$message.error("文件读取失败");
@@ -620,6 +706,102 @@ export default {
       // 清空文件输入框
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = "";
+      }
+      // 重置价格预估
+      this.predictPrice = null;
+      this.totalChars = 0;
+      this.displayChars = 0;
+    },
+
+    // 防抖调用价格预估
+    debouncePredictPrice() {
+      // 清除之前的定时器
+      if (this.predictPriceTimer) {
+        clearTimeout(this.predictPriceTimer);
+      }
+
+      // 检查是否有输入内容
+      let hasContent = false;
+      if (this.inputMethod === "text") {
+        hasContent = this.inputText.trim().length > 0;
+      } else if (this.inputMethod === "file") {
+        hasContent =
+          this.selectedFile !== null && this.uploadedText.trim().length > 0;
+      }
+
+      // 如果没有内容，重置价格预估
+      if (!hasContent) {
+        this.predictPrice = null;
+        this.totalChars = 0;
+        this.displayChars = 0;
+        return;
+      }
+
+      // 设置新的定时器，1000ms后调用价格预估
+      this.predictPriceTimer = setTimeout(() => {
+        this.getPredictPrice();
+      }, 1000);
+    },
+
+    // 获取预估价格
+    async getPredictPrice() {
+      // 检查是否有必要的数据
+      if (!this.activeTab || !this.inputMethod) {
+        return;
+      }
+
+      let inputText = "";
+      let file = null;
+
+      if (this.inputMethod === "text") {
+        inputText = this.inputText.trim();
+        if (!inputText) {
+          this.predictPrice = null;
+          this.totalChars = 0;
+          return;
+        }
+      } else if (this.inputMethod === "file") {
+        if (!this.selectedFile || !this.uploadedText.trim()) {
+          this.predictPrice = null;
+          this.totalChars = 0;
+          return;
+        }
+        file = this.selectedFile;
+      }
+
+      // 构建form-data
+      const formData = new FormData();
+      formData.append("product", this.activeTab);
+      formData.append("language", this.selectedLanguage);
+      formData.append("input_type", this.inputMethod);
+
+      if (this.inputMethod === "text") {
+        formData.append("input_text", inputText);
+      } else if (this.inputMethod === "file") {
+        formData.append("file", file);
+      }
+
+      try {
+        this.priceLoading = true;
+        const response = await predictPrice(formData);
+
+        if (response.code === 200) {
+          this.predictPrice = response.result.predict_price;
+          this.totalChars = response.result.total_chars;
+          this.displayChars = response.result.total_chars;
+        } else {
+          console.error("获取预估价格失败:", response.message);
+          this.predictPrice = null;
+          this.totalChars = 0;
+          this.displayChars = 0;
+        }
+      } catch (error) {
+        console.error("获取预估价格失败:", error);
+        this.predictPrice = null;
+        this.totalChars = 0;
+        this.displayChars = 0;
+      } finally {
+        this.priceLoading = false;
       }
     },
   },
