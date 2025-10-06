@@ -425,6 +425,10 @@ export default {
     closeImportantTipDialog() {
       this.importantTipDialogVisible = false;
     },
+    // 处理标签页点击事件
+    handleClick(tab) {
+      console.log("切换到标签页:", tab.name);
+    },
     showPayDialog(data) {
       console.log("dddd", data);
       this.requestKey2 = data.requestKey;
