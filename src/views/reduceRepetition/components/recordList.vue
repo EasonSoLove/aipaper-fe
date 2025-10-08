@@ -102,7 +102,8 @@
       </div>
     </div>
 
-    <!-- 分页 -->
+    <!-- 分页组件 -->
+    <!-- 当记录数量大于0时显示分页 -->
     <div class="pagination-container" v-if="recordList.length > 0">
       <el-pagination
         @current-change="handlePageChange"
@@ -111,6 +112,8 @@
         :total="total"
         layout="prev, pager, next"
         background
+        :page-sizes="[5, 10, 20]"
+        :page-size-options="['5条/页', '10条/页', '20条/页']"
       >
       </el-pagination>
     </div>
@@ -128,12 +131,12 @@ export default {
   },
   data() {
     return {
-      loading: false,
-      recordList: [],
-      currentPage: 1,
-      pageSize: 5,
-      total: 0,
-      showWarning: true,
+      loading: false, // 加载状态
+      recordList: [], // 记录列表数据
+      currentPage: 1, // 当前页码，从1开始
+      pageSize: 5, // 每页显示条数，设置为5条
+      total: 0, // 总记录数，用于分页计算
+      showWarning: true, // 是否显示警告横幅
     };
   },
   mounted() {
@@ -149,18 +152,49 @@ export default {
   },
   methods: {
     // 加载记录列表
+    // 根据当前页码和每页条数加载对应的记录数据
     async loadRecordList() {
-      console.log("开始加载记录列表");
+      console.log("开始加载记录列表，当前页:", this.currentPage);
       this.loading = true;
       try {
-        // 模拟接口调用
+        // 模拟接口调用，实际项目中这里应该调用真实的API
         const mockData = this.getMockData();
         console.log("模拟数据:", mockData);
-        this.recordList = mockData.result.record_list;
-        this.total = mockData.result.total;
-        this.currentPage = parseInt(mockData.result.page_num);
-        this.pageSize = parseInt(mockData.result.page_size);
+
+        // 根据分页参数获取当前页的数据
+        // 模拟真实的分页逻辑，根据当前页码和每页条数截取对应的数据
+        const allRecords = mockData.result.record_list;
+        const total = mockData.result.total;
+        const pageSize = parseInt(mockData.result.page_size);
+        const currentPage = parseInt(mockData.result.page_num);
+
+        // 计算当前页的起始索引和结束索引
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        console.log("分页计算:", {
+          currentPage,
+          pageSize,
+          startIndex,
+          endIndex,
+          totalRecords: allRecords.length,
+        });
+
+        // 截取当前页的数据
+        this.recordList = allRecords.slice(startIndex, endIndex);
+        this.total = total;
+        this.currentPage = currentPage;
+        this.pageSize = pageSize;
+
         console.log("记录列表:", this.recordList);
+        console.log(
+          "总记录数:",
+          this.total,
+          "当前页:",
+          this.currentPage,
+          "每页条数:",
+          this.pageSize
+        );
       } catch (error) {
         console.error("加载记录列表失败:", error);
         this.$message.error("加载记录列表失败");
@@ -170,14 +204,15 @@ export default {
     },
 
     // 获取模拟数据
+    // 模拟接口返回的分页数据，包含多条记录用于测试分页功能
     getMockData() {
       return {
         code: 200,
         message: "success",
         result: {
-          page_num: "1",
-          page_size: "5",
-          total: 5,
+          page_num: this.currentPage.toString(), // 当前页码
+          page_size: "5", // 每页显示5条记录
+          total: 12, // 总共12条记录，用于测试分页
           record_list: [
             {
               id: 1,
@@ -237,6 +272,91 @@ export default {
               status: 1,
               created_time: "2025-09-25T09:42:18+08:00",
               updated_time: "2025-09-25T09:42:18+08:00",
+            },
+            // 第6-12条记录，用于测试分页功能
+            {
+              id: 6,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "深度学习在图像识别中的应用研究 随着深度学习技术的快速发展，图像识别领域取得了重大突破。本文主要研究了卷积神经网络在图像识别中的应用，包括图像分类、目标检测、语义分割等任务。通过实验验证，深度学习在图像识别任务中表现出了优异的性能。",
+              result_text:
+                "深度学习在图像识别中的应用研究 随着深度学习技术的快速发展，图像识别领域取得了重大突破。本文主要研究了卷积神经网络在图像识别中的应用，包括图像分类、目标检测、语义分割等任务。通过实验验证，深度学习在图像识别任务中表现出了优异的性能。",
+              status: 1,
+              created_time: "2025-09-24T15:30:25+08:00",
+              updated_time: "2025-09-24T15:30:25+08:00",
+            },
+            {
+              id: 7,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "云计算环境下的数据安全保护策略 云计算技术的广泛应用为数据存储和处理带来了便利，但同时也带来了数据安全方面的挑战。本文分析了云计算环境下的数据安全威胁，并提出了相应的保护策略。",
+              result_text:
+                "云计算环境下的数据安全保护策略 云计算技术的广泛应用为数据存储和处理带来了便利，但同时也带来了数据安全方面的挑战。本文分析了云计算环境下的数据安全威胁，并提出了相应的保护策略。",
+              status: 0,
+              created_time: "2025-09-23T11:20:15+08:00",
+              updated_time: "2025-09-23T11:20:15+08:00",
+            },
+            {
+              id: 8,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "物联网技术在智慧城市建设中的应用 智慧城市是城市发展的重要方向，物联网技术为智慧城市建设提供了技术支撑。本文研究了物联网技术在智慧交通、智慧环保、智慧医疗等领域的应用。",
+              result_text:
+                "物联网技术在智慧城市建设中的应用 智慧城市是城市发展的重要方向，物联网技术为智慧城市建设提供了技术支撑。本文研究了物联网技术在智慧交通、智慧环保、智慧医疗等领域的应用。",
+              status: 1,
+              created_time: "2025-09-22T16:45:30+08:00",
+              updated_time: "2025-09-22T16:45:30+08:00",
+            },
+            {
+              id: 9,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "大数据分析在商业决策中的应用研究 大数据技术的快速发展为商业决策提供了新的工具和方法。本文分析了大数据分析在商业决策中的应用，包括客户行为分析、市场趋势预测、风险评估等方面。",
+              result_text:
+                "大数据分析在商业决策中的应用研究 大数据技术的快速发展为商业决策提供了新的工具和方法。本文分析了大数据分析在商业决策中的应用，包括客户行为分析、市场趋势预测、风险评估等方面。",
+              status: 1,
+              created_time: "2025-09-21T14:15:20+08:00",
+              updated_time: "2025-09-21T14:15:20+08:00",
+            },
+            {
+              id: 10,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "5G技术在工业互联网中的应用 5G技术的高速率、低延迟特性为工业互联网的发展提供了重要支撑。本文研究了5G技术在工业互联网中的应用场景和技术特点。",
+              result_text:
+                "5G技术在工业互联网中的应用 5G技术的高速率、低延迟特性为工业互联网的发展提供了重要支撑。本文研究了5G技术在工业互联网中的应用场景和技术特点。",
+              status: 1,
+              created_time: "2025-09-20T10:30:45+08:00",
+              updated_time: "2025-09-20T10:30:45+08:00",
+            },
+            {
+              id: 11,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "虚拟现实技术在教育领域的应用研究 虚拟现实技术为教育领域带来了新的教学方式和学习体验。本文探讨了VR技术在教学中的应用，包括虚拟实验室、历史场景重现等。",
+              result_text:
+                "虚拟现实技术在教育领域的应用研究 虚拟现实技术为教育领域带来了新的教学方式和学习体验。本文探讨了VR技术在教学中的应用，包括虚拟实验室、历史场景重现等。",
+              status: 2,
+              created_time: "2025-09-19T09:15:10+08:00",
+              updated_time: "2025-09-19T09:15:10+08:00",
+            },
+            {
+              id: 12,
+              user_id: 22,
+              task_id: "降AI率",
+              original_text:
+                "区块链技术在供应链管理中的应用研究 区块链技术的去中心化、不可篡改特性为供应链管理提供了新的解决方案。本文分析了区块链技术在供应链透明度、可追溯性等方面的应用。",
+              result_text:
+                "区块链技术在供应链管理中的应用研究 区块链技术的去中心化、不可篡改特性为供应链管理提供了新的解决方案。本文分析了区块链技术在供应链透明度、可追溯性等方面的应用。",
+              status: 1,
+              created_time: "2025-09-18T13:25:35+08:00",
+              updated_time: "2025-09-18T13:25:35+08:00",
             },
           ],
         },
@@ -300,9 +420,12 @@ export default {
       console.log("下载结果:", record);
     },
 
-    // 分页变化
+    // 分页变化处理
+    // 当用户点击分页按钮时触发，更新当前页码并重新加载数据
     handlePageChange(page) {
+      console.log("切换到第", page, "页");
       this.currentPage = page;
+      // 重新加载当前页的数据
       this.loadRecordList();
     },
 

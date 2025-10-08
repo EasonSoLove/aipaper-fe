@@ -519,6 +519,8 @@ export default {
       ) {
         this.selectedPlatform = product.cn_support_platform[0].platform;
       }
+      // 切换产品时也触发价格预估
+      this.debouncePredictPrice();
     },
 
     // 获取产品图标

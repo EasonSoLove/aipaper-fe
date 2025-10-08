@@ -66,12 +66,12 @@
                 <span class="count">{{ remaining_nums }}次</span>
               </div>
               <hr class="divider" />
-              <!-- <div class="content">
+              <div class="content">
                 <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
                 <button @click="showBuyDialog" class="recharge-button">
                   点我补充次数
                 </button>
-              </div> -->
+              </div>
             </div>
           </div>
           <template v-if="activeIndex != 4 && activeIndex != 0">
