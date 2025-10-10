@@ -528,7 +528,7 @@ export default {
       if (!this.inputMessage.trim()) {
         return false;
       }
-      const url = `${this.chatBaseApi}createSse?token=${encodeURIComponent(
+      const url = `${this.chatBaseApi}/createSse?token=${encodeURIComponent(
         this.token
       )}`;
 
