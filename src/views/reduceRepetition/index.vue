@@ -4,10 +4,10 @@
     <div style="height: 20px"></div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
       <el-tab-pane label="新版" name="first">
-        <newReduce></newReduce>
+        <newReduce @refresh-records="handleRefreshRecords"></newReduce>
         <!-- 查重记录列表 -->
-        <div class="record-list-container">
-          <record-list :visible="true" />
+        <div class="record-list-container-new">
+          <record-list :visible="true" ref="recordList" />
         </div>
       </el-tab-pane>
       <el-tab-pane label="旧版" name="second">
@@ -376,6 +376,12 @@ export default {
     // 处理标签页点击事件
     handleClick(tab) {
       console.log("切换到标签页:", tab.name);
+    },
+    // 处理刷新记录列表事件
+    handleRefreshRecords() {
+      if (this.$refs.recordList) {
+        this.$refs.recordList.loadRecordList();
+      }
     },
     showPayDialog(data) {
       console.log("dddd", data);
@@ -911,7 +917,7 @@ export default {
 }
 
 /* 查重记录列表容器样式 */
-.record-list-container {
+.record-list-container-new {
   margin-top: 30px;
   background: #fff;
   border-radius: 12px;

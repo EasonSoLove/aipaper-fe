@@ -494,7 +494,9 @@ export default {
 
     // 判断生成按钮是否禁用
     isGenerateDisabled() {
-      return !this.hasInputContent;
+      return (
+        !this.hasInputContent || this.isGenerating || this.predictPrice === null
+      );
     },
   },
   mounted() {
@@ -558,6 +560,12 @@ export default {
       } catch (error) {
         console.error("获取用户余额失败:", error);
       }
+    },
+
+    // 刷新记录列表
+    refreshRecordList() {
+      // 通过事件总线通知 recordList 组件刷新数据
+      this.$emit("refresh-records");
     },
 
     // 加载产品信息
@@ -743,6 +751,8 @@ export default {
               this.$message.success("生成完成");
               // 刷新用户余额
               this.getUserBalance();
+              // 刷新记录列表
+              this.refreshRecordList();
             } else if (task_status === 2) {
               // 失败
               this.isGenerating = false;
@@ -774,10 +784,66 @@ export default {
     },
 
     // 下载DOCX
-    downloadDocx() {
-      if (this.generatedText) {
-        // TODO: 实现下载DOCX功能
-        this.$message.info("下载功能开发中");
+    async downloadDocx() {
+      if (!this.generatedText) {
+        this.$message.warning("没有可下载的内容");
+        return;
+      }
+
+      try {
+        // 动态导入 docx 库
+        const { Document, Packer, Paragraph, TextRun } = await import("docx");
+
+        // 创建文档
+        const doc = new Document({
+          sections: [
+            {
+              properties: {},
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: this.generatedText,
+                      size: 24, // 12pt font size
+                    }),
+                  ],
+                }),
+              ],
+            },
+          ],
+        });
+
+        // 生成 DOCX 文件 (使用 toBlob 方法，浏览器兼容)
+        const blob = await Packer.toBlob(doc);
+
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+
+        // 生成文件名（使用当前时间戳）
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+        const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+        link.download = `降重结果_${timestamp}.docx`;
+
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // 清理 URL 对象
+        window.URL.revokeObjectURL(url);
+
+        this.$message.success("DOCX 文件下载成功");
+      } catch (error) {
+        console.error("下载 DOCX 文件失败:", error);
+        this.$message.error("下载失败，请稍后重试");
       }
     },
 
@@ -921,7 +987,7 @@ export default {
       // 设置新的定时器，1000ms后调用价格预估
       this.predictPriceTimer = setTimeout(() => {
         this.getPredictPrice();
-      }, 1000);
+      }, 300);
     },
 
     // 获取预估价格

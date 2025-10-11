@@ -295,3 +295,12 @@ export function getReduceResult(params) {
     params,
   });
 }
+
+// 获取降重记录
+export function getReduceRecords(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/records",
+    method: "get",
+    params,
+  });
+}

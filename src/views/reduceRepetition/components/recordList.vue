@@ -6,7 +6,7 @@
     </div>
 
     <!-- 警告横幅 -->
-    <div class="warning-banner">
+    <div class="warning-banner" v-if="showWarning">
       <div class="warning-content">
         <i class="el-icon-warning warning-icon"></i>
         <span class="warning-text">
@@ -70,12 +70,12 @@
                   <span class="standard-label">收费标准:</span>
                   <span class="standard-value">3.000元/千字</span>
                 </div>
-                <div class="billing-amount">
+                <!-- <div class="billing-amount">
                   <span class="amount-label">计费金额:</span>
                   <span class="amount-value">{{
                     calculatePrice(record.original_text.length)
                   }}</span>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -83,6 +83,7 @@
           <!-- 操作按钮 -->
           <div class="record-actions">
             <el-button
+              size="mini"
               class="download-original-btn"
               icon="el-icon-download"
               @click="downloadOriginal(record)"
@@ -91,6 +92,7 @@
             </el-button>
             <el-button
               type="primary"
+              size="mini"
               class="download-result-btn"
               icon="el-icon-download"
               @click="downloadResult(record)"
@@ -121,6 +123,8 @@
 </template>
 
 <script>
+import { getReduceRecords } from "@/api/paper";
+
 export default {
   name: "RecordList",
   props: {
@@ -141,6 +145,7 @@ export default {
   },
   mounted() {
     console.log("RecordList 组件已挂载");
+    this.checkWarningStatus();
     this.loadRecordList();
   },
   watch: {
@@ -152,215 +157,40 @@ export default {
   },
   methods: {
     // 加载记录列表
-    // 根据当前页码和每页条数加载对应的记录数据
     async loadRecordList() {
       console.log("开始加载记录列表，当前页:", this.currentPage);
       this.loading = true;
       try {
-        // 模拟接口调用，实际项目中这里应该调用真实的API
-        const mockData = this.getMockData();
-        console.log("模拟数据:", mockData);
-
-        // 根据分页参数获取当前页的数据
-        // 模拟真实的分页逻辑，根据当前页码和每页条数截取对应的数据
-        const allRecords = mockData.result.record_list;
-        const total = mockData.result.total;
-        const pageSize = parseInt(mockData.result.page_size);
-        const currentPage = parseInt(mockData.result.page_num);
-
-        // 计算当前页的起始索引和结束索引
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-
-        console.log("分页计算:", {
-          currentPage,
-          pageSize,
-          startIndex,
-          endIndex,
-          totalRecords: allRecords.length,
+        const response = await getReduceRecords({
+          page_num: this.currentPage,
+          page_size: this.pageSize,
         });
 
-        // 截取当前页的数据
-        this.recordList = allRecords.slice(startIndex, endIndex);
-        this.total = total;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-
-        console.log("记录列表:", this.recordList);
-        console.log(
-          "总记录数:",
-          this.total,
-          "当前页:",
-          this.currentPage,
-          "每页条数:",
-          this.pageSize
-        );
+        if (response.code === 200) {
+          this.recordList = response.result.record_list || [];
+          this.total = response.result.total || 0;
+          console.log("记录列表:", this.recordList);
+          console.log(
+            "总记录数:",
+            this.total,
+            "当前页:",
+            this.currentPage,
+            "每页条数:",
+            this.pageSize
+          );
+        } else {
+          this.$message.error("获取记录列表失败：" + response.message);
+          this.recordList = [];
+          this.total = 0;
+        }
       } catch (error) {
         console.error("加载记录列表失败:", error);
         this.$message.error("加载记录列表失败");
+        this.recordList = [];
+        this.total = 0;
       } finally {
         this.loading = false;
       }
-    },
-
-    // 获取模拟数据
-    // 模拟接口返回的分页数据，包含多条记录用于测试分页功能
-    getMockData() {
-      return {
-        code: 200,
-        message: "success",
-        result: {
-          page_num: this.currentPage.toString(), // 当前页码
-          page_size: "5", // 每页显示5条记录
-          total: 12, // 总共12条记录，用于测试分页
-          record_list: [
-            {
-              id: 1,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text: "这是一段测试文本,帮我降AIGC率",
-              result_text:
-                "这是一段经过AI降重处理的测试文本，帮助您降低AIGC检测率，确保内容更加自然流畅，符合学术写作标准。",
-              status: 1,
-              created_time: "2025-09-28T14:57:08+08:00",
-              updated_time: "2025-09-28T14:57:08+08:00",
-            },
-            {
-              id: 2,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "M公司员工绩效考核体系优化研究摘要 T公司作为一家快速发展的科技企业，其员工绩效考核体系直接影响着企业的运营效率和员工的工作积极性。本研究旨在通过深入分析M公司现有的绩效考核体系，识别其中存在的问题和不足，并提出相应的优化建议。研究发现，当前考核体系存在指标设置不够科学、评价标准不够明确、反馈机制不够完善等问题。基于此，本研究提出了建立多元化评价指标、完善评价标准、加强反馈机制等优化措施，以期提高M公司员工绩效考核体系的科学性和有效性。",
-              result_text:
-                "M公司员工绩效评估体系改进研究概述 T公司作为一家高速发展的科技型企业，其员工绩效评估体系直接关系到企业的经营效率和员工的工作积极性。本研究旨在通过深入分析M公司现有的绩效评估体系，识别其中存在的问题和不足，并提出相应的改进建议。研究发现，当前评估体系存在指标设置不够科学、评价标准不够明确、反馈机制不够完善等问题。基于此，本研究提出了建立多元化评价指标、完善评价标准、加强反馈机制等改进措施，以期提高M公司员工绩效评估体系的科学性和有效性。",
-              status: 1,
-              created_time: "2025-09-28T14:37:40+08:00",
-              updated_time: "2025-09-28T14:37:40+08:00",
-            },
-            {
-              id: 3,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "人工智能技术在医疗领域的应用研究 随着科技的不断发展，人工智能技术在医疗领域的应用越来越广泛。本文主要探讨了人工智能技术在医疗诊断、药物研发、个性化治疗等方面的应用现状和发展趋势。通过分析相关案例，我们发现人工智能技术能够显著提高医疗诊断的准确性和效率，为患者提供更好的医疗服务。",
-              result_text:
-                "智能技术在医疗领域的应用研究 随着科技的不断发展，智能技术在医疗领域的应用越来越广泛。本文主要探讨了智能技术在医疗诊断、药物研发、个性化治疗等方面的应用现状和发展趋势。通过分析相关案例，我们发现智能技术能够显著提高医疗诊断的准确性和效率，为患者提供更好的医疗服务。",
-              status: 1,
-              created_time: "2025-09-27T16:23:15+08:00",
-              updated_time: "2025-09-27T16:23:15+08:00",
-            },
-            {
-              id: 4,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "区块链技术在供应链管理中的应用 区块链技术作为一种新兴的分布式账本技术，在供应链管理中具有巨大的应用潜力。本文分析了区块链技术在供应链透明度、可追溯性、信任建立等方面的优势，并探讨了其在食品供应链、药品供应链等具体领域的应用案例。",
-              result_text:
-                "区块链技术在供应链管理中的应用 区块链技术作为一种新兴的分布式账本技术，在供应链管理中具有巨大的应用潜力。本文分析了区块链技术在供应链透明度、可追溯性、信任建立等方面的优势，并探讨了其在食品供应链、药品供应链等具体领域的应用案例。",
-              status: 0,
-              created_time: "2025-09-26T10:15:30+08:00",
-              updated_time: "2025-09-26T10:15:30+08:00",
-            },
-            {
-              id: 5,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "机器学习算法在金融风控中的应用研究 金融风控是金融机构的核心业务之一，传统的风控方法往往依赖于人工经验和简单的统计模型。随着大数据和机器学习技术的发展，越来越多的金融机构开始采用机器学习算法进行风险控制。本文研究了决策树、随机森林、支持向量机等机器学习算法在金融风控中的应用，并通过实验验证了这些算法的有效性。",
-              result_text:
-                "机器学习算法在金融风控中的应用研究 金融风控是金融机构的核心业务之一，传统的风控方法往往依赖于人工经验和简单的统计模型。随着大数据和机器学习技术的发展，越来越多的金融机构开始采用机器学习算法进行风险控制。本文研究了决策树、随机森林、支持向量机等机器学习算法在金融风控中的应用，并通过实验验证了这些算法的有效性。",
-              status: 1,
-              created_time: "2025-09-25T09:42:18+08:00",
-              updated_time: "2025-09-25T09:42:18+08:00",
-            },
-            // 第6-12条记录，用于测试分页功能
-            {
-              id: 6,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "深度学习在图像识别中的应用研究 随着深度学习技术的快速发展，图像识别领域取得了重大突破。本文主要研究了卷积神经网络在图像识别中的应用，包括图像分类、目标检测、语义分割等任务。通过实验验证，深度学习在图像识别任务中表现出了优异的性能。",
-              result_text:
-                "深度学习在图像识别中的应用研究 随着深度学习技术的快速发展，图像识别领域取得了重大突破。本文主要研究了卷积神经网络在图像识别中的应用，包括图像分类、目标检测、语义分割等任务。通过实验验证，深度学习在图像识别任务中表现出了优异的性能。",
-              status: 1,
-              created_time: "2025-09-24T15:30:25+08:00",
-              updated_time: "2025-09-24T15:30:25+08:00",
-            },
-            {
-              id: 7,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "云计算环境下的数据安全保护策略 云计算技术的广泛应用为数据存储和处理带来了便利，但同时也带来了数据安全方面的挑战。本文分析了云计算环境下的数据安全威胁，并提出了相应的保护策略。",
-              result_text:
-                "云计算环境下的数据安全保护策略 云计算技术的广泛应用为数据存储和处理带来了便利，但同时也带来了数据安全方面的挑战。本文分析了云计算环境下的数据安全威胁，并提出了相应的保护策略。",
-              status: 0,
-              created_time: "2025-09-23T11:20:15+08:00",
-              updated_time: "2025-09-23T11:20:15+08:00",
-            },
-            {
-              id: 8,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "物联网技术在智慧城市建设中的应用 智慧城市是城市发展的重要方向，物联网技术为智慧城市建设提供了技术支撑。本文研究了物联网技术在智慧交通、智慧环保、智慧医疗等领域的应用。",
-              result_text:
-                "物联网技术在智慧城市建设中的应用 智慧城市是城市发展的重要方向，物联网技术为智慧城市建设提供了技术支撑。本文研究了物联网技术在智慧交通、智慧环保、智慧医疗等领域的应用。",
-              status: 1,
-              created_time: "2025-09-22T16:45:30+08:00",
-              updated_time: "2025-09-22T16:45:30+08:00",
-            },
-            {
-              id: 9,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "大数据分析在商业决策中的应用研究 大数据技术的快速发展为商业决策提供了新的工具和方法。本文分析了大数据分析在商业决策中的应用，包括客户行为分析、市场趋势预测、风险评估等方面。",
-              result_text:
-                "大数据分析在商业决策中的应用研究 大数据技术的快速发展为商业决策提供了新的工具和方法。本文分析了大数据分析在商业决策中的应用，包括客户行为分析、市场趋势预测、风险评估等方面。",
-              status: 1,
-              created_time: "2025-09-21T14:15:20+08:00",
-              updated_time: "2025-09-21T14:15:20+08:00",
-            },
-            {
-              id: 10,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "5G技术在工业互联网中的应用 5G技术的高速率、低延迟特性为工业互联网的发展提供了重要支撑。本文研究了5G技术在工业互联网中的应用场景和技术特点。",
-              result_text:
-                "5G技术在工业互联网中的应用 5G技术的高速率、低延迟特性为工业互联网的发展提供了重要支撑。本文研究了5G技术在工业互联网中的应用场景和技术特点。",
-              status: 1,
-              created_time: "2025-09-20T10:30:45+08:00",
-              updated_time: "2025-09-20T10:30:45+08:00",
-            },
-            {
-              id: 11,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "虚拟现实技术在教育领域的应用研究 虚拟现实技术为教育领域带来了新的教学方式和学习体验。本文探讨了VR技术在教学中的应用，包括虚拟实验室、历史场景重现等。",
-              result_text:
-                "虚拟现实技术在教育领域的应用研究 虚拟现实技术为教育领域带来了新的教学方式和学习体验。本文探讨了VR技术在教学中的应用，包括虚拟实验室、历史场景重现等。",
-              status: 2,
-              created_time: "2025-09-19T09:15:10+08:00",
-              updated_time: "2025-09-19T09:15:10+08:00",
-            },
-            {
-              id: 12,
-              user_id: 22,
-              task_id: "降AI率",
-              original_text:
-                "区块链技术在供应链管理中的应用研究 区块链技术的去中心化、不可篡改特性为供应链管理提供了新的解决方案。本文分析了区块链技术在供应链透明度、可追溯性等方面的应用。",
-              result_text:
-                "区块链技术在供应链管理中的应用研究 区块链技术的去中心化、不可篡改特性为供应链管理提供了新的解决方案。本文分析了区块链技术在供应链透明度、可追溯性等方面的应用。",
-              status: 1,
-              created_time: "2025-09-18T13:25:35+08:00",
-              updated_time: "2025-09-18T13:25:35+08:00",
-            },
-          ],
-        },
-      };
     },
 
     // 格式化时间
@@ -409,15 +239,123 @@ export default {
     },
 
     // 下载原文
-    downloadOriginal(record) {
-      this.$message.info("下载原文功能开发中");
-      console.log("下载原文:", record);
+    async downloadOriginal(record) {
+      if (!record.original_text) {
+        this.$message.warning("没有可下载的原文内容");
+        return;
+      }
+
+      try {
+        // 动态导入 docx 库
+        const { Document, Packer, Paragraph, TextRun } = await import("docx");
+
+        // 创建文档
+        const doc = new Document({
+          sections: [
+            {
+              properties: {},
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: record.original_text,
+                      size: 24, // 12pt font size
+                    }),
+                  ],
+                }),
+              ],
+            },
+          ],
+        });
+
+        // 生成 DOCX 文件
+        const blob = await Packer.toBlob(doc);
+
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+
+        // 生成文件名
+        const timestamp = this.formatTime(record.created_time).replace(
+          /[: ]/g,
+          "-"
+        );
+        link.download = `原文_${record.task_id}_${timestamp}.docx`;
+
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // 清理 URL 对象
+        window.URL.revokeObjectURL(url);
+
+        this.$message.success("原文下载成功");
+      } catch (error) {
+        console.error("下载原文失败:", error);
+        this.$message.error("下载失败，请稍后重试");
+      }
     },
 
     // 下载结果
-    downloadResult(record) {
-      this.$message.info("下载结果功能开发中");
-      console.log("下载结果:", record);
+    async downloadResult(record) {
+      if (!record.result_text) {
+        this.$message.warning("没有可下载的结果内容");
+        return;
+      }
+
+      try {
+        // 动态导入 docx 库
+        const { Document, Packer, Paragraph, TextRun } = await import("docx");
+
+        // 创建文档
+        const doc = new Document({
+          sections: [
+            {
+              properties: {},
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: record.result_text,
+                      size: 24, // 12pt font size
+                    }),
+                  ],
+                }),
+              ],
+            },
+          ],
+        });
+
+        // 生成 DOCX 文件
+        const blob = await Packer.toBlob(doc);
+
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+
+        // 生成文件名
+        const timestamp = this.formatTime(record.created_time).replace(
+          /[: ]/g,
+          "-"
+        );
+        link.download = `结果_${record.task_id}_${timestamp}.docx`;
+
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // 清理 URL 对象
+        window.URL.revokeObjectURL(url);
+
+        this.$message.success("结果下载成功");
+      } catch (error) {
+        console.error("下载结果失败:", error);
+        this.$message.error("下载失败，请稍后重试");
+      }
     },
 
     // 分页变化处理
@@ -429,9 +367,19 @@ export default {
       this.loadRecordList();
     },
 
+    // 检查警告状态
+    checkWarningStatus() {
+      const hasClosedWarning = sessionStorage.getItem("hasClosedRecordWarning");
+      if (hasClosedWarning === "true") {
+        this.showWarning = false;
+      }
+    },
+
     // 关闭警告
     closeWarning() {
       this.showWarning = false;
+      // 设置 sessionStorage 标记，表示用户已经关闭过警告
+      sessionStorage.setItem("hasClosedRecordWarning", "true");
     },
   },
 };
@@ -656,10 +604,7 @@ export default {
 .record-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  margin-top: -46px;
 }
 
 .download-original-btn {
