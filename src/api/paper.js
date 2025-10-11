@@ -274,3 +274,24 @@ export function predictPrice(data) {
     },
   });
 }
+
+// 降重处理接口
+export function reduceText(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/reduce",
+    method: "post",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+// 查询降重结果
+export function getReduceResult(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/result",
+    method: "get",
+    params,
+  });
+}

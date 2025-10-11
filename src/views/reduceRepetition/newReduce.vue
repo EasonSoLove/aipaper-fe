@@ -331,7 +331,7 @@
                   ref="fileInput"
                   type="file"
                   style="display: none"
-                  accept=".docx,.txt"
+                  accept=".docx"
                   @change="handleFileSelect"
                 />
 
@@ -343,8 +343,7 @@
                   ></i>
                   <div class="el-upload__text">点击或拖拽文件到此区域上传</div>
                   <div class="el-upload__tip">
-                    支持DOCX、txt格式的文件，DOC文件请先在Word中转换为DOCX，最大
-                    20MB
+                    仅支持DOCX格式的文件，最大20MB
                   </div>
                   <div style="margin-top: 16px">
                     <el-button type="primary" @click="triggerFileSelect"
@@ -407,7 +406,11 @@
 
             <!-- 右侧生成区域 -->
             <div class="output-area">
-              <div class="output-container">
+              <div
+                class="output-container"
+                v-loading="isGenerating"
+                element-loading-text="正在生成中，请稍候..."
+              >
                 <div v-if="!generatedText" class="no-content">暂无内容</div>
                 <div v-else class="generated-content">
                   {{ generatedText }}
@@ -433,7 +436,12 @@
 </template>
 
 <script>
-import { getAigcProducts, predictPrice } from "@/api/paper";
+import {
+  getAigcProducts,
+  predictPrice,
+  reduceText,
+  getReduceResult,
+} from "@/api/paper";
 import RechargeDialog from "./components/RechargeDialog.vue";
 
 export default {
@@ -443,7 +451,7 @@ export default {
   },
   data() {
     return {
-      showWarningDialog: true,
+      showWarningDialog: false, // 初始为false，在mounted中根据sessionStorage决定
       showCaseDialog: false, // 处理案例展示弹窗
       showRechargeDialog: false, // 充值弹窗
       loading: false,
@@ -465,6 +473,8 @@ export default {
       displayChars: 0, // 显示的字符数（从接口获取）
       priceLoading: false, // 价格预估加载状态
       predictPriceTimer: null, // 防抖定时器
+      isGenerating: false, // 是否正在生成中
+      pollingTimer: null, // 轮询定时器
     };
   },
   computed: {
@@ -490,17 +500,32 @@ export default {
   mounted() {
     this.loadProducts();
     this.getUserBalance();
+    this.checkWarningDialog();
   },
   beforeDestroy() {
     // 清理防抖定时器
     if (this.predictPriceTimer) {
       clearTimeout(this.predictPriceTimer);
     }
+    // 清理轮询定时器
+    if (this.pollingTimer) {
+      clearInterval(this.pollingTimer);
+    }
   },
   methods: {
+    // 检查是否需要显示警告弹窗
+    checkWarningDialog() {
+      const hasSeenWarning = sessionStorage.getItem("hasSeenImportantWarning");
+      if (!hasSeenWarning) {
+        this.showWarningDialog = true;
+      }
+    },
+
     // 关闭警告弹窗
     closeWarningDialog() {
       this.showWarningDialog = false;
+      // 设置sessionStorage标记，表示已经看过重要提示
+      sessionStorage.setItem("hasSeenImportantWarning", "true");
     },
 
     // 打开充值弹窗
@@ -624,14 +649,119 @@ export default {
     },
 
     // 生成文本
-    generateText() {
-      // TODO: 实现生成逻辑
-      console.log("生成文本", {
-        product: this.activeTab,
-        language: this.selectedLanguage,
-        inputMethod: this.inputMethod,
-        text: this.inputMethod === "text" ? this.inputText : this.uploadedText,
-      });
+    async generateText() {
+      // 检查是否有预估价格
+      if (this.predictPrice === null) {
+        this.$message.warning("请先获取预估价格");
+        return;
+      }
+
+      // 检查余额是否充足
+      const userBalance = parseFloat(this.userBalance);
+      const predictPrice = parseFloat(this.predictPrice);
+
+      if (userBalance < predictPrice) {
+        // 余额不足，弹出充值弹窗
+        this.showRechargeDialog = true;
+        return;
+      }
+
+      // 余额充足，弹出确认弹窗
+      const confirmMessage = `您输入的字符数是${this.displayChars}，预估价格是${this.predictPrice}元，是否确认？`;
+
+      try {
+        await this.$confirm(confirmMessage, "确认生成", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+          lockScroll: false,
+        });
+
+        // 用户确认后，开始生成
+        await this.startGenerate();
+      } catch (error) {
+        // 用户取消
+        console.log("用户取消生成");
+      }
+    },
+
+    // 开始生成
+    async startGenerate() {
+      try {
+        this.isGenerating = true;
+        this.generatedText = "";
+
+        // 构建请求参数
+        const formData = new FormData();
+        formData.append("product", this.activeTab);
+        formData.append("language", this.selectedLanguage);
+        formData.append("input_type", this.inputMethod);
+
+        // 添加检测平台（如果有）
+        if (this.selectedPlatform) {
+          formData.append("platform", this.selectedPlatform);
+        }
+
+        if (this.inputMethod === "text") {
+          formData.append("input_text", this.inputText);
+        } else if (this.inputMethod === "file") {
+          formData.append("file", this.selectedFile);
+        }
+
+        // 调用降重接口
+        const response = await reduceText(formData);
+
+        if (response.code === 200) {
+          const taskId = response.result.task_id;
+          // 开始轮询查询结果
+          this.startPolling(taskId);
+        } else {
+          this.$message.error("生成失败：" + response.message);
+          this.isGenerating = false;
+        }
+      } catch (error) {
+        console.error("生成失败:", error);
+        this.$message.error("生成失败，请稍后重试");
+        this.isGenerating = false;
+      }
+    },
+
+    // 开始轮询查询结果
+    startPolling(taskId) {
+      this.pollingTimer = setInterval(async () => {
+        try {
+          const response = await getReduceResult({ task_id: taskId });
+
+          if (response.code === 200) {
+            const { task_status, result_text } = response.result;
+
+            if (task_status === 1) {
+              // 完成
+              this.generatedText = result_text;
+              this.isGenerating = false;
+              clearInterval(this.pollingTimer);
+              this.$message.success("生成完成");
+              // 刷新用户余额
+              this.getUserBalance();
+            } else if (task_status === 2) {
+              // 失败
+              this.isGenerating = false;
+              clearInterval(this.pollingTimer);
+              this.$message.error("降重失败，请稍后重试");
+              // 刷新用户余额
+              this.getUserBalance();
+            }
+            // task_status === 0 继续轮询
+          }
+        } catch (error) {
+          console.error("查询结果失败:", error);
+          this.isGenerating = false;
+          clearInterval(this.pollingTimer);
+          this.$message.error("查询结果失败");
+          // 刷新用户余额
+          this.getUserBalance();
+        }
+      }, 2000); // 每2秒轮询一次
     },
 
     // 复制结果
@@ -655,12 +785,11 @@ export default {
     beforeUpload(file) {
       const isValidType =
         file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-        file.type === "text/plain";
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
       const isLt20M = file.size / 1024 / 1024 < 20;
 
       if (!isValidType) {
-        this.$message.error("只能上传 DOCX 或 TXT 格式的文件!");
+        this.$message.error("只能上传 DOCX 格式的文件!");
         return false;
       }
       if (!isLt20M) {
@@ -698,20 +827,18 @@ export default {
     handleFileSelect(event) {
       const file = event.target.files[0];
       if (file) {
-        // 验证文件类型 - 更严格的验证
-        const validExtensions = [".docx", ".txt"];
+        // 验证文件类型 - 仅支持DOCX格式
+        const validExtensions = [".docx"];
         const isValidExtension = validExtensions.some((ext) =>
           file.name.toLowerCase().endsWith(ext)
         );
 
         const isValidMimeType =
           file.type ===
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-          file.type === "text/plain" ||
-          file.type === "application/msword"; // 兼容旧版Word格式
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
         if (!isValidExtension && !isValidMimeType) {
-          this.$message.error("只能选择 DOCX 或 TXT 格式的文件!");
+          this.$message.error("只能选择 DOCX 格式的文件!");
           // 清空文件输入框
           event.target.value = "";
           return;
@@ -840,9 +967,21 @@ export default {
         const response = await predictPrice(formData);
 
         if (response.code === 200) {
+          // 检查字数是否超过限制
+          if (response.result.total_chars > 10000) {
+            // 字数超限，清空文件并提示用户
+            this.deleteFile();
+            this.$message.error("文件字数大于10000字，暂不支持");
+            return;
+          }
+
           this.predictPrice = response.result.predict_price;
           this.totalChars = response.result.total_chars;
           this.displayChars = response.result.total_chars;
+        } else if (response.code === 30011) {
+          // 文件格式不支持，清空文件并提示用户
+          this.deleteFile();
+          this.$message.error("上传文件仅支持docx格式！");
         } else {
           console.error("获取预估价格失败:", response.message);
           this.predictPrice = null;

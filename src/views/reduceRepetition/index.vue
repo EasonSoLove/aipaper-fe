@@ -279,53 +279,6 @@
         <el-button type="primary" @click="submitBuyInfo">去支付</el-button>
       </span>
     </el-dialog>
-
-    <!-- 重要提示弹窗 -->
-    <el-dialog
-      title="重要提示"
-      :visible.sync="importantTipDialogVisible"
-      width="500px"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="true"
-      custom-class="important-tip-dialog"
-    >
-      <div class="important-tip-content">
-        <div class="tip-header">
-          <i class="el-icon-info"></i>
-          <span class="tip-title">请注意:</span>
-        </div>
-        <div class="tip-items">
-          <div class="tip-item">
-            <i class="el-icon-check tip-check-icon"></i>
-            <span>不同平台的AI检测算法各不相同,检测结果之间没有参考价值</span>
-          </div>
-          <div class="tip-item">
-            <i class="el-icon-check tip-check-icon"></i>
-            <span
-              >知网维普格子达查重100%一次过。<span class="highlight-text"
-                >30万单0失败</span
-              ></span
-            >
-          </div>
-          <div class="tip-item">
-            <i class="el-icon-check tip-check-icon"></i>
-            <span
-              >paperpass的AI查重逻辑和主流的付费的AI查重如知网维普格子达都不一样,如果选了知网维普的话通过不了paperpass</span
-            >
-          </div>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button
-          type="primary"
-          @click="closeImportantTipDialog"
-          class="confirm-button"
-        >
-          我知道了
-        </el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -393,8 +346,6 @@ export default {
       gezida_version: [],
       kns_version: [],
       weipu_version: [],
-      // 重要提示弹窗
-      importantTipDialogVisible: false,
     };
   },
   computed: {},
@@ -417,14 +368,11 @@ export default {
     checkFirstVisit() {
       const hasSeenImportantTip = sessionStorage.getItem("hasSeenImportantTip");
       if (!hasSeenImportantTip) {
-        this.importantTipDialogVisible = true;
         sessionStorage.setItem("hasSeenImportantTip", "true");
       }
     },
     // 关闭重要提示弹窗
-    closeImportantTipDialog() {
-      this.importantTipDialogVisible = false;
-    },
+    closeImportantTipDialog() {},
     // 处理标签页点击事件
     handleClick(tab) {
       console.log("切换到标签页:", tab.name);
