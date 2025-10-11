@@ -122,6 +122,12 @@
       </div>
     </el-dialog>
 
+    <!-- 充值弹窗组件 -->
+    <RechargeDialog
+      :visible.sync="showRechargeDialog"
+      @recharge-success="handleRechargeSuccess"
+    />
+
     <!-- 主页面内容 -->
     <div class="main-content">
       <!-- 加载状态 -->
@@ -281,6 +287,14 @@
           <div class="service-header">
             <h3>{{ currentProduct?.product_name || "降重复率" }}</h3>
             <span class="balance">(余额: {{ userBalance }}元)</span>
+            <el-button
+              type="primary"
+              size="mini"
+              style="margin-left: 20px"
+              icon="el-icon-wallet"
+              @click="recharge"
+              >充值金额</el-button
+            >
 
             <div v-if="activeTab === 'combinedplus'">
               <el-button
@@ -420,13 +434,18 @@
 
 <script>
 import { getAigcProducts, predictPrice } from "@/api/paper";
+import RechargeDialog from "./components/RechargeDialog.vue";
 
 export default {
   name: "NewReduce",
+  components: {
+    RechargeDialog,
+  },
   data() {
     return {
       showWarningDialog: true,
       showCaseDialog: false, // 处理案例展示弹窗
+      showRechargeDialog: false, // 充值弹窗
       loading: false,
       error: null,
       products: [],
@@ -470,6 +489,7 @@ export default {
   },
   mounted() {
     this.loadProducts();
+    this.getUserBalance();
   },
   beforeDestroy() {
     // 清理防抖定时器
@@ -481,6 +501,38 @@ export default {
     // 关闭警告弹窗
     closeWarningDialog() {
       this.showWarningDialog = false;
+    },
+
+    // 打开充值弹窗
+    recharge() {
+      this.showRechargeDialog = true;
+    },
+
+    // 处理充值成功
+    handleRechargeSuccess(data) {
+      console.log("充值成功:", data);
+      this.$message.success(`充值成功！已到账 ${data.amount} 元`);
+      // 刷新用户余额
+      this.getUserBalance();
+    },
+
+    // 获取用户余额
+    async getUserBalance() {
+      try {
+        const { default: request } = await import("@/utils/request");
+        const baseUrl = process.env.VUE_APP_BASE_API;
+
+        const response = await request({
+          url: baseUrl + "/api/ai-paper/aigc/balance",
+          method: "get",
+        });
+
+        if (response.code === 200) {
+          this.userBalance = response.result.balance;
+        }
+      } catch (error) {
+        console.error("获取用户余额失败:", error);
+      }
     },
 
     // 加载产品信息
