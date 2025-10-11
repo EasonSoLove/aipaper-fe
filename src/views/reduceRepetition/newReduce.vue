@@ -190,7 +190,7 @@
         <!-- 功能区域 -->
         <div class="function-area">
           <!-- 文本语言选择 -->
-          <div class="language-selection">
+          <!-- <div class="language-selection">
             <div class="selection-label">
               <i class="el-icon-document"></i>
               <p style="font-size: 16px; color: #1f2937">
@@ -217,7 +217,7 @@
                 英文
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- 检测平台选择 -->
           <div
