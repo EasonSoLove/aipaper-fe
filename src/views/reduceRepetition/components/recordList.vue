@@ -30,8 +30,8 @@
           <!-- 记录头部信息 -->
           <div class="record-item-header">
             <div class="record-id">
-              <span class="id-label">ID:</span>
-              <span class="id-value">{{ record.task_id }}</span>
+              <span class="id-label">类型:</span>
+              <span class="id-value">{{ record.product_type_text }}</span>
               <span class="record-time">{{
                 formatTime(record.created_time)
               }}</span>
