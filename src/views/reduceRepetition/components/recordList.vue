@@ -3,6 +3,13 @@
     <!-- 生成记录标题 -->
     <div class="record-header">
       <h3 class="record-title">生成记录</h3>
+      <el-button
+        type="primary"
+        size="mini"
+        icon="el-icon-refresh"
+        @click="loadRecordList"
+        >刷新</el-button
+      >
     </div>
 
     <!-- 警告横幅 -->
@@ -66,10 +73,10 @@
 
             <div class="content-right">
               <div class="pricing-info">
-                <div class="charging-standard">
+                <!-- <div class="charging-standard">
                   <span class="standard-label">收费标准:</span>
                   <span class="standard-value">3.000元/千字</span>
-                </div>
+                </div> -->
                 <!-- <div class="billing-amount">
                   <span class="amount-label">计费金额:</span>
                   <span class="amount-value">{{
@@ -147,6 +154,12 @@ export default {
     console.log("RecordList 组件已挂载");
     this.checkWarningStatus();
     this.loadRecordList();
+    // 监听刷新事件
+    this.$parent.$on("refresh-records", this.loadRecordList);
+  },
+  beforeDestroy() {
+    // 清理事件监听
+    this.$parent.$off("refresh-records", this.loadRecordList);
   },
   watch: {
     visible(newVal) {
@@ -394,6 +407,9 @@ export default {
 }
 
 .record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid #e4e7ed;

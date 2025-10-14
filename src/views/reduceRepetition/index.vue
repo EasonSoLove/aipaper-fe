@@ -68,9 +68,9 @@
               <hr class="divider" />
               <div class="content">
                 <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
-                <button @click="showBuyDialog" class="recharge-button">
+                <!-- <button @click="showBuyDialog" class="recharge-button">
                   点我补充次数
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
