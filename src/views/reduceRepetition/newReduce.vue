@@ -299,6 +299,7 @@
             <div v-if="activeTab === 'combinedplus'">
               <el-button
                 type="primary"
+                size="mini"
                 icon="el-icon-view"
                 style="margin-left: 20px"
                 @click="showCaseDialog = true"
