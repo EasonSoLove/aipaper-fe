@@ -25,15 +25,7 @@
         <div class="my-invite-stat-icon">💰</div>
         <div class="my-invite-stat-label">累计佣金</div>
         <div class="my-invite-stat-value">
-          ￥{{ formatAmount(baseInfo.total_income)
-          }}<el-button
-            style="margin-left: 10px"
-            type="primary"
-            size="small"
-            @click="handleWithdraw"
-          >
-            提现
-          </el-button>
+          ￥{{ formatAmount(baseInfo.total_income) }}
         </div>
       </div>
       <div class="my-invite-stat-card">
@@ -54,6 +46,11 @@
 
     <div style="display: flex; justify-content: center; margin-bottom: 18px">
       <div class="my-invite-tabs">
+        <div
+          style="margin-left: -74px; margin-right: 15px; display: inline-block"
+        >
+          <div class="withdraw-btn" @click="handleWithdraw">提现</div>
+        </div>
         <button
           v-for="tab in promotionTabs"
           :key="tab.id"
@@ -954,6 +951,34 @@ export default {
   width: 100px;
   height: 36px;
   margin-left: 10px;
+}
+
+/* 提现按钮样式 */
+.withdraw-btn {
+  background: linear-gradient(90deg, #6c63ff 0%, #b6c7f7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2);
+}
+
+.withdraw-btn:hover {
+  background: linear-gradient(90deg, #b6c7f7 0%, #6c63ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.withdraw-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2);
 }
 
 .refresh-btn:hover {
