@@ -105,7 +105,11 @@
             <div :class="['iconRight', { titleRight: data.level === 1 }]">
               <div>
                 <el-tooltip
-                  v-if="data.level >= maxLevel"
+                  v-if="
+                    data.level >= maxLevel &&
+                    (requestForm.product == '毕业论文' ||
+                      requestForm.product == '结课论文')
+                  "
                   placement="top"
                   content="增删图表配置"
                 >
@@ -158,7 +162,14 @@
                   </span>
                 </el-tooltip>
               </div>
-              <div v-if="data.level >= maxLevel" class="rightbottom">
+              <div
+                v-if="
+                  data.level >= maxLevel &&
+                  (requestForm.product == '毕业论文' ||
+                    requestForm.product == '结课论文')
+                "
+                class="rightbottom"
+              >
                 <!-- 表 -->
                 <el-tooltip
                   class="item"
