@@ -98,6 +98,8 @@ router.beforeEach(async (to, from, next) => {
       if (expiredTimestamp && currentTimestamp > expiredTimestamp) {
         localStorage.removeItem("expired_timestamp");
         localStorage.removeItem("loginID");
+        // 清除首次登录弹窗标记
+        sessionStorage.removeItem("firstTag");
         throw new Error("Token 已过期");
       }
       if (to.path === "/login" && hasToken === "editor-token") {

@@ -5,6 +5,7 @@ import app from "./modules/app";
 import paper from "./modules/paper";
 import settings from "./modules/settings";
 import user from "./modules/user";
+import distribution from "./modules/distribution";
 
 Vue.use(Vuex);
 
@@ -14,6 +15,7 @@ const store = new Vuex.Store({
     paper,
     settings,
     user,
+    distribution,
   },
   getters,
 });

@@ -26,6 +26,20 @@
           ></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="优惠券规则" prop="rule_id">
+        <el-select
+          v-model="couponForm.rule_id"
+          clearable
+          placeholder="请选择优惠券规则"
+        >
+          <el-option
+            v-for="(item, index) in coupon_rule_list"
+            :key="index + 'rule_id'"
+            :label="item.rule_id_description"
+            :value="item.rule_id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item
         label="优惠折扣"
         v-if="couponForm.coupon_type == 1"
@@ -123,6 +137,7 @@ export default {
         channel: "",
         coupon_type: 1,
         rights_num: "",
+        rule_id: "",
       },
       discountRates: [
         { label: "免费", value: 0 },
@@ -138,6 +153,7 @@ export default {
       ],
       channels: [],
       coupon_type_list: [],
+      coupon_rule_list: [],
       rules: {
         discount_rate: [
           { required: true, message: "请选择优惠折扣", trigger: "change" },
@@ -149,6 +165,9 @@ export default {
           { required: true, message: "请输入优惠券数量", trigger: "blur" },
         ],
         channel: [{ required: true, message: "请选择渠道", trigger: "change" }],
+        rule_id: [
+          { required: true, message: "请选择优惠券规则", trigger: "change" },
+        ],
       },
       datePickerOptions: {
         disabledDate(time) {
@@ -179,6 +198,7 @@ export default {
         Ming("res", res);
         this.channels = res.result.coupon_channels;
         this.coupon_type_list = res.result.coupon_type_list;
+        this.coupon_rule_list = res.result.coupon_rule_id_list;
       });
     },
     handleClose() {
@@ -205,6 +225,9 @@ export default {
         expire_time: "",
         create_counts: 1,
         channel: "",
+        coupon_type: 1,
+        rights_num: "",
+        rule_id: "",
       };
     },
   },

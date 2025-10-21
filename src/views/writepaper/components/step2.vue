@@ -1168,7 +1168,7 @@ export default {
       });
     },
     getList() {
-      polling({ key: this.requestForm.key || this.requestForm.key1 })
+      polling({ key: this.requestForm.key || this.requestForm.key1, type: 2 })
         .then((res) => {
           if (res == "生成失败") {
             this.$message({
@@ -1683,7 +1683,12 @@ export default {
                 is_discount: res.result.is_discount, // 优惠金额
               };
               this.$store.dispatch("app/toggleCurrentOrder", order);
-
+              if (res.result.available_coupons) {
+                this.$store.dispatch(
+                  "user/setAvailableCoupons",
+                  res.result.available_coupons
+                );
+              }
               eventBus.emit("showEmitPaypopup", {
                 requestKey: res.result.out_trade_no,
                 payStatus: 2,

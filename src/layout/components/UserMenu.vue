@@ -18,8 +18,46 @@
             <div class="img">
               <img :src="avatar" alt="" />
             </div>
-            <div class="info">
-              <p class="name">{{ userInfo.user_name }}</p>
+            <div class="info" @click="jumpToDistribution">
+              <div class="name-container">
+                <p class="name">{{ userInfo.user_name }}</p>
+
+                <!-- 调试模式：显示所有VIP等级 -->
+                <template v-if="debugVipMode && userVipInfo">
+                  <div
+                    v-for="(vipInfo, key) in userVipInfo"
+                    :key="key"
+                    class="vip-badge"
+                    :style="{ '--vip-color': vipInfo.color }"
+                  >
+                    <img
+                      :src="vipInfo.icon"
+                      :alt="vipInfo.name"
+                      class="vip-icon"
+                    />
+                    <span class="vip-text">{{ vipInfo.name }}</span>
+                  </div>
+                </template>
+
+                <!-- 正常模式：显示单个VIP等级 -->
+                <el-tooltip
+                  v-else-if="!debugVipMode && userVipInfo"
+                  content="点击跳转分享页面,升级您的权益"
+                  placement="top"
+                >
+                  <div
+                    class="vip-badge"
+                    :style="{ '--vip-color': userVipInfo.color }"
+                  >
+                    <img
+                      :src="userVipInfo.icon"
+                      :alt="userVipInfo.name"
+                      class="vip-icon"
+                    />
+                    <span class="vip-text">{{ userVipInfo.name }}</span>
+                  </div>
+                </el-tooltip>
+              </div>
               <p class="tel">{{ userInfo.phone }}</p>
               <div class="tel">
                 <span class="tel">{{ $t("login.lastLogin") }}：</span>
@@ -44,7 +82,7 @@
                 {{ $t("navbar.myOutline") }}
               </div>
               <!-- v-if="userInfo.role == 'LEVEL_PROXY'" -->
-              <div
+              <!-- <div
                 v-if="
                   userInfo.permission == 'AGENT' ||
                   userInfo.permission == 'SUPER_ADMIN'
@@ -54,7 +92,7 @@
               >
                 <i class="el-icon-tickets"></i>
                 {{ $t("navbar.myPromotion") }}
-              </div>
+              </div> -->
             </div>
             <div class="menuGroup menuAboutMixPaper">
               <!-- v-if="userInfo.permission == 'SUPER_ADMIN'" -->
@@ -77,14 +115,14 @@
                 <i class="el-icon-heavy-rain"></i>
                 退款管理
               </div>
-              <div
+              <!-- <div
                 v-if="userInfo.permission == 'SUPER_ADMIN'"
                 class="menuItem"
                 @click="jumpDetail('/user/AIGClist')"
               >
                 <i class="el-icon-heavy-rain"></i>
                 降AIGC任务
-              </div>
+              </div> -->
               <div class="menuItem gray" @click="$devf">
                 <svg class="icon svg-icon" aria-hidden="true">
                   <use xlink:href="#icon-updatelog"></use>
@@ -177,6 +215,8 @@ export default {
       ordersDrawer: false,
       orderTabs: 1,
       isPhone: false,
+      // 调试模式：显示所有VIP等级
+      debugVipMode: false,
     };
   },
   mounted() {
@@ -196,6 +236,45 @@ export default {
   computed: {
     // 计算属性
     ...mapGetters(["avatar", "userInfo", "device"]),
+
+    // 用户VIP信息
+    userVipInfo() {
+      const vipConfig = {
+        NORMAL: {
+          name: "普通用户",
+          icon: require("@/assets/images/vip/normal.svg"),
+          color: "#999999",
+        },
+        DISTRIBUTION: {
+          name: "代理用户",
+          icon: require("@/assets/images/vip/distribution.svg"),
+          color: "#1890ff",
+        },
+        FRANCHISEE: {
+          name: "城市合伙人",
+          icon: require("@/assets/images/vip/franchisee.svg"),
+          color: "#52c41a",
+        },
+        SUPER_ADMIN: {
+          name: "超级管理员",
+          icon: require("@/assets/images/vip/super_admin.svg"),
+          color: "#f5222d",
+        },
+      };
+
+      // 调试模式：显示所有VIP等级
+      if (this.debugVipMode) {
+        return vipConfig;
+      }
+
+      // 正常模式：根据用户权限显示对应等级
+      if (!this.userInfo || !this.userInfo.permission) {
+        return null;
+      }
+
+      const permission = this.userInfo.permission;
+      return vipConfig[permission] || null;
+    },
   },
   methods: {
     closeDialog() {
@@ -233,6 +312,12 @@ export default {
     },
     jumpDetail(path) {
       this.$router.push(path);
+    },
+
+    // 跳转到分销页面
+    jumpToDistribution() {
+      this.$router.push("/distribution");
+      this.hidePopup(); // 关闭用户菜单
     },
     showPhoneOrderList(status) {
       this.isPhone = true;
@@ -318,12 +403,86 @@ export default {
 .menuHeader .info {
   display: inline-block;
   line-height: 1.5em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 4px;
+  margin: -4px;
+}
+
+.menuHeader .vip-badge:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.menuHeader .info .name-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .menuHeader .info p.name {
   font-size: 16px;
   line-height: 1.8em;
   color: #1f2a2e;
+  margin: 0;
+}
+
+.vip-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--vip-color, rgba(0, 0, 0, 0.08));
+  font-size: 11px;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vip-badge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    var(--vip-color, transparent) 0%,
+    transparent 100%
+  );
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.vip-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-color: var(--vip-color, rgba(0, 0, 0, 0.2));
+}
+
+.vip-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.vip-text {
+  color: #555;
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 .menuHeader .info .tel {

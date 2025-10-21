@@ -1,20 +1,36 @@
 <template>
   <div style="width: 100%; background-color: #fff">
     <div class="exchange-component">
-      <div class="header">降AIGC率优惠券兑换</div>
-      <el-input
-        v-model="exchangeCode"
-        placeholder="请输入降AIGC率优惠券的兑换码"
-        clearable
-        prefix-icon="el-icon-goods"
-      />
-      <el-button
-        type="success"
-        style="margin-top: 20px; width: 50%"
-        @click="exchangeCodeRequest"
+      <div class="header">优惠券兑换</div>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          align-items: center;
+        "
       >
-        立即兑换
-      </el-button>
+        <el-input
+          v-model="exchangeCode"
+          style="width: 470px"
+          placeholder="请输入优惠券的兑换码"
+          clearable
+          prefix-icon="el-icon-goods"
+          @blur="handleInputBlur"
+        />
+        <el-button
+          type="success"
+          style="margin-top: 20px; width: 50%"
+          @click="exchangeCodeRequest"
+        >
+          立即兑换
+        </el-button>
+      </div>
+
+      <!-- 优惠卷页面 -->
+      <div class="vouchers-container">
+        <vouchers ref="vouchersComponent" />
+      </div>
       <div class="warning">
         <h3>温馨提示：</h3>
         <p>
@@ -34,29 +50,19 @@
         </p>
         <p>兑换码一经兑换，概不退换，请确认无误后再操作。</p>
       </div>
-      <div class="warning">
-        <p>
-          tips: <span class="red">正文折扣卷</span> 在订单支付页使用,如下图:
-        </p>
-
-        <div class="tipImgBox">
-          <el-image
-            style="width: 100%"
-            :src="imageUrl"
-            :preview-src-list="previewList"
-            fit="cover"
-          >
-          </el-image>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { exchange_coupon } from "@/api/wallet";
+import vouchers from "./vouchers.vue";
+
 export default {
   name: "ExchangeComponent",
+  components: {
+    vouchers,
+  },
   data() {
     return {
       imageUrl: require("@/assets/images/bg/tipsPay.png"),
@@ -69,7 +75,8 @@ export default {
     exchangeCodeRequest() {
       // 模拟请求接口
       // 这里可以使用 axios 或者 fetch 来请求接口
-      if (!this.exchangeCode) {
+      const trimmedCode = this.exchangeCode.trim();
+      if (!trimmedCode) {
         this.$message({
           type: "warning",
           message: "请输入兑换码",
@@ -78,16 +85,43 @@ export default {
         return false;
       }
       let data = {
-        coupon_code: this.exchangeCode,
+        coupon_code: trimmedCode,
       };
-      exchange_coupon(data).then((res) => {
-        console.log("res", res);
-        this.$message({
-          type: "success",
-          message: "优惠卷兑换成功,请前往对应页面查看兑换内容!",
+      exchange_coupon(data)
+        .then((res) => {
+          console.log("res", res);
+          if (res && res.code === 200) {
+            this.$message({
+              type: "success",
+              message: "优惠卷兑换成功,请前往对应页面查看兑换内容!",
+            });
+            this.exchangeCode = "";
+
+            // 兑换成功后刷新优惠券列表
+            if (this.$refs.vouchersComponent) {
+              this.$refs.vouchersComponent.getList();
+            }
+          } else {
+            this.$message({
+              type: "error",
+              message: (res && res.message) || "兑换失败，请重试",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("兑换失败:", error);
+          this.$message({
+            type: "error",
+            message: "兑换失败，请重试",
+          });
         });
-        this.exchangeCode = "";
-      });
+    },
+
+    // 输入框失去焦点时自动去除首尾空格
+    handleInputBlur() {
+      if (this.exchangeCode) {
+        this.exchangeCode = this.exchangeCode.trim();
+      }
     },
   },
 };
@@ -95,10 +129,17 @@ export default {
 
 <style scoped>
 .exchange-component {
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto;
   padding-bottom: 100px;
   text-align: center;
+}
+
+.vouchers-container {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .header {

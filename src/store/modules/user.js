@@ -12,6 +12,7 @@ const getDefaultState = () => {
     userInfo: {},
     agent_image: {},
     walletsOrder: {},
+    available_coupons: [], // 可用优惠券列表
   };
 };
 
@@ -41,6 +42,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar;
+  },
+  SET_AVAILABLE_COUPONS: (state, available_coupons) => {
+    state.available_coupons = available_coupons;
   },
 };
 
@@ -116,6 +120,8 @@ const actions = {
           removeToken(); // must remove  token  first
           resetRouter();
           commit("RESET_STATE");
+          // 清除首次登录弹窗标记
+          sessionStorage.removeItem("firstTag");
           resolve();
         })
         .catch((error) => {
@@ -138,11 +144,16 @@ const actions = {
   setStoreToken({ commit }, token) {
     commit("SET_TOKEN", token);
   },
+  setAvailableCoupons({ commit }, available_coupons) {
+    commit("SET_AVAILABLE_COUPONS", available_coupons);
+  },
   // remove token
   resetToken({ commit }) {
     return new Promise((resolve) => {
       removeToken(); // must remove  token  first
       commit("RESET_STATE");
+      // 清除首次登录弹窗标记
+      sessionStorage.removeItem("firstTag");
       resolve();
     });
   },

@@ -254,3 +254,53 @@ export function reduce_aigc_pay(data) {
     data,
   });
 }
+
+// 获取降AIGC产品信息
+export function getAigcProducts() {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/product",
+    method: "get",
+  });
+}
+
+// 获取预估价格
+export function predictPrice(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/predict_price",
+    method: "post",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+// 降重处理接口
+export function reduceText(data) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/reduce",
+    method: "post",
+    data,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+// 查询降重结果
+export function getReduceResult(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/result",
+    method: "get",
+    params,
+  });
+}
+
+// 获取降重记录
+export function getReduceRecords(params) {
+  return request({
+    url: baseUrl + "/api/ai-paper/aigc/records",
+    method: "get",
+    params,
+  });
+}

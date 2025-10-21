@@ -10,6 +10,7 @@ const getters = {
   userInfo: (state) => state.user.userInfo,
   agent_image: (state) => state.user.agent_image,
   walletsOrder: (state) => state.user.walletsOrder,
+  availableCoupons: (state) => state.user.available_coupons,
   homeData: (state) => state.app.homeData,
   lineTitle: (state) => state.app.lineTitle,
   requestForm: (state) => state.app.requestForm,
@@ -27,5 +28,6 @@ const getters = {
   formdataV2: (state) => state.paper.formdataV2,
   outlineVersion: (state) => state.paper.outlineVersion,
   is_reduce_aigc: (state) => state.paper.is_reduce_aigc,
+  distributionBaseInfo: (state) => state.distribution.baseInfo,
 };
 export default getters;

@@ -169,7 +169,12 @@ export function apply(data) {
 }
 export function outlineStatus(params) {
   return request({
-    url: baseUrl + "/api/ai-paper/paper/outline/status/" + params.key,
+    url:
+      baseUrl +
+      "/api/ai-paper/paper/outline/status/" +
+      params.key +
+      "?type=" +
+      params.type,
     method: "get",
   });
 }

@@ -60,10 +60,10 @@
         </div>
       </div>
       <!-- 风投轮播 -->
-      <div class="carouselBox">
+      <div class="carouselBox" v-if="shouldShowCarousel">
         <div class="carouselCon">
           <el-carousel
-            height="44px"
+            height="60px"
             direction="vertical"
             indicator-position="none"
             :autoplay="true"
@@ -77,16 +77,18 @@
               </p>
             </el-carousel-item> -->
             <el-carousel-item v-for="item in 3" :key="item">
-              <div class="giftBox hidden-xs-only">
-                <img src="../../assets/images/bg/giftbox.png" alt="" />
-                <div style="text-align: center">
+              <div class="giftBox hidden-xs-only" @click="handleGiftBoxClick">
+                <!-- <img src="../../assets/images/bg/giftbox.png" alt="" /> -->
+                <img src="../../assets/images/bg/active_bg.png" alt="" />
+                <!-- <div style="text-align: center">
                   <p>新功能<b>"降aigc率"</b>上线了！</p>
                   <p>
                     通过"降aigc率"功能，保证知网，维普，格子达的aigc率不超过<b>
                       20% </b
                     >，<b>超必退</b> ！
                   </p>
-                </div>
+
+                </div> -->
               </div>
             </el-carousel-item>
           </el-carousel>
@@ -117,7 +119,7 @@
             <span class="icoSpan"> HOT </span>
             <span class="giftSpanMain">最新活动 </span>
           </div> -->
-          <el-tooltip
+          <!-- <el-tooltip
             class="item"
             effect="dark"
             content="分享获取免费查重券"
@@ -130,20 +132,41 @@
                 </svg>
               </span>
             </div>
-          </el-tooltip>
+          </el-tooltip> -->
 
           <div
             v-if="avatar"
             class="navOrderBtn g_hover"
             @click="navClickOrder(3)"
           >
-            <span> 降AIGC卷 </span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="优惠卷"
+              placement="top"
+            >
+              <span class="menuIcon">
+                <img src="@/assets/images/nav/coupon_menu_icon.png" alt="" />
+              </span>
+            </el-tooltip>
+            <span> 优惠卷 </span>
           </div>
           <div
             v-if="avatar"
             class="navOrderBtn g_hover"
             @click="navClickOrder(1)"
           >
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="我的订单"
+              placement="top"
+            >
+              <span class="menuIcon">
+                <img src="@/assets/images/nav/order_menu_icon.png" alt="" />
+              </span>
+            </el-tooltip>
+
             <span> 我的订单 </span>
           </div>
           <div
@@ -151,6 +174,17 @@
             class="navOrderBtn g_hover"
             @click="navClickOrder(2)"
           >
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="我的大纲"
+              placement="top"
+            >
+              <span class="menuIcon">
+                <img src="@/assets/images/nav/outline_menu_icon.png" alt="" />
+              </span>
+            </el-tooltip>
+
             <span> 我的大纲 </span>
           </div>
           <!-- 钱包 -->
@@ -392,6 +426,9 @@ export default {
       "device",
       "sub_domain",
     ]),
+    shouldShowCarousel() {
+      return this.$route.path !== "/distribution";
+    },
   },
 
   mounted() {
@@ -403,11 +440,11 @@ export default {
       (obj) => obj.name == "main" && obj.meta.id == "5"
     );
     this.routerList = arr.children;
-    // console.log('loca', localStorage.getItem('firstTag'))
-    // let firstTag = localStorage.getItem('firstTag');
-    // if (firstTag != '1') {
-    //   this.showGift();
-    // }
+    // console.log('loca', sessionStorage.getItem('firstTag'))
+    let firstTag = sessionStorage.getItem("firstTag");
+    if (firstTag != "1") {
+      this.showGift();
+    }
   },
 
   methods: {
@@ -416,6 +453,9 @@ export default {
     },
     showGift() {
       this.$refs.giftRef.showInit();
+    },
+    handleGiftBoxClick() {
+      this.$router.push("/distribution");
     },
     generateTitle,
     showOrderList(status) {
@@ -923,6 +963,9 @@ export default {
   padding: 0px 10px;
   height: 32px;
   background: #0066ff1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   color: #0066ff;
   line-height: 32px;
@@ -1008,16 +1051,18 @@ export default {
 .giftBox {
   display: flex;
   align-items: center;
-  height: 40px;
-  background: #ffefe7;
-  border: 1px solid #ffd1b9;
-  border-radius: 8px;
+  background: #fff;
+  height: 60px;
+  width: 280px;
   padding-left: 10px;
   padding-right: 10px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   img {
-    width: 26px;
-    margin-right: 8px;
-    height: 26px;
+    width: 100%;
+    height: 100%;
+  }
+  &:hover {
+    cursor: pointer;
   }
   font-size: 14px;
   color: #e20000;
@@ -1028,12 +1073,24 @@ export default {
   justify-content: center;
   background-color: #f7f7f7;
   .carouselCon {
-    width: 550px;
+    width: 276px;
   }
 }
 .homeSwiper {
   width: 280px;
   height: 40px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+.menuIcon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 3px;
   img {
     width: 100%;
     height: 100%;

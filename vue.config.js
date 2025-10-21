@@ -46,8 +46,8 @@ module.exports = {
     proxy: {
       // 配置跨域处理, 设置代理
       "/dev-api": {
-        target: `https://api.mixpaper.cn/`, //正式环境
-        // target: `https://devapi.mixpaper.cn/`, //测试环境
+        // target: `https://api.mixpaper.cn/`, //正式环境
+        target: `https://devapi.mixpaper.cn/`, //测试环境
         // target: `https://web-proxy.apifox.cn:3000/`,
         changeOrigin: true,
         pathRewrite: {

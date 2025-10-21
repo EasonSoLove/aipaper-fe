@@ -14,7 +14,7 @@
     >
       <template slot="title">
         <div class="titleHeader">
-          <p class="dialogTitleP">订单支付</p>
+          <p class="dialogTitleP">订单支付.</p>
         </div>
       </template>
       <div
@@ -139,28 +139,33 @@
                   <!-- <el-tab-pane label="消息中心">消息中心</el-tab-pane> -->
                 </el-tabs>
               </div>
-              <!-- 优惠卷 -->
+              <!-- 优惠卷  &&
+                  currentOrder.is_discount == 1-->
               <div
                 v-show="
                   currentOrder.order_type !== 'OUTLINE_DOWNLOAD' &&
-                  currentOrder.order_type !== 'EXTRA_PROPOSAL' &&
-                  currentOrder.order_type !== 'EXTRA_TASK_ASSIGNMENT' &&
-                  currentOrder.order_type !== 'EXTRA_SURVEY' &&
-                  currentOrder.order_type !== 'EXTRA_JOURNAL_REVIEWED' &&
                   currentOrder.order_type !== 'REDUCE_AIGC' &&
-                  currentOrder.is_discount == 1
+                  couponOptions.length > 0
                 "
                 class="newJuan"
                 style="margin-top: 10px; margin-bottom: 10px"
               >
                 <span>优惠卷: </span>
 
-                <input
-                  type="text"
-                  placeholder="请输入优惠卷编号"
+                <el-select
                   v-model="coupon_code"
-                  @blur="useCoupon"
-                />
+                  placeholder="请选择优惠券"
+                  style="width: 180px"
+                  @change="handleCouponChange"
+                >
+                  <el-option
+                    v-for="option in couponOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                  >
+                  </el-option>
+                </el-select>
                 <!-- <el-button size="mini" type="primary" plain
                   >兑换</el-button
                 > -->
@@ -233,7 +238,7 @@ export default {
       successIndex: 0,
       orderId: "",
       loading: false,
-      coupon_code: "",
+      coupon_code: "", // 将在mounted中设置为默认选中的优惠券
       orderPayDisabled: false, // 去支付 不能切换订单
     };
   },
@@ -267,6 +272,20 @@ export default {
         this.setCanDis();
       },
     },
+    // 监听优惠券数据变化
+    availableCoupons: {
+      handler(newVal) {
+        if (newVal && newVal.length > 0 && !this.coupon_code) {
+          // 当优惠券数据更新且当前没有选择优惠券时，设置默认值
+          this.$nextTick(() => {
+            if (this.defaultSelectedCoupon) {
+              this.coupon_code = this.defaultSelectedCoupon;
+            }
+          });
+        }
+      },
+      immediate: true,
+    },
   },
   components: {
     payadditional,
@@ -275,6 +294,12 @@ export default {
   mounted() {
     // eventBus.emit("sendOutline", 5); // 发布事件
     // 页面初始化
+    this.$nextTick(() => {
+      // 设置默认选中的优惠券
+      if (this.defaultSelectedCoupon) {
+        this.coupon_code = this.defaultSelectedCoupon;
+      }
+    });
   },
   created() {
     // eventBus.on("sendOutline", this.addE); // 订阅事件
@@ -290,10 +315,31 @@ export default {
       "currentOrder",
       "requestForm",
       "agent_image",
+      "availableCoupons",
       // "additionalList",
     ]),
     imgData() {
       return this.agent_image.find((image) => image.id === 5);
+    },
+    // 格式化优惠券选项
+    couponOptions() {
+      if (!this.availableCoupons || this.availableCoupons.length === 0) {
+        return [];
+      }
+      return this.availableCoupons.map((coupon) => ({
+        label: `${(coupon.discount_rate * 10).toFixed(
+          0
+        )}折  (编号:${coupon.coupon_code.slice(-6)})`,
+        value: coupon.coupon_code,
+        is_selected: coupon.is_selected,
+      }));
+    },
+    // 默认选中的优惠券
+    defaultSelectedCoupon() {
+      const selectedCoupon = this.availableCoupons?.find(
+        (coupon) => coupon.is_selected
+      );
+      return selectedCoupon ? selectedCoupon.coupon_code : "";
     },
   },
 
@@ -324,26 +370,22 @@ export default {
       if (!this.coupon_code) {
         return false;
       }
-      this.$confirm("优惠卷兑换后，无法退回, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          if (this.currentOrder.returnStatus == "去支付") {
-            this.payUseCode();
-          } else if (this.currentOrder.returnStatus == "付尾款") {
-            this.payWeiUseCode();
-          } else {
-            this.handleClick();
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消兑换",
-          });
-        });
+      // 直接使用选中的优惠券，无需确认
+      if (this.currentOrder.returnStatus == "去支付") {
+        this.payUseCode();
+      } else if (this.currentOrder.returnStatus == "付尾款") {
+        this.payWeiUseCode();
+      } else {
+        this.handleClick();
+      }
+    },
+    // 处理优惠券选择变化
+    handleCouponChange(value) {
+      this.coupon_code = value;
+      // 如果选择了优惠券，自动应用
+      if (value) {
+        this.useCoupon();
+      }
     },
     startCountdown() {
       const countdownInterval = setInterval(() => {
@@ -381,6 +423,15 @@ export default {
             discounted_price: res.result.discounted_price,
           };
           this.$store.dispatch("app/toggleCurrentOrder", order);
+
+          if (res.result.available_coupons) {
+            this.$store.dispatch(
+              "user/setAvailableCoupons",
+              res.result.available_coupons
+            );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
+          }
           let _this = this;
           setTimeout(() => {
             _this.loading = false;
@@ -410,6 +461,14 @@ export default {
       };
       ordersRepay(data)
         .then((res) => {
+          if (res.result.available_coupons) {
+            this.$store.dispatch(
+              "user/setAvailableCoupons",
+              res.result.available_coupons
+            );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
+          }
           let order = {
             ...this.currentOrder,
             out_trade_no: res.result.out_trade_no,
@@ -442,9 +501,18 @@ export default {
     },
     resetForm() {
       this.coupon_code = "";
+      // 重置后，如果有默认选中的优惠券，重新设置
+      this.$nextTick(() => {
+        if (this.defaultSelectedCoupon) {
+          this.coupon_code = this.defaultSelectedCoupon;
+        }
+      });
     },
-    handleClick(tab, event) {
-      console.log(tab, "sttabbb", tab, event);
+    handleClick(tab) {
+      console.log("sttabbb", tab);
+      if (tab == "PAY_STAGES") {
+        this.coupon_code = "";
+      }
       this.loading = true;
       this.startCountdown();
       // 停止上一次循环
@@ -472,7 +540,6 @@ export default {
       }
       getOrder(data)
         .then((res) => {
-          this.resetForm();
           let order = {
             ...this.currentOrder,
             out_trade_no: res.result.out_trade_no,
@@ -486,7 +553,17 @@ export default {
             is_discount: res.result.is_discount,
             discounted_price: res.result.discounted_price,
           };
+          if (res.result.available_coupons) {
+            this.$store.dispatch(
+              "user/setAvailableCoupons",
+              res.result.available_coupons
+            );
+          } else {
+            this.$store.dispatch("user/setAvailableCoupons", []);
+          }
           this.$store.dispatch("app/toggleCurrentOrder", order);
+          this.resetForm();
+
           let _this = this;
           setTimeout(() => {
             _this.loading = false;

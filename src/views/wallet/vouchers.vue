@@ -4,17 +4,23 @@
     <el-tabs type="border-card">
       <el-tab-pane label="未使用">
         <div v-if="unused_coupons.length > 0" class="flexBox">
-          <div class="coupon" v-for="item in unused_coupons" :key="item.id">
+          <div
+            class="coupon"
+            v-for="item in unused_coupons"
+            :key="item.coupon_code"
+          >
             <div class="content">
-              <div class="title">学位论文抵扣券</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
-              <div class="restriction">仅限制使用，不可使用</div>
+              <div class="restriction">{{ item.limit_tips }}</div>
             </div>
             <div class="right">
-              <div class="discount">{{ item.discount_rate * 10 }}折</div>
-              <button class="use-button">去使用</button>
+              <div class="discount">{{ getCouponDisplay(item) }}</div>
+              <button class="use-button" @click="useCoupon(item)">
+                去使用
+              </button>
             </div>
           </div>
         </div>
@@ -23,21 +29,21 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="已使用">
-        <div v-if="expired_coupons.length > 0" class="flexBox">
+        <div v-if="used_coupons.length > 0" class="flexBox">
           <div
             class="coupon couponUse"
-            v-for="item in expired_coupons"
-            :key="item.id"
+            v-for="item in used_coupons"
+            :key="item.coupon_code"
           >
             <div class="content">
-              <div class="title">学位论文抵扣券</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
-              <div class="restriction">仅限制使用，不可使用</div>
+              <div class="restriction">{{ item.limit_tips }}</div>
             </div>
             <div class="right">
-              <div class="discount">{{ item.discount_rate * 10 }}折</div>
+              <div class="discount">{{ getCouponDisplay(item) }}</div>
             </div>
           </div>
         </div>
@@ -46,21 +52,21 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="已失效">
-        <div v-if="used_coupons.length > 0" class="flexBox">
+        <div v-if="expired_coupons.length > 0" class="flexBox">
           <div
-            class="coupon couponUse"
-            v-for="item in used_coupons"
-            :key="item.id"
+            class="coupon couponDated"
+            v-for="item in expired_coupons"
+            :key="item.coupon_code"
           >
             <div class="content">
-              <div class="title">学位论文抵扣券</div>
+              <div class="title">{{ getCouponTitle(item.rule_id) }}</div>
               <div class="validity">
                 过期时间: {{ item.expire_time | dateFormatter }}
               </div>
-              <div class="restriction">仅限制使用，不可使用</div>
+              <div class="restriction">{{ item.limit_tips }}</div>
             </div>
             <div class="right">
-              <div class="discount">{{ item.discount_rate * 10 }}折</div>
+              <div class="discount">{{ getCouponDisplay(item) }}</div>
             </div>
           </div>
         </div>
@@ -72,53 +78,70 @@
   </div>
 </template>
 <script>
-import { find_user_coupons } from "@/api/wallet";
+import { getCouponBag } from "@/api/wallet";
 export default {
   name: "vouchers",
   data() {
     return {
       isInputFocused: false,
-      expired_coupons: null, // 已失效的优惠券
-      unused_coupons: [
-        // 未使用的优惠券
-        {
-          id: 899,
-          type: 1, // 1-折扣券，目前都是折扣券
-          rule_id: -1,
-          create_user_id: 22,
-          exchange_user_id: 6893,
-          coupon_code: "other_cc535d11-491d-4daf-b3b2-b95a01304691",
-          discount_rate: 0.9, // 9这
-          create_time: "2025-01-20T20:16:32+08:00",
-          used_time: null,
-          // 过期时间，前端格式化为yyyy-MM-dd hh:mm:ss格式
-          expire_time: "2025-01-21T00:00:00+08:00",
-          channel: "other",
-          status: 1,
-          order_id: -1,
-        },
-      ],
-      used_coupons: null, // 已使用的优惠券
+      expired_coupons: [], // 已失效的优惠券
+      unused_coupons: [], // 未使用的优惠券
+      used_coupons: [], // 已使用的优惠券
     };
   },
   mounted() {
     this.getList();
   },
   methods: {
-    getList() {
-      find_user_coupons().then((res) => {
-        console.log("res", res);
-        this.used_coupons = res.result.used_coupons
-          ? res.result.used_coupons
-          : [];
-        this.unused_coupons = res.result.unused_coupons
-          ? res.result.unused_coupons
-          : [];
-        this.expired_coupons = res.result.expired_coupons
-          ? res.result.expired_coupons
-          : [];
+    useCoupon(item) {
+      console.log("item", item);
+      this.$router.push({
+        path: "/main/writepaper",
       });
     },
+    getList() {
+      getCouponBag()
+        .then((res) => {
+          console.log("res", res);
+          if (res && res.code === 200 && res.result) {
+            this.used_coupons = res.result.used_coupon_list || [];
+            this.unused_coupons = res.result.available_coupon_list || [];
+            this.expired_coupons = res.result.expired_coupon_list || [];
+          }
+        })
+        .catch((error) => {
+          console.error("获取优惠券列表失败:", error);
+          this.$message.error("获取优惠券列表失败");
+        });
+    },
+    // 获取优惠券标题
+    getCouponTitle(rule_id) {
+      const titleMap = {
+        1: "毕业论文 - 优惠券",
+        2: "结课论文 - 优惠券",
+        3: "开题报告 - 优惠券",
+        4: "任务书 - 优惠券",
+        5: "文献综述 - 优惠券",
+      };
+      return titleMap[rule_id] || "优惠券";
+    },
+
+    // 获取优惠券显示内容
+    getCouponDisplay(item) {
+      if (item.type === 1) {
+        // 折扣券
+        if (item.discount_rate === 0) {
+          return "免费";
+        } else {
+          return `${(item.discount_rate * 10).toFixed(0)}折`;
+        }
+      } else if (item.type === 3) {
+        // 降AIGC次数券
+        return `${item.rights_num}次`;
+      }
+      return "优惠券";
+    },
+
     exchangeCodeRequest() {
       // 模拟请求接口
       // 这里可以使用 axios 或者 fetch 来请求接口
@@ -150,16 +173,19 @@ body {
   width: 300px;
   height: 150px;
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   position: relative;
 }
 .couponUse {
-  width: 350px;
+  width: 300px;
 
-  background: url("../../assets/images/wallets/used.png");
+  background: url("../../assets/images/wallets/used.png") no-repeat center
+    center / 100% 100%;
 }
-.couponUse {
-  background: url("../../assets/images/wallets/used.png");
+
+.couponDated {
+  background: url("../../assets/images/wallets/dated.png") no-repeat center
+    center / 100% 100%;
 }
 .content {
   color: #fff;
@@ -173,28 +199,37 @@ body {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .validity {
   font-size: 14px;
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .restriction {
   font-size: 12px;
+  text-align: left;
+  padding-right: 60px;
+  margin-top: 25px;
 }
 
 .right {
   display: flex;
+  width: 60px;
+  right: 10px;
+  top: 15px;
+  padding-bottom: 20px;
+  font-size: 14px;
   height: 90%;
-
+  position: absolute;
   flex-direction: column;
   justify-content: space-between;
   color: #fff;
 }
 
 .discount {
-  font-size: 16px;
   background: rgba(0, 0, 0, 0.2);
   padding: 5px 10px;
   border-radius: 5px;
@@ -207,10 +242,12 @@ body {
   background: transparent;
   border: 1px solid #fff;
   color: #fff;
-  padding: 5px 10px;
+  padding: 5px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  position: relative;
+  top: 10px;
 }
 
 .use-button:hover {
@@ -221,5 +258,9 @@ body {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
+  margin-right: -20px;
+  .coupon:nth-child(3n) {
+    // margin-right: 0;
+  }
 }
 </style>

@@ -1,44 +1,55 @@
 <template>
   <div class="mainContentSec reduceRepetiton">
     <!-- <swiper-one class="topSwiper"></swiper-one> -->
-    <div class="outlineTab">
-      <div class="outLeft">
-        <!-- <p
+    <div style="height: 20px"></div>
+    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
+      <el-tab-pane label="新版" name="first">
+        <newReduce @refresh-records="handleRefreshRecords"></newReduce>
+        <!-- 查重记录列表 -->
+        <div class="record-list-container-new">
+          <record-list :visible="true" ref="recordList" />
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="旧版" name="second">
+        <div class="reduce_Old_Page">
+          <div class="outlineTab">
+            <div class="outLeft">
+              <!-- <p
           @click="checkoutPaper(0)"
           :class="['outLeftTitle', activeIndex == 0 ? 'activeLT' : '']"
         >
           降AIGC率-上传文件
           <span class="underLeft"></span>
         </p> -->
-        <p
-          @click="checkoutPaper(1)"
-          :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
-        >
-          降AIGC率-维普
-          <span class="underLeft"></span>
-        </p>
-        <p
-          @click="checkoutPaper(2)"
-          :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
-        >
-          降AIGC率-知网
-          <span class="underLeft"></span>
-        </p>
-        <p
-          @click="checkoutPaper(3)"
-          :class="['outLeftTitle', activeIndex == 3 ? 'activeLT' : '']"
-        >
-          降AIGC率-格子达
-          <span class="underLeft"></span>
-        </p>
-        <!-- <p
+              <p
+                @click="checkoutPaper(1)"
+                :class="['outLeftTitle', activeIndex == 1 ? 'activeLT' : '']"
+              >
+                降AIGC率-维普
+                <span class="underLeft"></span>
+              </p>
+              <p
+                @click="checkoutPaper(2)"
+                :class="['outLeftTitle', activeIndex == 2 ? 'activeLT' : '']"
+              >
+                降AIGC率-知网
+                <span class="underLeft"></span>
+              </p>
+              <p
+                @click="checkoutPaper(3)"
+                :class="['outLeftTitle', activeIndex == 3 ? 'activeLT' : '']"
+              >
+                降AIGC率-格子达
+                <span class="underLeft"></span>
+              </p>
+              <!-- <p
           @click="checkoutPaper(4)"
           :class="['outLeftTitle', activeIndex == 4 ? 'activeLT' : '']"
         >
           降AIGC率-人工版
           <span class="underLeft"></span>
         </p> -->
-        <!-- <div style="position: relative; top: 10px">
+              <!-- <div style="position: relative; top: 10px">
           <p style="font-size: 14px; margin-bottom: 8px">温馨提示:</p>
           <p style="color: #606266">推荐字数: 300-400字效果最佳</p>
           <p style="color: #606266; margin-top: 3px">
@@ -48,75 +59,75 @@
             保证降重后的AIGC率 <b class="red">20%</b> 以下
           </p>
         </div> -->
-      </div>
-      <div v-if="activeIndex != 0" class="card">
-        <div class="header">
-          <span>可用次数：</span>
-          <span class="count">{{ remaining_nums }}次</span>
-        </div>
-        <hr class="divider" />
-        <div class="content">
-          <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
-          <button @click="showBuyDialog" class="recharge-button">
-            点我补充次数
-          </button>
-        </div>
-      </div>
-    </div>
-    <template v-if="activeIndex != 4 && activeIndex != 0">
-      <div
-        v-loading="sendStatus"
-        element-loading-text="使用高级推理AI, 润色中..."
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
-      >
-        <div class="edit flex">
-          <div class="edit-1">
-            <el-input
-              type="textarea"
-              :rows="20"
-              placeholder="1、采用独家算法 + 学术模型进行降AIGC，可通过知网、维普、格子达三家平台的AIGC检测，保证降完之后的AIGC率低于20%；
+            </div>
+            <div v-if="activeIndex != 0" class="card">
+              <div class="header">
+                <span>可用次数：</span>
+                <span class="count">{{ remaining_nums }}次</span>
+              </div>
+              <hr class="divider" />
+              <div class="content">
+                <p>限时优惠，单次低至 <span class="count">0.8</span>元</p>
+                <!-- <button @click="showBuyDialog" class="recharge-button">
+                  点我补充次数
+                </button> -->
+              </div>
+            </div>
+          </div>
+          <template v-if="activeIndex != 4 && activeIndex != 0">
+            <div
+              v-loading="sendStatus"
+              element-loading-text="使用高级推理AI, 润色中..."
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(0, 0, 0, 0.8)"
+            >
+              <div class="edit flex">
+                <div class="edit-1">
+                  <el-input
+                    type="textarea"
+                    :rows="20"
+                    placeholder="1、采用独家算法 + 学术模型进行降AIGC，可通过知网、维普、格子达三家平台的AIGC检测，保证降完之后的AIGC率低于20%；
 2、单次降AIGC率输入限制500字符，为保证最好的降AIGC效果，单次推荐输入300-400字符；
 3、降AIGC可能会导致前后字符数有差异，属于正常现象；
 4、如有大量文本需要降AIGC，请联系人工客服进行处理。由于人工介入，因此收费会有所不同
 5、仅支持中文， 其他语言正在陆续支持中
 6、版本区别: 首先用V1去一遍,然后拿去检测, 如果无法去除再用V2"
-              maxlength="500"
-              show-word-limit
-              v-model="original_paragraph"
-              resize="false"
-              :autosize="{ minRows: 15, maxRows: 20 }"
-            >
-            </el-input>
-          </div>
-          <div class="edit-3">
-            <el-input
-              type="textarea"
-              :rows="20"
-              readonly
-              placeholder="请在左侧输入待降AIGC率的文章段落，点击“降AIGC”按钮，稍等片刻，成品会显示在这里"
-              maxlength="5000"
-              show-word-limit
-              v-model="textareaOut"
-              resize="false"
-              :autosize="{ minRows: 15, maxRows: 20 }"
-            >
-            </el-input>
-            <div class="btns">
-              <el-button
-                type="primary"
-                v-clipboard:copy="textareaOut"
-                v-clipboard:success="onCopy"
-                v-clipboard:error="onError"
-                round
-                size="mini"
-              >
-                复制结果
-              </el-button>
-            </div>
-          </div>
-        </div>
-        <!-- <div class="customization">
+                    maxlength="500"
+                    show-word-limit
+                    v-model="original_paragraph"
+                    resize="false"
+                    :autosize="{ minRows: 15, maxRows: 20 }"
+                  >
+                  </el-input>
+                </div>
+                <div class="edit-3">
+                  <el-input
+                    type="textarea"
+                    :rows="20"
+                    readonly
+                    placeholder="请在左侧输入待降AIGC率的文章段落，点击“降AIGC”按钮，稍等片刻，成品会显示在这里"
+                    maxlength="5000"
+                    show-word-limit
+                    v-model="textareaOut"
+                    resize="false"
+                    :autosize="{ minRows: 15, maxRows: 20 }"
+                  >
+                  </el-input>
+                  <div class="btns">
+                    <el-button
+                      type="primary"
+                      v-clipboard:copy="textareaOut"
+                      v-clipboard:success="onCopy"
+                      v-clipboard:error="onError"
+                      round
+                      size="mini"
+                    >
+                      复制结果
+                    </el-button>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="customization">
           <p class="contentTitle">
             请输入您对生成内容的建议：例如：扩写，缩写，降重，降AIGC率等
           </p>
@@ -129,78 +140,82 @@
           >
           </el-input>
         </div> -->
-      </div>
-      <div v-if="activeIndex == 1" class="reduceBottom">
-        <div
-          v-for="btnItem in weipu_version"
-          :key="btnItem.version + 'btn1'"
-          v-loading="sendStatus"
-          @click="reduceSend(btnItem)"
-          class="reduceBtn g_poin"
-        >
-          <p>{{ btnItem.version_description }}</p>
-        </div>
-      </div>
-      <div v-if="activeIndex == 2" class="reduceBottom">
-        <div
-          v-for="btnItem in kns_version"
-          :key="btnItem.version + 'btn2'"
-          v-loading="sendStatus"
-          @click="reduceSend(btnItem)"
-          class="reduceBtn g_poin"
-        >
-          <p>{{ btnItem.version_description }}</p>
-        </div>
-      </div>
-      <div v-if="activeIndex == 3" class="reduceBottom">
-        <div
-          v-for="btnItem in gezida_version"
-          :key="btnItem.version + 'btn3'"
-          v-loading="sendStatus"
-          @click="reduceSend(btnItem)"
-          class="reduceBtn g_poin"
-        >
-          <p>{{ btnItem.version_description }}</p>
-        </div>
-      </div>
-    </template>
-    <template v-if="activeIndex == 4">
-      <div
-        style="
-          display: flex;
-          background-color: #fff;
-          flex-direction: column;
-          padding-bottom: 20px;
-          align-items: center;
-        "
-      >
-        <p style="margin-top: 20px; margin-bottom: 10px; font-size: 16px">
-          联系客服,进行人工降重/降AIGC
-        </p>
-        <div style="width: 400px">
-          <el-image :src="useImg"></el-image>
-        </div>
-      </div>
+            </div>
+            <div v-if="activeIndex == 1" class="reduceBottom">
+              <div
+                v-for="btnItem in weipu_version"
+                :key="btnItem.version + 'btn1'"
+                v-loading="sendStatus"
+                @click="reduceSend(btnItem)"
+                class="reduceBtn g_poin"
+              >
+                <p>{{ btnItem.version_description }}</p>
+              </div>
+            </div>
+            <div v-if="activeIndex == 2" class="reduceBottom">
+              <div
+                v-for="btnItem in kns_version"
+                :key="btnItem.version + 'btn2'"
+                v-loading="sendStatus"
+                @click="reduceSend(btnItem)"
+                class="reduceBtn g_poin"
+              >
+                <p>{{ btnItem.version_description }}</p>
+              </div>
+            </div>
+            <div v-if="activeIndex == 3" class="reduceBottom">
+              <div
+                v-for="btnItem in gezida_version"
+                :key="btnItem.version + 'btn3'"
+                v-loading="sendStatus"
+                @click="reduceSend(btnItem)"
+                class="reduceBtn g_poin"
+              >
+                <p>{{ btnItem.version_description }}</p>
+              </div>
+            </div>
+          </template>
+          <template v-if="activeIndex == 4">
+            <div
+              style="
+                display: flex;
+                background-color: #fff;
+                flex-direction: column;
+                padding-bottom: 20px;
+                align-items: center;
+              "
+            >
+              <p style="margin-top: 20px; margin-bottom: 10px; font-size: 16px">
+                联系客服,进行人工降重/降AIGC
+              </p>
+              <div style="width: 400px">
+                <el-image :src="useImg"></el-image>
+              </div>
+            </div>
 
-      <!-- <filereduce></filereduce> -->
+            <!-- <filereduce></filereduce> -->
 
-      <!-- <progressonly
+            <!-- <progressonly
         :requestKey="requestKey"
         :payStatus="payStatusPro"
         :paperPercent="paperPercent"
       /> -->
-    </template>
-    <template v-if="activeIndex == 0">
-      <div style="">
-        <filereduce></filereduce>
-      </div>
+          </template>
+          <template v-if="activeIndex == 0">
+            <div style="">
+              <filereduce></filereduce>
+            </div>
 
-      <!-- <progressonly
+            <!-- <progressonly
         :requestKey="requestKey"
         :payStatus="payStatusPro"
         :paperPercent="paperPercent"
       /> -->
-    </template>
+          </template>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+
     <reducepay2
       :requestKey="requestKey2"
       :payStatus="popupStatus2"
@@ -279,8 +294,10 @@ import {
 import filereduce from "./components/filereduce.vue";
 import reducepay from "./components/index.vue";
 import reducepay2 from "./components/reducePay.vue";
+import recordList from "./components/recordList.vue";
 import eventBus from "@/utils/eventBus";
 import { getToken, setToken } from "@/utils/auth"; // get token from cookie
+import newReduce from "./newReduce.vue";
 
 export default {
   name: "reduceRepetition",
@@ -289,9 +306,12 @@ export default {
     reducepay,
     filereduce,
     reducepay2,
+    newReduce,
+    recordList,
   },
   data() {
     return {
+      activeName: "first",
       popupStatus: 0,
       popupStatus2: 0,
       requestKey: "", //out_trade_no
@@ -312,8 +332,8 @@ export default {
         "请输入文章段落，待降AIGC率，每次最多1000字",
       ],
       reduceText: [
-        "请在左侧输入待降AIGC率的文章段落，点击“降AIGC”按钮，稍等片刻，成品会显示在这里",
-        "请在左侧输入待降AIGC率的文章段落，点击“开始生成”按钮，稍等片刻，成品会显示在这里",
+        '请在左侧输入待降AIGC率的文章段落，点击"降AIGC"按钮，稍等片刻，成品会显示在这里',
+        '请在左侧输入待降AIGC率的文章段落，点击"开始生成"按钮，稍等片刻，成品会显示在这里',
       ],
       original_paragraph: "",
       user_content: "",
@@ -340,18 +360,29 @@ export default {
   mounted() {
     this.getReTimes();
     this.getVersion();
-    // if()
-    let hasToken = getToken();
-    if (!sessionStorage.getItem("hasSeenPopup")) {
-      // 如果没有标记，则显示弹窗
-      if (hasToken) {
-        this.showBuyDialog();
-        sessionStorage.setItem("hasSeenPopup", "true");
-      }
-      // 弹窗显示后，设置标记
-    }
+    // 检查是否首次进入降重页面
+    this.checkFirstVisit();
   },
   methods: {
+    // 检查是否首次访问降重页面
+    checkFirstVisit() {
+      const hasSeenImportantTip = sessionStorage.getItem("hasSeenImportantTip");
+      if (!hasSeenImportantTip) {
+        sessionStorage.setItem("hasSeenImportantTip", "true");
+      }
+    },
+    // 关闭重要提示弹窗
+    closeImportantTipDialog() {},
+    // 处理标签页点击事件
+    handleClick(tab) {
+      console.log("切换到标签页:", tab.name);
+    },
+    // 处理刷新记录列表事件
+    handleRefreshRecords() {
+      if (this.$refs.recordList) {
+        this.$refs.recordList.loadRecordList();
+      }
+    },
     showPayDialog(data) {
       console.log("dddd", data);
       this.requestKey2 = data.requestKey;
@@ -453,7 +484,11 @@ export default {
       console.log(btnItem, "btnItem");
       // 判断次数是否够用
       if (this.remaining_nums < 1) {
-        this.showBuyDialog();
+        // this.showBuyDialog();
+        this.$message({
+          type: "warning",
+          message: "次数不足，请使用新版AIGC降重",
+        });
         return false;
       }
       zhuge.track(`用户点击降重按钮`, {});
@@ -729,9 +764,9 @@ export default {
 ::v-deep .el-upload {
   width: 100%;
 }
-::v-deep .el-dialog {
-  // background: linear-gradient(to right, #fff6d9, #fff9e7);
-}
+/* ::v-deep .el-dialog {
+  background: linear-gradient(to right, #fff6d9, #fff9e7);
+} */
 
 ::v-deep .el-upload-dragger {
   height: 240px;
@@ -793,5 +828,100 @@ export default {
 
 .recharge-button:hover {
   background-color: #ff4500;
+}
+
+/* 重要提示弹窗样式 */
+::v-deep .important-tip-dialog .el-dialog__header {
+  padding: 20px 20px 10px;
+  border-bottom: none;
+}
+
+::v-deep .important-tip-dialog .el-dialog__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+::v-deep .important-tip-dialog .el-dialog__body {
+  padding: 0 20px 20px;
+}
+
+::v-deep .important-tip-dialog .el-dialog__footer {
+  padding: 10px 20px 20px;
+  text-align: center;
+}
+
+.important-tip-content .tip-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.important-tip-content .tip-header .el-icon-info {
+  color: #409eff;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.important-tip-content .tip-header .tip-title {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.important-tip-content .tip-items .tip-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.important-tip-content .tip-items .tip-item .tip-check-icon {
+  color: #409eff;
+  font-size: 16px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.important-tip-content .tip-items .tip-item span {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.important-tip-content .tip-items .tip-item span .highlight-text {
+  color: #ff4757;
+  font-weight: 600;
+}
+
+.confirm-button {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  padding: 10px 30px;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.confirm-button:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+
+.confirm-button:focus {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+}
+
+/* 查重记录列表容器样式 */
+.record-list-container-new {
+  margin-top: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 </style>
