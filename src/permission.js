@@ -130,9 +130,10 @@ router.beforeEach(async (to, from, next) => {
     // next(`/login?redirect=${to.path}`);
     if (to.path == "/home/redemption") {
       next(`/login`);
+    } else {
+      // 对于白名单中的路径，正常跳转，由页面组件处理登录逻辑
+      next();
     }
-
-    eventBus.emit("showLogin"); // 发布事件
 
     NProgress.done();
   }

@@ -186,6 +186,9 @@ export default {
     // 页面初始化
     window.addEventListener("scroll", this.handleScroll);
     // this.$store.dispatch("app/setActiveIndex", 2);
+
+    // 检查是否需要弹出登录弹窗
+    this.checkLoginRequired();
   },
   created() {
     this.getBdVidFromUrl();
@@ -247,6 +250,32 @@ export default {
     ]),
   },
   methods: {
+    // 检查是否需要弹出登录弹窗
+    checkLoginRequired() {
+      // 检查URL参数中是否包含 inv_code
+      // 由于使用的是 hash 路由，需要从 hash 部分解析参数
+      const hash = window.location.hash;
+      const urlParams = new URLSearchParams(hash.split("?")[1] || "");
+      const invCode = urlParams.get("inv_code");
+
+      console.log("检查登录需求:", {
+        hash: hash,
+        invCode: invCode,
+        hasToken: this.$store.getters.token || localStorage.getItem("loginID"),
+      });
+
+      if (invCode) {
+        // 检查用户是否已登录
+        const hasToken =
+          this.$store.getters.token || localStorage.getItem("loginID");
+
+        if (!hasToken) {
+          // 用户未登录，弹出登录弹窗
+          console.log("触发登录弹窗");
+          eventBus.emit("showLogin");
+        }
+      }
+    },
     fetchDataBasedOnRoute(to) {
       this.$log("tototototo---------", to);
     },
