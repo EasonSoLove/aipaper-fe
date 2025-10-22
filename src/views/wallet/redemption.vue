@@ -33,19 +33,20 @@
       </div>
       <div class="warning">
         <h3>温馨提示：</h3>
-        <p>
+        <!-- <p>
           有兑换码的用户可以在此兑换，<span class="red"
             >兑换码目前支持兑换为降AIGC的可用次数。</span
           >
-        </p>
+        </p> -->
         <p>
           兑换流程：
           <span class="red">
-            输入兑换码 → 点击“立即兑换” → 兑换成功，前往
+            输入兑换码 → 点击“立即兑换” → 兑换成功
+            <!-- ，前往
             <el-link type="primary" @click="$jumpUrl('/main/reduceRepetition')"
               >降AIGC页面</el-link
             >
-            右上角查看可用次数。
+            右上角查看可用次数。 -->
           </span>
         </p>
         <p>兑换码一经兑换，概不退换，请确认无误后再操作。</p>

@@ -598,6 +598,7 @@ export default {
       this.activeTab = product.product;
       // 重置检测平台选择
       this.selectedPlatform = "";
+      this.generatedText = "";
       // 如果产品有检测平台，默认选择第一个
       if (
         product.cn_support_platform &&
@@ -623,16 +624,19 @@ export default {
     // 选择语言
     selectLanguage(language) {
       this.selectedLanguage = language;
+      this.generatedText = "";
     },
 
     // 选择检测平台
     selectPlatform(platform) {
       this.selectedPlatform = platform;
+      this.generatedText = "";
     },
 
     // 选择输入方式
     selectInputMethod(method) {
       this.inputMethod = method;
+      this.generatedText = "";
     },
 
     // 处理文本输入
@@ -869,7 +873,7 @@ export default {
     // 文件上传成功
     handleUploadSuccess(response, file) {
       // TODO: 处理文件上传成功，提取文本内容
-      this.$message.success("文件上传成功");
+      // this.$message.success("文件上传成功");
       // 这里需要根据实际接口返回处理文件内容
       this.uploadedText = "文件内容已上传，等待处理...";
     },
@@ -923,7 +927,7 @@ export default {
         // 更新文件信息
         this.selectedFile = file;
         this.showFileInput = true;
-        this.$message.success("文件选择成功");
+        // this.$message.success("文件选择成功");
 
         // 这里可以添加文件内容读取逻辑
         this.readFileContent(file);
@@ -1032,13 +1036,21 @@ export default {
       try {
         this.priceLoading = true;
         const response = await predictPrice(formData);
-
+        console.log(response);
         if (response.code === 200) {
           // 检查字数是否超过限制
           if (response.result.total_chars > 10000) {
             // 字数超限，清空文件并提示用户
             this.deleteFile();
             this.$message.error("文件字数大于10000字，暂不支持");
+            return;
+          }
+
+          // 检查字数是否小于2个字符
+          if (response.result.total_chars < 2) {
+            // 字数过少，清空文件并提示用户
+            this.deleteFile();
+            this.$message.error("文件未提取到文本，字数为空！请重新上传！");
             return;
           }
 
@@ -1049,6 +1061,12 @@ export default {
           // 文件格式不支持，清空文件并提示用户
           this.deleteFile();
           this.$message.error("上传文件仅支持docx格式！");
+        } else if (response.code === 10001) {
+          // 无法解析上传文件的总字符数，清空文件并提示用户
+          this.deleteFile();
+          this.$message.error(
+            response.message || "无法解析上传文件的总字符数！"
+          );
         } else {
           console.error("获取预估价格失败:", response.message);
           this.predictPrice = null;
