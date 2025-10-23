@@ -67,7 +67,7 @@
               <img :src="imgData.image_url" alt="" />
             </div>
             <div class="popupBottom">
-              <p>添加客服微信 <span class="red">免费</span> 领礼包</p>
+              <p>添加客服微信 <span class="red">免费</span> 领开题报告生成卷</p>
             </div>
           </div>
         </div>
