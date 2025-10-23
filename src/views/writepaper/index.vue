@@ -401,6 +401,7 @@ export default {
       console.log("ddd", to.query.key1);
       let data = {
         key: to.query.key1,
+        type: 1,
       };
       outlineStatus(data)
         .then((res) => {
@@ -446,6 +447,7 @@ export default {
     if (to.query.key1) {
       let data = {
         key: to.query.key1,
+        type: 1,
       };
       outlineStatus(data).then((res) => {
         this.showOutLine(res.result.outline.outline);

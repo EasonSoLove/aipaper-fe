@@ -1029,7 +1029,7 @@ export default {
               this.$store.dispatch("app/setRequestForm", this.requestForm);
               this.requestKey = res.result.key;
               // this.requestKey = "eb3a2422-301c-47ba-be1f-7c334e15c655";
-              polling({ key: this.requestKey }, 5000)
+              polling({ key: this.requestKey, type: 3 }, 5000)
                 .then((res) => {
                   this.$log("ddddd", res);
                   if (res == "生成失败") {
