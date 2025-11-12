@@ -59,6 +59,11 @@
           </div>
         </div>
       </div>
+      <div class="logoL phoneLLogo">
+        <!-- <p>万象学术</p> -->
+        <!-- <img :src="logo" alt="" title="logo" /> -->
+        <p>万象写作</p>
+      </div>
       <!-- 风投轮播 -->
       <div class="carouselBox" v-if="shouldShowCarousel">
         <div class="carouselCon">
