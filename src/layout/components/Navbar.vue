@@ -59,11 +59,7 @@
           </div>
         </div>
       </div>
-      <div class="logoL phoneLLogo">
-        <!-- <p>万象学术</p> -->
-        <!-- <img :src="logo" alt="" title="logo" /> -->
-        <p>万象写作</p>
-      </div>
+
       <!-- 风投轮播 -->
       <div class="carouselBox" v-if="shouldShowCarousel">
         <div class="carouselCon">
@@ -446,10 +442,10 @@ export default {
     );
     this.routerList = arr.children;
     // console.log('loca', sessionStorage.getItem('firstTag'))
-    let firstTag = sessionStorage.getItem("firstTag");
-    if (firstTag != "1") {
-      this.showGift();
-    }
+    // let firstTag = sessionStorage.getItem("firstTag");
+    // if (firstTag != "1") {
+    this.showGift();
+    // }
   },
 
   methods: {
@@ -1057,8 +1053,11 @@ export default {
   display: flex;
   align-items: center;
   background: #fff;
-  height: 60px;
-  width: 280px;
+  height: 80px;
+  width: 100%;
+  margin-top: -10px;
+  border-radius: 8px;
+  overflow: hidden;
   padding-left: 10px;
   padding-right: 10px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -1077,12 +1076,14 @@ export default {
   align-items: center;
   justify-content: center;
   background-color: #f7f7f7;
+  border-radius: 8px;
+  overflow: hidden;
   .carouselCon {
-    width: 276px;
+    width: 400px;
   }
 }
 .homeSwiper {
-  width: 280px;
+  width: 400px;
   height: 40px;
   img {
     width: 100%;
