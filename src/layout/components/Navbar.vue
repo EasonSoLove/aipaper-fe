@@ -441,11 +441,10 @@ export default {
       (obj) => obj.name == "main" && obj.meta.id == "5"
     );
     this.routerList = arr.children;
-    // console.log('loca', sessionStorage.getItem('firstTag'))
-    // let firstTag = sessionStorage.getItem("firstTag");
-    // if (firstTag != "1") {
-    this.showGift();
-    // }
+    // 每次 mounted 都展示弹窗，但如果页面路由是 /distribution 就别展示弹窗
+    if (this.$route.path !== "/distribution") {
+      this.showGift();
+    }
   },
 
   methods: {
