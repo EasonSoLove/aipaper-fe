@@ -95,6 +95,8 @@ import TextareaAutosize from "vue-textarea-autosize";
 import orderTypeMixin from "@/mixins/orderTypeMixin";
 Vue.mixin(orderTypeMixin);
 Vue.use(TextareaAutosize);
+import { initStructuredData } from "@/utils/seo";
+
 new Vue({
   el: "#app",
   router,
@@ -103,5 +105,9 @@ new Vue({
   render: (h) => h(App),
   beforeCreate() {
     this.$setMinWindowWidth(); // 在 Vue 实例创建前设置窗口大小限制
+  },
+  mounted() {
+    // 初始化结构化数据
+    initStructuredData();
   },
 });

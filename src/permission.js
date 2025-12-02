@@ -9,27 +9,11 @@ import getPageTitle from "@/utils/get-page-title";
 import { getDomain } from "@/utils/index.js";
 import { login } from "./api/user";
 import eventBus from "@/utils/eventBus";
+import { updateSEO, updateStructuredData, pushToBaidu } from "@/utils/seo";
 
 NProgress.configure({
   showSpinner: false,
 }); // NProgress Configuration
-
-// 更新 canonical 标签的函数
-function updateCanonicalTag(path) {
-  // 获取当前页面的完整URL（保留hash，移除查询参数）
-  const baseUrl = window.location.origin;
-  const cleanPath = path.split('?')[0]; // 只移除查询参数，保留hash
-  const canonicalUrl = baseUrl + (cleanPath.startsWith('/') ? '' : '/') + cleanPath;
-  
-  // 查找或创建 canonical 标签
-  let canonicalLink = document.querySelector('link[rel="canonical"]');
-  if (!canonicalLink) {
-    canonicalLink = document.createElement('link');
-    canonicalLink.setAttribute('rel', 'canonical');
-    document.head.appendChild(canonicalLink);
-  }
-  canonicalLink.setAttribute('href', canonicalUrl);
-}
 
 const whiteList = [
   "/login",
@@ -86,11 +70,17 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // set page title
-  document.title = getPageTitle(to.meta.title);
+  // 更新 SEO 信息（title, meta, og tags, canonical等）
+  updateSEO(to);
   
-  // 更新 canonical 标签
-  updateCanonicalTag(to.fullPath);
+  // 更新结构化数据
+  updateStructuredData(to);
+  
+  // 百度自动推送（仅在生产环境，且只在首次访问时初始化）
+  if (process.env.NODE_ENV === 'production' && !from.name) {
+    // 只在首次访问时初始化百度推送（from.name 为空表示首次访问）
+    pushToBaidu();
+  }
   
   Ming(loginId, "loginId3");
 

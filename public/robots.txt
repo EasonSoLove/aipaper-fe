@@ -4,6 +4,18 @@
 User-agent: *
 Allow: /
 
+# 针对百度的特殊配置
+User-agent: Baiduspider
+Allow: /
+
+# 针对搜狗的配置
+User-agent: Sogou web spider
+Allow: /
+
+# 针对Bing的配置
+User-agent: bingbot
+Allow: /
+
 # 禁止抓取管理后台和API接口
 Disallow: /user/
 Disallow: /api/
