@@ -14,6 +14,23 @@ NProgress.configure({
   showSpinner: false,
 }); // NProgress Configuration
 
+// 更新 canonical 标签的函数
+function updateCanonicalTag(path) {
+  // 获取当前页面的完整URL（保留hash，移除查询参数）
+  const baseUrl = window.location.origin;
+  const cleanPath = path.split('?')[0]; // 只移除查询参数，保留hash
+  const canonicalUrl = baseUrl + (cleanPath.startsWith('/') ? '' : '/') + cleanPath;
+  
+  // 查找或创建 canonical 标签
+  let canonicalLink = document.querySelector('link[rel="canonical"]');
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link');
+    canonicalLink.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonicalLink);
+  }
+  canonicalLink.setAttribute('href', canonicalUrl);
+}
+
 const whiteList = [
   "/login",
   "/toPromotion",
@@ -71,6 +88,10 @@ router.beforeEach(async (to, from, next) => {
 
   // set page title
   document.title = getPageTitle(to.meta.title);
+  
+  // 更新 canonical 标签
+  updateCanonicalTag(to.fullPath);
+  
   Ming(loginId, "loginId3");
 
   // determine whether the user has logged in
