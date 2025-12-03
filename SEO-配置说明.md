@@ -36,7 +36,7 @@
 // 示例：手动推送单个 URL
 fetch('https://data.zz.baidu.com/urls?site=https://mixpaper.cn&token=你的token', {
   method: 'post',
-  body: 'https://mixpaper.cn/#/main/writepaper'
+  body: 'https://mixpaper.cn/main/writepaper'
 })
 ```
 

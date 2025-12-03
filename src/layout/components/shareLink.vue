@@ -20,7 +20,7 @@
           </ul>
           <p>
             官网:
-            <a href="https://mixpaper.cn/#/home/home">https://mixpaper.cn/</a>
+            <a href="https://mixpaper.cn/home/home">https://mixpaper.cn/</a>
           </p>
         </div>
 

@@ -363,21 +363,13 @@ export default {
             sms_code: this.sms_code.trim(),
             sub_domain: getDomain(),
           };
-          let param = "inv_code";
-
-          // Log the window location to ensure it's being accessed correctly
-          Ming("Current URL:", window.location.href);
-
-          // Retrieve the hash fragment (everything after #)
-          const hash = window.location.hash;
-
-          // Check if the hash contains the query parameters
-          const regex = new RegExp(`[?&]${param}=([^&]*)`);
-          const match = hash.match(regex);
-          Ming("hash", hash);
-          Ming("match", hash);
-
-          let inv_code = match ? decodeURIComponent(match[1]) : "";
+          // 使用 history 模式，从 search 或 route query 中获取参数
+          const urlParams = new URLSearchParams(window.location.search);
+          let inv_code =
+            urlParams.get("inv_code") || this.$route.query.inv_code || "";
+          if (inv_code) {
+            inv_code = decodeURIComponent(inv_code);
+          }
           if (inv_code) {
             data.inv_code = inv_code;
           }

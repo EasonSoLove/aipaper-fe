@@ -149,7 +149,7 @@ export function initStructuredData() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/#/main/explore?q={search_term_string}`
+        urlTemplate: `${siteUrl}/main/explore?q={search_term_string}`
       },
       'query-input': 'required name=search_term_string'
     }

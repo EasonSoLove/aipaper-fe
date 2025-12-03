@@ -253,10 +253,9 @@ export default {
     // 检查是否需要弹出登录弹窗
     checkLoginRequired() {
       // 检查URL参数中是否包含 inv_code
-      // 由于使用的是 hash 路由，需要从 hash 部分解析参数
-      const hash = window.location.hash;
-      const urlParams = new URLSearchParams(hash.split("?")[1] || "");
-      const invCode = urlParams.get("inv_code");
+      // 使用 history 模式，从 search 部分解析参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const invCode = urlParams.get("inv_code") || this.$route.query.inv_code;
 
       console.log("检查登录需求:", {
         hash: hash,

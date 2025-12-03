@@ -39,7 +39,12 @@
           Please check that the URL you entered is correct, or click the button
           below to return to the homePage
         </div>
-        <a href="" class="bullshit__return-home">Back to home.</a>
+        <a
+          href="javascript:void(0)"
+          class="bullshit__return-home"
+          @click="handleReturnHome"
+          >Back to home.</a
+        >
       </div>
     </div>
   </div>
@@ -51,6 +56,11 @@ export default {
   computed: {
     message() {
       return "The webmaster said that you can not enter this page...";
+    },
+  },
+  methods: {
+    handleReturnHome() {
+      this.$router.push("/main/writepaper");
     },
   },
 };
