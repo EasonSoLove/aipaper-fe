@@ -343,6 +343,22 @@ export const constantRoutes = [
     hidden: true,
   },
   {
+    path: "/vegalite",
+    component: Layout,
+    children: [
+      {
+        path: "",
+        name: "vegalite",
+        component: () => import("@/views/vegalite/index.vue"),
+        meta: {
+          title: "VegaLite 页面",
+          icon: "dashboard",
+        },
+      },
+    ],
+    hidden: true,
+  },
+  {
     path: "/paper",
     component: Layout,
     redirect: "/paper/preview",
