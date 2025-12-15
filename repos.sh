@@ -63,6 +63,13 @@ done
 # 获取当前分支名称
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+# 检查当前分支是否是 dev 或 main，如果不是则切换到 dev
+if [[ "$CURRENT_BRANCH" != "dev" && "$CURRENT_BRANCH" != "main" ]]; then
+  echo "当前分支 '$CURRENT_BRANCH' 不是 dev 或 main，切换到 dev 分支..."
+  git checkout dev || { echo "切换到 dev 分支失败"; exit 1; }
+  CURRENT_BRANCH="dev"
+fi
+
 # 检查是否有未提交的更改
 STASHED=false
 if ! git diff-index --quiet HEAD --; then
@@ -93,17 +100,12 @@ if ! git diff-index --cached --quiet HEAD -- || ! git diff --quiet; then
   git commit -m "$MESSAGE" || { echo "提交失败"; exit 1; }
 fi
 
-# 推送更改到 origin 仓库
-for BRANCH in "${BRANCHES[@]}"; do
-  echo "向 $REMOTE_ORIGIN/$BRANCH 推送更改..."
-  git push $REMOTE_ORIGIN $CURRENT_BRANCH:$BRANCH || { echo "推送到 $REMOTE_ORIGIN/$BRANCH 失败"; exit 1; }
-done
+# 只推送当前分支（dev 或 main）到对应的远程分支
+echo "向 $REMOTE_ORIGIN/$CURRENT_BRANCH 推送更改..."
+git push $REMOTE_ORIGIN $CURRENT_BRANCH || { echo "推送到 $REMOTE_ORIGIN/$CURRENT_BRANCH 失败"; exit 1; }
 
-# 推送更改到 github 仓库
-for BRANCH in "${BRANCHES[@]}"; do
-  echo "向 $REMOTE_GITHUB/$BRANCH 推送更改..."
-  git push $REMOTE_GITHUB $CURRENT_BRANCH:$BRANCH || { echo "推送到 $REMOTE_GITHUB/$BRANCH 失败"; exit 1; }
-done
+echo "向 $REMOTE_GITHUB/$CURRENT_BRANCH 推送更改..."
+git push $REMOTE_GITHUB $CURRENT_BRANCH || { echo "推送到 $REMOTE_GITHUB/$CURRENT_BRANCH 失败"; exit 1; }
 
 # 切换到 main 分支
 echo "切换到 main 分支..."
