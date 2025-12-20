@@ -9,7 +9,7 @@ const state = {
   orderStatus: "", //支付时判断支付状态
   selector_item: {},
   formdataV2: {},
-  outlineVersion: "v1",
+  outlineVersion: "v2",
   is_reduce_aigc: true,
 };
 
