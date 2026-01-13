@@ -152,20 +152,15 @@ export function param2Obj(url) {
   return obj;
 }
 
-export function getDomain(func, wait, immediate) {
+export function getDomain() {
   const hostname = window.location.hostname;
-  if (hostname === "mixpaper.cn") {
-    sub_domain = "www";
-  }
-
   let sub_domain = hostname.replace(".mixpaper.cn", "");
-  if (sub_domain == "localhost" || sub_domain == "mixpaper.cn") {
+
+  // localhost、mixpaper.cn 或空字符串都返回 "www"
+  if (sub_domain === "localhost" || sub_domain === "mixpaper.cn" || sub_domain === "") {
     sub_domain = "www";
   }
 
-  if (sub_domain == "") {
-    sub_domain = "www";
-  }
   return sub_domain;
 }
 export function downloadFile(url, filename) {
