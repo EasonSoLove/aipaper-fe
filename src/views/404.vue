@@ -43,7 +43,7 @@
           href="javascript:void(0)"
           class="bullshit__return-home"
           @click="handleReturnHome"
-          >Back to home.</a
+          >Back to homePage</a
         >
       </div>
     </div>
