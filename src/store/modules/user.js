@@ -89,7 +89,7 @@ const actions = {
               手机号: data.phone,
               用户名: data.user_name,
               角色权限: data.role,
-              所属域名: data.sub_domain,
+              访问域名: data.sub_domain,
               角色: data.permission,
               最后登录时间: data.last_login_time,
             }

@@ -86,8 +86,15 @@ router.beforeEach(async (to, from, next) => {
 
   // determine whether the user has logged in
   const sub_domain = getDomain();
+  // 只在首次访问时设置域名（store 中尚未存储时）
   if (sub_domain && !store.getters.sub_domain) {
     store.dispatch("user/setSubDomain", sub_domain);
+    // 为所有用户（包括未登录用户）设置全局属性记录访问域名
+    if (window.zhuge) {
+      window.zhuge.setSuperProperty({
+        访问域名: sub_domain,
+      });
+    }
   }
 
   // 获取当前时间的十位数时间戳
@@ -153,4 +160,5 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach(() => {
   // finish progress bar
   NProgress.done();
+  // 页面访问追踪由 autoTrack + singlePage 自动处理
 });
