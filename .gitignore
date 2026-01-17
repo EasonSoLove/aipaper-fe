@@ -7,6 +7,8 @@ yarn-error.log*
 # 忽略 deploy.log 文件
 deploy.log
 
+*.zip
+dist.zip
 # 忽略所有以 deploy.log 为前缀的文件
 deploy.log*
 tests/**/coverage/

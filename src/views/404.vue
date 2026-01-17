@@ -37,13 +37,13 @@
         <div class="bullshit__headline">{{ message }}</div>
         <div class="bullshit__info">
           Please check that the URL you entered is correct, or click the button
-          below to return to the homePage
+          below to return to the homePage.
         </div>
         <a
           href="javascript:void(0)"
           class="bullshit__return-home"
           @click="handleReturnHome"
-          >Back to homePage</a
+          >Back to homePage.</a
         >
       </div>
     </div>
