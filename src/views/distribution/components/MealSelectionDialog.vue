@@ -190,7 +190,7 @@
             <div class="action-buttons">
               <el-popover placement="top" width="150" trigger="hover">
                 <div class="qywxBox">
-                  <img :src="contactService.image_url" alt="" />
+                  <img src="@/assets/images/index/kefu_right.jpg" alt="" />
                 </div>
                 <p>扫描二维码，<br />联系客服</p>
                 <button
