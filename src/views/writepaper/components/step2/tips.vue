@@ -38,7 +38,7 @@
         >
       </div>
     </div>
-    <div class="tipBox">
+    <!-- <div class="tipBox">
       <p class="tipTitle">Tips 2:</p>
       <div class="tipCon">
         <p>
@@ -47,9 +47,9 @@
           >
         </p>
       </div>
-    </div>
+    </div> -->
     <div class="tipBox">
-      <p class="tipTitle">Tips 3:</p>
+      <p class="tipTitle">Tips 2:</p>
       <div class="tipCon">
         <p><span>网站暂不支持三级目录</span>，该功能正在努力升级中...</p>
       </div>

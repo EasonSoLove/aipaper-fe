@@ -250,10 +250,10 @@
         <i class="el-icon-download"></i>
         付费下载大纲
       </p>
-      <p class="g_poin btnDefault" @click="reloadOutline">
+      <!-- <p class="g_poin btnDefault" @click="reloadOutline">
         <i class="el-icon-refresh"></i>
         大纲不满意? 重新生成
-      </p>
+      </p> -->
     </div>
     <!-- 付费项选择 -->
     <div id="reduceId"></div>
