@@ -1168,7 +1168,11 @@ export default {
       });
     },
     getList() {
-      polling({ key: this.requestForm.key || this.requestForm.key1, type: 2 })
+      polling(
+        { key: this.requestForm.key || this.requestForm.key1, type: 2 },
+        180000, // 180000毫秒 3分钟超时时间
+        5 // 5次重试,
+      )
         .then((res) => {
           if (res == "生成失败") {
             this.$message({
