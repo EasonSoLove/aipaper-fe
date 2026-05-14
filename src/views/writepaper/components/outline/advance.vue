@@ -711,7 +711,11 @@ export default {
     getPaperList(resultData) {
       this.loading = true;
 
-      let data = resultData;
+      let data = {
+        key: resultData.key,
+        search_cn_keywords: [this.formdataV2.title],
+        search_en_keywords: [],
+      };
       search_papers(data)
         .then((res) => {
           this.loading = false;
