@@ -710,7 +710,7 @@ export default {
     },
     getPaperList(resultData) {
       this.loading = true;
-
+      console.log("resultData", resultData);
       let data = {
         key: resultData.key,
         search_cn_keywords: [this.formdataV2.title],

@@ -230,6 +230,7 @@ export function search_papers(data) {
     url: baseUrl + "/api/ai-paper/step_outline/search_papers",
     method: "post",
     data,
+    timeout: 300000, // 文献检索后端耗时较长，单独放宽到 5 分钟
   });
 }
 export function save_extra_requirements(data) {
